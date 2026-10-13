@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+:root{--font-body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;--font-mono:'DM Mono',ui-monospace,'Consolas',monospace;--color-bg:#FFFFFF;--color-surface:#F1F5F9;--color-text:#1E293B;--color-accent:#2563EB;--slate-50:#F8FAFC;--slate-100:#F1F5F9;--slate-200:#E2E8F0;--slate-300:#CBD5E1;--slate-400:#94A3B8;--slate-500:#64748B;--slate-600:#475569;--slate-700:#334155;--blue-50:#EFF6FF;--blue-100:#DBEAFE;--blue-500:#3B82F6;--blue-600:#2563EB;--blue-700:#1D4ED8;--green-50:#ECFDF5;--amber-50:#FFFBEB;--red-50:#FEF2F2;--card:#FFFFFF;--card-shadow:0 1px 2px rgba(15,23,42,.06)}
+:root[data-tema="escuro"]{--color-bg:#0F172A;--color-surface:#0B1220;--color-text:#E7EDF5;--card:#141E33;--slate-50:#1A2439;--slate-100:#24314B;--slate-200:#31405C;--slate-300:#48587A;--slate-400:#9AA8BD;--slate-500:#B4C0D2;--slate-600:#D2DBE7;--slate-700:#E7EDF5;--blue-50:#1B2B54;--blue-100:#23386B;--blue-500:#5B93F8;--blue-600:#5B93F8;--blue-700:#93B8FB;--green-50:#12301F;--amber-50:#2E2410;--red-50:#331A1A;--card-shadow:0 1px 2px rgba(0,0,0,.4)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--color-surface);color:var(--color-text);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
+select,input,textarea,option{color:var(--color-text);background:var(--card)}
+button{color:inherit;font-family:var(--font-body)}
+h1,h2,h3,h4{font-weight:800;letter-spacing:-0.01em}
+a{color:var(--color-accent)}a:hover{color:var(--blue-700)}
+:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
+*{scrollbar-width:thin;scrollbar-color:var(--slate-500) transparent}
+@media print{:root[data-tema="escuro"]{--card:#fff;--color-text:#1E293B;--slate-50:#F8FAFC;--slate-100:#F1F5F9;--slate-200:#E2E8F0;--slate-300:#CBD5E1;--slate-400:#94A3B8;--slate-500:#64748B;--slate-600:#475569;--slate-700:#334155;--blue-600:#2563EB;--blue-700:#1D4ED8;--red-50:#FEF2F2;--amber-50:#FFFBEB;--green-50:#ECFDF5}[data-noprint]{display:none!important}[data-root],[data-scroll]{height:auto!important;overflow:visible!important;display:block!important}html,body{height:auto;background:var(--card)}[data-sheet]{box-shadow:none!important;border:0!important;border-radius:0!important;margin:0!important;max-width:none!important;padding:0!important}[data-docwrap]{padding:0!important}@page{size:A4;margin:14mm}}
+</style>
+<script src="data/cofre.js"></script>
+</helmet>
+<div data-root="1" style="display:flex;height:100vh;overflow:hidden;background:var(--color-surface);color:var(--color-text);font-family:var(--font-body)">
+  <aside data-noprint="1" style="width:236px;flex-shrink:0;background:var(--card);border-right:1px solid var(--slate-200);display:flex;flex-direction:column">
+    <div onClick="{{ goHome }}" style="padding:20px;border-bottom:1px solid var(--slate-100);display:flex;align-items:center;gap:11px;cursor:pointer">
+      <img src="assets/logo-gadens.png" alt="Grupo Gadens" style="width:40px;height:auto;flex-shrink:0;display:block">
+      <div>
+        <div style="font-weight:900;font-size:12px;line-height:1.1">Grupo Gadens</div>
+        <div style="font-size:9px;color:var(--slate-400);margin-top:3px;line-height:1.25">Termo de Abertura de Projeto</div>
+      </div>
+    </div>
+    <nav style="flex:1;display:flex;flex-direction:column;gap:2px;padding:14px 12px;overflow-y:auto">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="3">
+        <div>
+          <sc-if value="{{ n.isHead }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:var(--slate-400);padding:16px 13px 6px;line-height:1.3">{{ n.label }}</div>
+          </sc-if>
+          <sc-if value="{{ n.isActive }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ n.go }}" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:10px 13px;border:0;border-radius:12px;cursor:pointer;font-family:var(--font-body);font-size:12.5px;font-weight:800;background:var(--blue-50);color:var(--blue-700)">
+              <sc-if value="{{ n.hasNum }}"><span style="font-family:var(--font-mono);font-size:10px;opacity:.7">{{ n.num }}</span></sc-if>
+              <span>{{ n.label }}</span>
+              <sc-if value="{{ n.hasMark }}"><span style="font-family:var(--font-mono);font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;margin-left:auto;white-space:nowrap;background:var(--card);color:var(--blue-700)">{{ n.mark }}</span></sc-if>
+            </button>
+          </sc-if>
+          <sc-if value="{{ n.isIdle }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ n.go }}" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:10px 13px;border:0;border-radius:12px;cursor:pointer;font-family:var(--font-body);font-size:12.5px;font-weight:600;background:transparent;color:var(--slate-500)" style-hover="background:var(--slate-50)">
+              <sc-if value="{{ n.hasNum }}"><span style="font-family:var(--font-mono);font-size:10px;color:var(--slate-400)">{{ n.num }}</span></sc-if>
+              <span>{{ n.label }}</span>
+              <sc-if value="{{ n.hasMark }}"><span style="font-family:var(--font-mono);font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;margin-left:auto;white-space:nowrap;background:var(--slate-100);color:var(--slate-500)">{{ n.mark }}</span></sc-if>
+            </button>
+          </sc-if>
+        </div>
+      </sc-for>
+    </nav>
+    <div style="padding:14px 12px;border-top:1px solid var(--slate-100);display:flex;flex-direction:column;gap:8px">
+      <span style="font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:var(--slate-400);padding:0 4px">Tema</span>
+      <div style="display:flex;gap:4px;background:var(--slate-100);border-radius:11px;padding:4px">
+        <sc-for list="{{ temaOpts }}" as="o" hint-placeholder-count="2">
+          <sc-if value="{{ o.on }}"><button onClick="{{ o.go }}" style="flex:1;padding:7px 10px;border:0;border-radius:8px;cursor:pointer;font-family:var(--font-body);font-weight:700;font-size:11.5px;background:var(--card);color:var(--slate-700);box-shadow:0 1px 2px rgba(15,23,42,.12)">{{ o.label }}</button></sc-if>
+          <sc-if value="{{ o.off }}"><button onClick="{{ o.go }}" style="flex:1;padding:7px 10px;border:0;border-radius:8px;cursor:pointer;font-family:var(--font-body);font-weight:700;font-size:11.5px;background:transparent;color:var(--slate-500)">{{ o.label }}</button></sc-if>
+        </sc-for>
+      </div>
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid var(--slate-100);display:flex;justify-content:space-between;gap:8px;font-size:10px;color:var(--slate-400)">
+      <span>{{ totTaps }}</span>
+      <span style="font-family:var(--font-mono)">v1.1</span>
+    </div>
+  </aside>
+  <main data-scroll="1" style="flex:1;min-width:0;overflow-y:auto">
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:26px 28px 64px;max-width:1280px;width:100%;display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+        <div style="flex:1;min-width:260px">
+          <h1 style="margin:0;font-size:26px;font-weight:800">Termo de Abertura de Projeto (TAP)</h1>
+          <p style="margin:4px 0 0;font-size:14px;color:var(--slate-400)">{{ crumb }}</p>
+        </div>
+        <input value="{{ q }}" onChange="{{ onQ }}" placeholder="Buscar por nome, sigla ou cidade" style="border-radius:10px;width:280px;padding:10px 12px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:14px;outline:none">
+        <button onClick="{{ newEmp }}" style="border-radius:10px;padding:11px 20px;background:var(--blue-600);color:#fff;border:0;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:var(--blue-700)">+ Novo TAP</button>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);overflow-x:auto">
+        <div style="display:grid;grid-template-columns:72px minmax(160px,2fr) minmax(110px,1fr) 70px 90px minmax(120px,1fr) 80px;min-width:760px;gap:16px;padding:12px 20px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400);border-bottom:1px solid var(--slate-200)">
+          <span>Sigla</span><span>Empreendimento</span><span>Cidade</span><span>Revisão</span><span>Emitida em</span><span>Elaborado por</span><span></span>
+        </div>
+        <sc-for list="{{ emps }}" as="e" hint-placeholder-count="3">
+          <div onClick="{{ e.open }}" style="display:grid;grid-template-columns:72px minmax(160px,2fr) minmax(110px,1fr) 70px 90px minmax(120px,1fr) 80px;min-width:760px;gap:16px;padding:16px 20px;font-size:14px;border-bottom:1px solid var(--slate-100);cursor:pointer;align-items:center" style-hover="background:var(--slate-50)">
+            <span style="font-family:var(--font-mono);font-weight:500;color:var(--blue-700)">{{ e.sigla }}</span>
+            <span style="font-weight:600">{{ e.nome }}</span>
+            <span style="color:var(--slate-500)">{{ e.cidade }}</span>
+            <span style="font-weight:600">{{ e.rev }}</span>
+            <span style="color:var(--slate-500)">{{ e.date }}</span>
+            <span style="color:var(--slate-500)">{{ e.autor }}</span>
+            <span style="display:flex;justify-content:flex-end">
+              <sc-if value="{{ e.hasDraft }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;background:var(--blue-50);color:var(--blue-700);font-weight:600">Rascunho</span></sc-if>
+            </span>
+          </div>
+        </sc-for>
+        <sc-if value="{{ noEmps }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:40px 20px;text-align:center;color:var(--slate-500);font-size:14px">Nenhum empreendimento encontrado.</div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isEmp }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:26px 28px 64px;max-width:1280px;width:100%;display:flex;flex-direction:column;gap:22px">
+            <div style="display:flex;gap:24px;align-items:flex-end;flex-wrap:wrap">
+        <div style="flex:1;min-width:280px">
+          <div style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--blue-600)">{{ empV.codigo }}</div>
+          <h1 style="margin:6px 0 4px;font-size:26px;font-weight:800">{{ empV.nome }}</h1>
+          <div style="font-size:14px;color:var(--slate-500)">{{ empV.meta }}</div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <sc-if value="{{ empV.hasLast }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ empV.viewLast }}" style="border-radius:10px;padding:11px 18px;background:transparent;color:var(--color-text);border:1px solid var(--slate-200);font-family:inherit;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:var(--slate-50)">Documento vigente ({{ empV.lastRev }})</button>
+          </sc-if>
+          <button onClick="{{ empV.edit }}" style="border-radius:10px;padding:11px 20px;background:var(--blue-600);color:#fff;border:0;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:var(--blue-700)">{{ empV.editLabel }}</button>
+        </div>
+      </div>
+      <section style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden">
+        <div style="padding:16px 20px;display:flex;align-items:baseline;gap:12px;border-bottom:1px solid var(--slate-200)">
+          <h2 style="margin:0;font-size:18px;font-weight:800">Controle de revisões</h2>
+          <span style="font-size:13px;color:var(--slate-500)">A revisão mais recente é o documento vigente.</span>
+        </div>
+        <sc-for list="{{ empV.revs }}" as="r" hint-placeholder-count="2">
+          <div style="border-bottom:1px solid var(--slate-100)">
+            <div style="display:grid;grid-template-columns:90px 110px minmax(0,1fr) minmax(0,2fr) auto;gap:16px;padding:16px 20px;align-items:center;font-size:14px">
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <span style="font-weight:800;font-size:16px">{{ r.revL }}</span>
+                <sc-if value="{{ r.isLast }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--blue-600);padding:2px 6px;align-self:flex-start">Vigente</span></sc-if>
+              </div>
+              <span style="color:var(--slate-500)">{{ r.date }}</span>
+              <span>{{ r.autor }}</span>
+              <span style="color:var(--slate-600);text-wrap:pretty">{{ r.motivo }}</span>
+              <div style="display:flex;gap:8px;justify-content:flex-end">
+                <sc-if value="{{ r.hasDiff }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ r.toggle }}" style="border-radius:10px;padding:7px 12px;background:var(--color-surface);border:0;font-family:inherit;font-size:13px;cursor:pointer" style-hover="background:var(--slate-100)">{{ r.diffLabel }}</button>
+                </sc-if>
+                <button onClick="{{ r.view }}" style="border-radius:10px;padding:7px 12px;background:transparent;border:1px solid var(--slate-200);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:var(--slate-50)">Documento</button>
+              </div>
+            </div>
+            <sc-if value="{{ r.open }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0 20px 20px 126px;display:flex;flex-direction:column;gap:2px">
+                <sc-for list="{{ r.diff }}" as="c" hint-placeholder-count="3">
+                  <div style="display:grid;grid-template-columns:84px minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);gap:12px;padding:8px 12px;background:var(--slate-50);font-size:13px">
+                    <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--blue-700)">{{ c.kind }}</span>
+                    <span style="font-weight:600">{{ c.l }}</span>
+                    <span style="color:var(--slate-400);text-decoration:line-through">{{ c.a }}</span>
+                    <span>{{ c.b }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{ empV.noRevs }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:32px 20px;color:var(--slate-500);font-size:14px">Nenhuma revisão emitida. Finalize o rascunho para emitir a Rev. 00.</div>
+        </sc-if>
+      </section>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ false }}">
+    <div>
+
+      <div style="padding:26px 28px 96px;display:flex;flex-direction:column;gap:22px;max-width:1280px;width:100%">
+        <div>
+          <div style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--blue-600)">Etapa {{ cur.n }} de {{ cur.tot }} · {{ ed.revLabel }}</div>
+          <h1 style="margin:6px 0 6px;font-size:26px;font-weight:800">{{ cur.t }}</h1>
+          <p style="margin:0;font-size:15px;color:var(--slate-500);max-width:720px;text-wrap:pretty">{{ cur.d }}</p>
+        </div>
+
+        <sc-if value="{{ isFields }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px 20px;background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);padding:28px">
+            <sc-for list="{{ fields }}" as="f" hint-placeholder-count="8">
+              <label style="display:flex;flex-direction:column;gap:6px;grid-column:{{ f.span }}">
+                <span style="font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--slate-600)">{{ f.l }}</span>
+                <sc-if value="{{ f.isInput }}" hint-placeholder-val="{{ true }}">
+                  <input type="{{ f.type }}" value="{{ f.v }}" onChange="{{ f.on }}" placeholder="{{ f.ph }}" style="border-radius:10px;width:100%;padding:10px 12px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:14px;color:var(--color-text);outline:none" style-focus="border-color:var(--color-text)">
+                </sc-if>
+                <sc-if value="{{ f.isSel }}" hint-placeholder-val="{{ false }}">
+                  <select value="{{ f.v }}" onChange="{{ f.on }}" style="border-radius:10px;width:100%;padding:10px 12px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:14px;color:var(--color-text);outline:none">
+                    <option value="">Selecione…</option>
+                    <sc-for list="{{ f.opts }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for>
+                  </select>
+                </sc-if>
+                <sc-if value="{{ f.isArea }}" hint-placeholder-val="{{ false }}">
+                  <textarea value="{{ f.v }}" onChange="{{ f.on }}" placeholder="{{ f.ph }}" rows="4" style="border-radius:10px;width:100%;padding:10px 12px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:14px;line-height:1.5;color:var(--color-text);outline:none;resize:vertical" style-focus="border-color:var(--color-text)"></textarea>
+                </sc-if>
+              </label>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isObj }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);padding:22px 26px;display:flex;flex-direction:column;gap:8px;border-left:4px solid var(--blue-600)">
+              <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Objetivo do projeto · gerado automaticamente</span>
+              <p style="margin:0;font-size:17px;font-weight:600;line-height:1.5;text-wrap:pretty">{{ objTxt }}</p>
+              <span style="font-size:12px;color:var(--slate-400)">Campos vêm de Produto: unidade de negócio, torres, pavimentos, unidades e data de lançamento.</span>
+            </div>
+            <sc-for list="{{ restr }}" as="r" hint-placeholder-count="2">
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);padding:20px 26px;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                  <span style="flex:1;font-size:15px;font-weight:700">{{ r.l }}</span>
+                  <div style="display:flex;gap:4px;background:var(--slate-100);border-radius:11px;padding:4px">
+                    <sc-if value="{{ r.sim }}"><button style="padding:7px 18px;border:0;border-radius:8px;background:var(--card);font-weight:800;font-size:12.5px;color:var(--blue-700);box-shadow:0 1px 2px rgba(15,23,42,.12)">Sim</button></sc-if>
+                    <sc-if value="{{ r.simOff }}"><button onClick="{{ r.setSim }}" style="padding:7px 18px;border:0;border-radius:8px;background:transparent;font-weight:700;font-size:12.5px;color:var(--slate-500);cursor:pointer">Sim</button></sc-if>
+                    <sc-if value="{{ r.nao }}"><button style="padding:7px 18px;border:0;border-radius:8px;background:var(--card);font-weight:800;font-size:12.5px;color:var(--slate-700);box-shadow:0 1px 2px rgba(15,23,42,.12)">Não</button></sc-if>
+                    <sc-if value="{{ r.naoOff }}"><button onClick="{{ r.setNao }}" style="padding:7px 18px;border:0;border-radius:8px;background:transparent;font-weight:700;font-size:12.5px;color:var(--slate-500);cursor:pointer">Não</button></sc-if>
+                  </div>
+                </div>
+                <sc-if value="{{ r.sim }}"><textarea value="{{ r.txt }}" onChange="{{ r.onTxt }}" rows="3" placeholder="Descrição" style="border-radius:10px;width:100%;padding:10px 12px;border:1px solid var(--slate-200);font-size:14px;line-height:1.5;outline:none;resize:vertical"></textarea></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isMarcos }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);padding:12px 28px 24px;display:flex;flex-direction:column">
+            <sc-for list="{{ marcos }}" as="m" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:44px minmax(0,1fr) 180px 36px;gap:12px;padding:10px 0;border-bottom:1px solid var(--slate-100);align-items:center">
+                <span style="font-family:var(--font-mono);font-size:11px;font-weight:500;text-align:center;padding:3px 0;border-radius:99px;background:var(--blue-50);color:var(--blue-700)">{{ m.k }}</span>
+                <input value="{{ m.n }}" onChange="{{ m.onN }}" style="border-radius:10px;width:100%;padding:9px 0;border:0;background:transparent;font-family:inherit;font-size:15px;font-weight:500;color:var(--color-text);outline:none">
+                <input type="date" value="{{ m.d }}" onChange="{{ m.onD }}" style="border-radius:10px;width:100%;padding:9px 10px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:14px;outline:none">
+                <button onClick="{{ m.del }}" style="border-radius:10px;height:36px;border:0;background:transparent;font-size:18px;color:var(--slate-400);cursor:pointer" style-hover="color:var(--blue-600)">×</button>
+              </div>
+            </sc-for>
+            <button onClick="{{ addMarco }}" style="border-radius:10px;margin-top:16px;align-self:flex-start;padding:9px 14px;background:transparent;border:1px dashed var(--slate-400);font-family:inherit;font-size:13px;cursor:pointer">+ Adicionar marco</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isZonas }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+            <div style="flex:1 1 560px;min-width:0;display:flex;flex-direction:column;gap:14px">
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                  <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Demarcar zona</span>
+                  <span style="font-family:var(--font-mono);font-size:12px;color:var(--blue-700);background:var(--blue-50);padding:3px 8px;border-radius:99px">{{ zoneFmt }}</span>
+                  <div style="flex:1"></div>
+                  <label style="border-radius:10px;padding:8px 14px;background:var(--blue-600);color:#fff;font-weight:700;font-size:12.5px;cursor:pointer">
+                    <input type="file" accept="image/*" onChange="{{ onUpload }}" style="display:none">
+                    <span>{{ uploadLabel }}</span>
+                  </label>
+                  <sc-if value="{{ hasPlanta }}"><button onClick="{{ rmPlanta }}" style="border-radius:10px;padding:8px 12px;background:transparent;border:1px solid var(--slate-200);font-size:12.5px;cursor:pointer" style-hover="background:var(--slate-50)">Remover</button></sc-if>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ ztypes }}" as="z" hint-placeholder-count="11">
+                    <span>
+                      <sc-if value="{{ z.on }}"><button onClick="{{ z.go }}" style="display:flex;align-items:center;gap:6px;white-space:nowrap;border-radius:99px;padding:6px 12px;background:var(--color-text);color:var(--card);border:1px solid var(--color-text);font-size:12.5px;font-weight:700;cursor:pointer"><span style="width:9px;height:9px;border-radius:3px;background:{{ z.c }}"></span>{{ z.n }}</button></sc-if>
+                      <sc-if value="{{ z.off }}"><button onClick="{{ z.go }}" style="display:flex;align-items:center;gap:6px;white-space:nowrap;border-radius:99px;padding:6px 12px;background:var(--card);color:var(--slate-600);border:1px solid var(--slate-200);font-size:12.5px;font-weight:600;cursor:pointer" style-hover="border-color:var(--slate-400)"><span style="width:9px;height:9px;border-radius:3px;background:{{ z.c }}"></span>+ {{ z.n }}</button></sc-if>
+                    </span>
+                  </sc-for>
+                  <sc-if value="{{ ntClosed }}" hint-placeholder-val="{{ true }}"><button onClick="{{ ntStart }}" style="white-space:nowrap;border-radius:99px;padding:6px 12px;background:transparent;color:var(--blue-700);border:1px dashed var(--blue-500);font-size:12.5px;font-weight:700;cursor:pointer" style-hover="background:var(--blue-50)">+ Nova zona</button></sc-if>
+                </div>
+                <sc-if value="{{ ntOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:12px;background:var(--slate-50);border:1px solid var(--slate-200)">
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+                      <label style="flex:1 1 200px;display:flex;flex-direction:column;gap:5px"><span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Nome do tipo de zona</span>
+                        <input value="{{ nt.n }}" onChange="{{ nt.onN }}" placeholder="Ex.: Estacionamento externo" style="border-radius:10px;padding:8px 10px;border:1px solid var(--slate-200);font-size:13px;outline:none"></label>
+                      <label style="width:90px;display:flex;flex-direction:column;gap:5px"><span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Sigla</span>
+                        <input value="{{ nt.k }}" onChange="{{ nt.onK }}" placeholder="{{ nt.kPh }}" style="border-radius:10px;padding:8px 10px;border:1px solid var(--slate-200);font-family:var(--font-mono);font-size:13px;outline:none"></label>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Cor</span>
+                      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                        <sc-for list="{{ nt.sw }}" as="w"><span>
+                          <sc-if value="{{ w.on }}"><button onClick="{{ w.go }}" style="width:26px;height:26px;border-radius:8px;background:{{ w.c }};border:3px solid var(--card);box-shadow:0 0 0 2px {{ w.c }};cursor:pointer"></button></sc-if>
+                          <sc-if value="{{ w.off }}"><button onClick="{{ w.go }}" style="width:26px;height:26px;border-radius:8px;background:{{ w.c }};border:0;cursor:pointer"></button></sc-if>
+                        </span></sc-for>
+                        <input type="color" value="{{ nt.c }}" onChange="{{ nt.onC }}" title="Outra cor" style="width:34px;height:28px;padding:0;border:1px solid var(--slate-200);border-radius:8px;background:transparent;cursor:pointer">
+                      </div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <sc-if value="{{ nt.ok }}"><button onClick="{{ nt.save }}" style="border-radius:10px;padding:8px 14px;background:var(--blue-600);color:#fff;border:0;font-size:12.5px;font-weight:700;cursor:pointer">Criar e demarcar</button></sc-if>
+                      <button onClick="{{ nt.cancel }}" style="border-radius:10px;padding:8px 12px;background:transparent;border:1px solid var(--slate-200);font-size:12.5px;cursor:pointer">Cancelar</button>
+                      <sc-if value="{{ nt.hasErr }}"><span style="font-size:12px;color:var(--slate-500)">{{ nt.err }}</span></sc-if>
+                    </div>
+                  </div>
+                </sc-if>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                  <div style="display:flex;gap:4px;background:var(--slate-100);border-radius:11px;padding:4px">
+                    <sc-for list="{{ tools }}" as="o" hint-placeholder-count="2">
+                      <sc-if value="{{ o.on }}"><button onClick="{{ o.go }}" style="padding:6px 14px;border:0;border-radius:8px;background:var(--card);font-weight:800;font-size:12px;color:var(--blue-700);box-shadow:0 1px 2px rgba(15,23,42,.12);cursor:pointer">{{ o.l }}</button></sc-if>
+                      <sc-if value="{{ o.off }}"><button onClick="{{ o.go }}" style="padding:6px 14px;border:0;border-radius:8px;background:transparent;font-weight:700;font-size:12px;color:var(--slate-500);cursor:pointer">{{ o.l }}</button></sc-if>
+                    </sc-for>
+                  </div>
+                  <sc-if value="{{ orthoOn }}"><button onClick="{{ togOrtho }}" title="Ajusta linhas a 0°/90° e perpendicular ao segmento anterior. Segure Alt para desligar." style="white-space:nowrap;border-radius:99px;padding:6px 12px;background:#ECFDF5;color:#047857;border:1px solid #10B981;font-size:12px;font-weight:800;cursor:pointer">⊾ Ortogonal ligado</button></sc-if>
+                  <sc-if value="{{ orthoOff }}"><button onClick="{{ togOrtho }}" style="white-space:nowrap;border-radius:99px;padding:6px 12px;background:transparent;color:var(--slate-500);border:1px solid var(--slate-200);font-size:12px;font-weight:700;cursor:pointer">⊾ Ortogonal desligado</button></sc-if>
+                  <div style="display:flex;align-items:center;gap:2px;background:var(--slate-100);border-radius:11px;padding:3px;margin-left:auto">
+                    <button onClick="{{ zOut }}" title="Diminuir zoom" style="width:30px;height:28px;border:0;border-radius:8px;background:transparent;font-size:16px;font-weight:800;cursor:pointer" style-hover="background:var(--card)">−</button>
+                    <button onClick="{{ zFit }}" title="Ajustar à tela" style="min-width:52px;height:28px;border:0;border-radius:8px;background:transparent;font-family:var(--font-mono);font-size:11.5px;cursor:pointer" style-hover="background:var(--card)">{{ zoomL }}</button>
+                    <button onClick="{{ zIn }}" title="Aumentar zoom" style="width:30px;height:28px;border:0;border-radius:8px;background:transparent;font-size:16px;font-weight:800;cursor:pointer" style-hover="background:var(--card)">+</button>
+                  </div>
+                </div>
+                <div style="display:flex">
+                  <span style="flex:1;min-width:200px;font-size:12.5px;color:var(--slate-500)">{{ drawHint }} · Ctrl + roda do mouse para zoom.</span>
+                </div>
+              </div>
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);padding:10px;overflow:hidden">
+                <div ref="{{ scrollRef }}" style="overflow:auto;max-height:72vh;border-radius:10px">
+                <div ref="{{ planRef }}" onMouseDown="{{ planDown }}" onMouseMove="{{ planMove }}" onMouseUp="{{ planUp }}" onMouseLeave="{{ planUp }}" onDoubleClick="{{ planDbl }}" style="position:relative;width:{{ zoomW }};aspect-ratio:{{ planAR }};cursor:{{ planCursor }};user-select:none;overflow:hidden;background-color:var(--slate-50);background-image:linear-gradient(var(--slate-200) 1px,transparent 1px),linear-gradient(90deg,var(--slate-200) 1px,transparent 1px);background-size:32px 32px">
+                  <sc-if value="{{ hasPlanta }}" hint-placeholder-val="{{ false }}">{{ plantaImg }}</sc-if>
+                  <sc-if value="{{ noPlanta }}"><div style="position:absolute;left:16px;bottom:14px;font-size:12px;color:var(--slate-400);pointer-events:none">Sem implantação enviada · envie a planta (JPG/PNG) para demarcar sobre ela</div></sc-if>
+                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none">
+                    <sc-for list="{{ zonesP }}" as="z">
+                      <polygon points="{{ z.pts }}" fill="{{ z.fill }}" stroke="{{ z.c }}" stroke-width="{{ z.sw }}" stroke-linejoin="round" onMouseDown="{{ z.down }}" onDoubleClick="{{ z.dbl }}" style="vector-effect:non-scaling-stroke;pointer-events:{{ z.pe }};cursor:{{ z.cur }}"></polygon>
+                    </sc-for>
+                    <sc-if value="{{ hasPoly }}"><polyline points="{{ polyV.pts }}" fill="none" stroke="{{ polyV.snapC }}" stroke-width="2" stroke-dasharray="{{ polyV.dash }}" style="vector-effect:non-scaling-stroke"></polyline></sc-if>
+                  </svg>
+                  <sc-for list="{{ zonesP }}" as="z">
+                    <span style="position:absolute;left:{{ z.l }};top:{{ z.tp }};transform:translate(3px,3px);font-family:var(--font-mono);font-size:11px;font-weight:500;padding:1px 6px;border-radius:4px;background:{{ z.c }};color:#fff;white-space:nowrap;pointer-events:none">{{ z.code }}</span>
+                  </sc-for>
+                  <sc-for list="{{ zonesP }}" as="z">
+                    <sc-for list="{{ z.handles }}" as="h">
+                      <div onMouseDown="{{ h.down }}" onContextMenu="{{ h.ctx }}" style="position:absolute;left:{{ h.l }};top:{{ h.tp }};width:12px;height:12px;transform:translate(-50%,-50%);border-radius:50%;background:#fff;border:2px solid {{ h.c }};cursor:grab;box-shadow:0 1px 3px rgba(15,23,42,.3)"></div>
+                    </sc-for>
+                  </sc-for>
+                  <sc-if value="{{ hasPoly }}">
+                    <sc-for list="{{ polyV.dots }}" as="p"><div style="position:absolute;left:{{ p.l }};top:{{ p.tp }};width:{{ p.sz }};height:{{ p.sz }};transform:translate(-50%,-50%);border-radius:50%;background:{{ p.c }};border:2px solid #fff;pointer-events:none"></div></sc-for>
+                  </sc-if>
+                  <sc-if value="{{ dragging }}"><div style="position:absolute;left:{{ dragBox.l }};top:{{ dragBox.tp }};width:{{ dragBox.w }};height:{{ dragBox.h }};border:2px dashed {{ dragBox.c }};background:rgba(37,99,235,.08);pointer-events:none"></div></sc-if>
+                </div>
+                </div>
+              </div>
+            </div>
+            <div style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:14px">
+              <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+                <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);border-top:4px solid {{ sel.c }};padding:18px 20px;display:flex;flex-direction:column;gap:16px">
+                  <div style="display:flex;align-items:flex-start;gap:10px">
+                    <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+                      <span style="font-family:var(--font-mono);font-size:18px;font-weight:500;color:var(--blue-700)">{{ sel.full }}</span>
+                      <input value="{{ sel.nome }}" onChange="{{ sel.onNome }}" placeholder="Nome da zona" style="width:100%;padding:4px 0;border:0;border-bottom:1px solid var(--slate-200);background:transparent;font-size:16px;font-weight:700;outline:none">
+                    </div>
+                    <button onClick="{{ sel.close }}" style="border:0;background:transparent;font-size:18px;color:var(--slate-400);cursor:pointer">×</button>
+                  </div>
+                  <div style="display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:10px">
+                    <label style="display:flex;flex-direction:column;gap:5px"><span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Tipo</span>
+                      <select value="{{ sel.tipo }}" onChange="{{ sel.onTipo }}" style="border-radius:10px;padding:8px 8px;border:1px solid var(--slate-200);font-size:13px;outline:none"><sc-for list="{{ sel.types }}" as="o"><option value="{{ o.k }}">{{ o.n }}</option></sc-for></select>
+                    </label>
+                    <label style="display:flex;flex-direction:column;gap:5px"><span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Código</span>
+                      <input value="{{ sel.code }}" onChange="{{ sel.onCode }}" style="border-radius:10px;padding:8px 10px;border:1px solid var(--slate-200);font-family:var(--font-mono);font-size:13px;outline:none">
+                    </label>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Cor da zona</span>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                      <sc-for list="{{ selSw }}" as="w"><span>
+                        <sc-if value="{{ w.on }}"><button onClick="{{ w.go }}" style="width:22px;height:22px;border-radius:6px;background:{{ w.c }};border:3px solid var(--card);box-shadow:0 0 0 2px {{ w.c }};cursor:pointer"></button></sc-if>
+                        <sc-if value="{{ w.off }}"><button onClick="{{ w.go }}" style="width:22px;height:22px;border-radius:6px;background:{{ w.c }};border:0;cursor:pointer"></button></sc-if>
+                      </span></sc-for>
+                      <input type="color" value="{{ selColor }}" onChange="{{ onSelColor }}" title="Outra cor" style="width:30px;height:24px;padding:0;border:1px solid var(--slate-200);border-radius:6px;background:transparent;cursor:pointer">
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Áreas da zona (proposta)</span>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+                      <sc-for list="{{ sel.areas }}" as="c"><span>
+                        <sc-if value="{{ c.on }}"><button onClick="{{ c.toggle }}" style="border-radius:99px;padding:5px 11px;background:var(--blue-600);color:#fff;border:1px solid var(--blue-600);font-size:12px;font-weight:600;cursor:pointer">{{ c.l }}</button></sc-if>
+                        <sc-if value="{{ c.off }}"><button onClick="{{ c.toggle }}" style="border-radius:99px;padding:5px 11px;background:var(--card);color:var(--slate-500);border:1px solid var(--slate-200);font-size:12px;cursor:pointer">{{ c.l }}</button></sc-if>
+                      </span></sc-for>
+                      <input value="{{ sel.area }}" onChange="{{ sel.onArea }}" onKeyDown="{{ sel.onAreaKey }}" placeholder="+ outra área ↵" style="border-radius:99px;width:130px;padding:5px 11px;border:1px dashed var(--slate-300);background:transparent;font-size:12px;outline:none">
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Escopo de projeto · disciplinas (proposta)</span>
+                    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">
+                      <sc-for list="{{ sel.discs }}" as="c"><span>
+                        <sc-if value="{{ c.on }}"><button onClick="{{ c.toggle }}" style="border-radius:8px;padding:4px 9px;background:var(--blue-50);color:var(--blue-700);border:1px solid var(--blue-500);font-size:11.5px;font-weight:700;cursor:pointer">{{ c.l }}</button></sc-if>
+                        <sc-if value="{{ c.off }}"><button onClick="{{ c.toggle }}" style="border-radius:8px;padding:4px 9px;background:var(--card);color:var(--slate-400);border:1px solid var(--slate-100);font-size:11.5px;cursor:pointer">{{ c.l }}</button></sc-if>
+                      </span></sc-for>
+                      <input value="{{ sel.nd }}" onChange="{{ sel.onNd }}" onKeyDown="{{ sel.onNdKey }}" placeholder="+ nova disciplina ↵" style="border-radius:8px;width:150px;padding:4px 9px;border:1px dashed var(--slate-300);background:transparent;font-size:11.5px;outline:none">
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Projetistas</span>
+                    <sc-for list="{{ sel.projs }}" as="p">
+                      <div style="display:grid;grid-template-columns:120px minmax(0,1fr);gap:8px;align-items:center">
+                        <span style="font-size:12.5px;font-weight:600">{{ p.disc }}</span>
+                        <select value="{{ p.v }}" onChange="{{ p.onSel }}" style="border-radius:8px;padding:6px 6px;border:1px solid var(--slate-200);font-size:12.5px;outline:none"><option value="">A definir</option><sc-for list="{{ p.opts }}" as="o"><option value="{{ o.id }}">{{ o.l }}</option></sc-for></select>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <textarea value="{{ sel.obs }}" onChange="{{ sel.onObs }}" rows="2" placeholder="Observações de escopo da zona" style="border-radius:10px;width:100%;padding:8px 10px;border:1px solid var(--slate-200);font-size:13px;outline:none;resize:vertical"></textarea>
+                  <button onClick="{{ sel.del }}" style="align-self:flex-start;padding:0;border:0;background:transparent;font-size:12px;color:#DC2626;cursor:pointer;text-decoration:underline">Remover zona</button>
+                </div>
+              </sc-if>
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden">
+                <div style="padding:12px 16px;border-bottom:1px solid var(--slate-100);font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Zonas demarcadas</div>
+                <sc-for list="{{ zList }}" as="z">
+                  <div onClick="{{ z.go }}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--slate-100);cursor:pointer" style-hover="background:var(--slate-50)">
+                    <span style="width:10px;height:10px;border-radius:3px;background:{{ z.c }}"></span>
+                    <span style="font-family:var(--font-mono);font-size:12px;color:var(--blue-700);width:60px">{{ z.code }}</span>
+                    <span style="flex:1;font-size:13px;font-weight:600">{{ z.nome }}</span>
+                    <span style="font-size:11px;color:var(--slate-400)">{{ z.n }} disc.</span>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ noZonas }}"><div style="padding:16px;font-size:13px;color:var(--slate-500)">Nenhuma zona demarcada.</div></sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isEquip }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <sc-if value="{{ temEletrico }}">
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);border-left:4px solid #F59E0B;overflow:hidden">
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--slate-100);flex-wrap:wrap">
+                  <span style="font-family:var(--font-mono);font-size:13px;color:var(--blue-700)">ELE</span>
+                  <span style="font-size:16px;font-weight:800;flex:1">Premissas · Elétrico</span>
+                  <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Respondidas {{ elAns }}</span>
+                </div>
+                <div style="display:flex;flex-direction:column;padding:4px 20px 10px">
+                  <sc-for list="{{ elQs }}" as="q">
+                    <div style="{{ q.rowStyle }}">
+                      <div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:220px">
+                        <span style="font-size:13px;font-weight:700">{{ q.l }}</span>
+                        <sc-if value="{{ q.hasRes }}"><span style="font-size:11.5px;color:#047857;font-weight:700">{{ q.res }}</span></sc-if>
+                      </div>
+                      <sc-if value="{{ q.hasQtd }}">
+                        <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--slate-500);font-weight:700">Quantos?
+                          <input type="number" min="1" value="{{ q.qtd }}" onChange="{{ q.onQtd }}" style="width:72px;border-radius:10px;padding:7px 8px;border:1px solid var(--slate-200);font-size:13px;outline:none;background:var(--card);color:var(--color-text)">
+                        </label>
+                      </sc-if>
+                      <div style="display:flex;gap:3px;background:var(--slate-100);border-radius:10px;padding:3px;flex-shrink:0">
+                      <sc-if value="{{ q.sim }}"><button style="padding:5px 14px;border:0;border-radius:7px;background:var(--blue-600);color:#fff;font-weight:800;font-size:12px">Sim</button></sc-if>
+                      <sc-if value="{{ q.naoSim }}"><button onClick="{{ q.setSim }}" style="padding:5px 14px;border:0;border-radius:7px;background:transparent;font-weight:700;font-size:12px;color:var(--slate-500);cursor:pointer">Sim</button></sc-if>
+                      <sc-if value="{{ q.nao }}"><button style="padding:5px 14px;border:0;border-radius:7px;background:var(--card);color:var(--slate-700);font-weight:800;font-size:12px;box-shadow:0 1px 2px rgba(15,23,42,.12)">Não</button></sc-if>
+                      <sc-if value="{{ q.simNao }}"><button onClick="{{ q.setNao }}" style="padding:5px 14px;border:0;border-radius:7px;background:transparent;font-weight:700;font-size:12px;color:var(--slate-500);cursor:pointer">Não</button></sc-if>
+                    </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ semEletrico }}"><div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);padding:16px 20px;font-size:13.5px;color:var(--slate-500)">A disciplina Elétrico não está cadastrada. Inclua-a nas zonas ou em Projetistas para responder às premissas elétricas.</div></sc-if>
+            <sc-if value="{{ noZonasEq }}"><div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);padding:16px 20px;font-size:13.5px;color:var(--slate-500)">Nenhuma zona demarcada. Demarque as zonas na etapa anterior para lançar os equipamentos por zona.</div></sc-if>
+            <sc-for list="{{ eqGroups }}" as="g" hint-placeholder-count="3">
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);border-left:4px solid {{ g.c }};overflow:hidden">
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--slate-100);flex-wrap:wrap">
+                  <span style="font-family:var(--font-mono);font-size:13px;color:var(--blue-700)">{{ g.code }}</span>
+                  <span style="font-size:16px;font-weight:800;flex:1">{{ g.nome }}</span>
+                  <sc-if value="{{ g.nAns }}"><span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Perguntas respondidas {{ g.nAns }}</span></sc-if>
+                </div>
+                <sc-if value="{{ g.nAns }}">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:0 24px;padding:6px 20px 12px;background:var(--slate-50);border-bottom:1px solid var(--slate-100)">
+                    <sc-for list="{{ g.qs }}" as="q">
+                      <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--slate-100)">
+                        <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                          <span style="font-size:13px;font-weight:700">{{ q.l }}</span>
+                          <sc-if value="{{ q.sim }}"><span style="font-size:11.5px;color:#047857;font-weight:700">{{ q.res }}</span></sc-if>
+                          <sc-if value="{{ q.hasHint }}"><span style="font-size:11px;color:var(--slate-400)">{{ q.hint }}</span></sc-if>
+                        </div>
+                        <div style="display:flex;gap:3px;background:var(--slate-100);border-radius:10px;padding:3px;flex-shrink:0">
+                        <sc-if value="{{ q.sim }}"><button style="padding:5px 14px;border:0;border-radius:7px;background:var(--blue-600);color:#fff;font-weight:800;font-size:12px">Sim</button></sc-if>
+                        <sc-if value="{{ q.naoSim }}"><button onClick="{{ q.setSim }}" style="padding:5px 14px;border:0;border-radius:7px;background:transparent;font-weight:700;font-size:12px;color:var(--slate-500);cursor:pointer">Sim</button></sc-if>
+                        <sc-if value="{{ q.nao }}"><button style="padding:5px 14px;border:0;border-radius:7px;background:var(--card);color:var(--slate-700);font-weight:800;font-size:12px;box-shadow:0 1px 2px rgba(15,23,42,.12)">Não</button></sc-if>
+                        <sc-if value="{{ q.simNao }}"><button onClick="{{ q.setNao }}" style="padding:5px 14px;border:0;border-radius:7px;background:transparent;font-weight:700;font-size:12px;color:var(--slate-500);cursor:pointer">Não</button></sc-if>
+                      </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <div style="overflow-x:auto">
+                  <sc-if value="{{ g.has }}">
+                    <div style="display:grid;grid-template-columns:minmax(150px,1fr) minmax(180px,1.5fr) 64px minmax(150px,1.2fr) 120px 32px;gap:10px;padding:10px 20px 4px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400);min-width:780px">
+                      <span>Equipamento</span><span>Descrição</span><span>Qtd</span><span>Especificação</span><span>Status</span><span></span>
+                    </div>
+                  </sc-if>
+                  <sc-for list="{{ g.items }}" as="r">
+                    <div style="display:grid;grid-template-columns:minmax(150px,1fr) minmax(180px,1.5fr) 64px minmax(150px,1.2fr) 120px 32px;gap:10px;padding:6px 20px;align-items:center;min-width:780px">
+                      <div style="display:flex;flex-direction:column;gap:2px">
+                        <input value="{{ r.cat }}" onChange="{{ r.onCat }}" placeholder="Equipamento" style="border-radius:10px;width:100%;padding:8px 10px;border:1px solid var(--slate-200);font-size:13px;outline:none;font-weight:600">
+                        <sc-if value="{{ r.isAuto }}"><span style="font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#047857">Previsão automática</span></sc-if>
+                      </div>
+                      <input value="{{ r.desc }}" onChange="{{ r.onDesc }}" placeholder="Descrição" style="border-radius:10px;width:100%;padding:8px 10px;border:1px solid var(--slate-200);font-size:13px;outline:none">
+                      <input type="number" value="{{ r.qtd }}" onChange="{{ r.onQtd }}" style="border-radius:10px;width:100%;padding:8px 10px;border:1px solid var(--slate-200);font-size:13px;outline:none;padding:8px 8px">
+                      <input value="{{ r.spec }}" onChange="{{ r.onSpec }}" placeholder="Capacidade, potência…" style="border-radius:10px;width:100%;padding:8px 10px;border:1px solid var(--slate-200);font-size:13px;outline:none">
+                      <select value="{{ r.status }}" onChange="{{ r.onStatus }}" style="border-radius:10px;width:100%;padding:8px 10px;border:1px solid var(--slate-200);font-size:13px;outline:none;padding:8px 6px;background:var(--card)"><sc-for list="{{ eqStatus }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for></select>
+                      <button onClick="{{ r.del }}" style="border:0;background:transparent;font-size:18px;color:var(--slate-400);cursor:pointer" style-hover="color:#DC2626">×</button>
+                    </div>
+                  </sc-for>
+                  <div style="padding:10px 20px 14px"><button onClick="{{ g.add }}" style="border-radius:10px;padding:7px 12px;background:transparent;border:1px dashed var(--slate-300);font-size:12.5px;font-weight:700;color:var(--blue-700);cursor:pointer" style-hover="background:var(--blue-50)">+ Equipamento nesta zona</button></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isProj }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:18px">
+          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden">
+            <div style="padding:14px 20px;border-bottom:1px solid var(--slate-100);font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Perguntas do empreendimento</div>
+            <sc-for list="{{ pqs }}" as="q" hint-placeholder-count="6">
+              <div style="display:flex;align-items:center;gap:14px;padding:11px 20px;border-bottom:1px solid var(--slate-100);flex-wrap:wrap">
+                <span style="flex:1 1 280px;font-size:13.5px;font-weight:700">{{ q.l }}</span>
+                <sc-if value="{{ q.sim }}">
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <sc-for list="{{ q.adds }}" as="a"><span>
+                      <sc-if value="{{ a.can }}"><button onClick="{{ a.add }}" style="border-radius:99px;padding:6px 12px;background:var(--blue-600);color:#fff;border:0;font-size:12px;font-weight:700;cursor:pointer" style-hover="background:var(--blue-700)">{{ a.lbl }}</button></sc-if>
+                      <sc-if value="{{ a.done }}"><span style="display:inline-block;border-radius:99px;padding:6px 12px;background:#ECFDF5;color:#047857;font-size:12px;font-weight:700">✓ {{ a.doneL }}</span></sc-if>
+                    </span></sc-for>
+                  </div>
+                </sc-if>
+                <div style="display:flex;gap:3px;background:var(--slate-100);border-radius:10px;padding:3px;flex-shrink:0">
+                        <sc-if value="{{ q.sim }}"><button style="padding:5px 14px;border:0;border-radius:7px;background:var(--blue-600);color:#fff;font-weight:800;font-size:12px">Sim</button></sc-if>
+                        <sc-if value="{{ q.naoSim }}"><button onClick="{{ q.setSim }}" style="padding:5px 14px;border:0;border-radius:7px;background:transparent;font-weight:700;font-size:12px;color:var(--slate-500);cursor:pointer">Sim</button></sc-if>
+                        <sc-if value="{{ q.nao }}"><button style="padding:5px 14px;border:0;border-radius:7px;background:var(--card);color:var(--slate-700);font-weight:800;font-size:12px;box-shadow:0 1px 2px rgba(15,23,42,.12)">Não</button></sc-if>
+                        <sc-if value="{{ q.simNao }}"><button onClick="{{ q.setNao }}" style="padding:5px 14px;border:0;border-radius:7px;background:transparent;font-weight:700;font-size:12px;color:var(--slate-500);cursor:pointer">Não</button></sc-if>
+                      </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden">
+            <div style="display:grid;grid-template-columns:170px 140px minmax(0,1.6fr) 150px;gap:16px;padding:12px 20px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400);border-bottom:1px solid var(--slate-200)">
+              <span>Disciplina</span><span>Zonas</span><span>Projetista</span><span>Contratação</span>
+            </div>
+            <sc-for list="{{ proj }}" as="p" hint-placeholder-count="10">
+              <div style="display:grid;grid-template-columns:170px 140px minmax(0,1.6fr) 150px;gap:16px;padding:10px 20px;border-bottom:1px solid var(--slate-100);align-items:center">
+                <div style="display:flex;align-items:center;gap:6px"><span style="font-size:14px;font-weight:600">{{ p.disc }}</span><sc-if value="{{ p.canRm }}"><button onClick="{{ p.rm }}" title="Remover disciplina" style="border:0;background:transparent;font-size:15px;color:var(--slate-400);cursor:pointer;padding:0 2px" style-hover="color:#DC2626">×</button></sc-if></div>
+                <span style="font-family:var(--font-mono);font-size:11.5px;color:var(--blue-700)">{{ p.zonas }}</span>
+                <div style="display:flex;gap:8px">
+                  <sc-if value="{{ p.isNew }}" hint-placeholder-val="{{ false }}">
+                    <input value="{{ p.newName }}" onChange="{{ p.onNew }}" onKeyDown="{{ p.onNewKey }}" placeholder="Nome do novo escritório" style="border-radius:10px;flex:1;padding:8px 10px;border:1px solid var(--slate-200);font-family:inherit;font-size:13px;outline:none">
+                    <button onClick="{{ p.confirm }}" style="border-radius:10px;padding:8px 12px;background:var(--blue-600);color:#fff;border:0;font-family:inherit;font-size:13px;cursor:pointer">Cadastrar</button>
+                    <button onClick="{{ p.cancel }}" style="border-radius:10px;padding:8px 10px;background:transparent;border:0;font-family:inherit;font-size:13px;color:var(--slate-500);cursor:pointer">Cancelar</button>
+                  </sc-if>
+                  <sc-if value="{{ p.notNew }}" hint-placeholder-val="{{ true }}">
+                    <select value="{{ p.v }}" onChange="{{ p.onSel }}" style="border-radius:10px;flex:1;padding:8px 8px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:13px;outline:none">
+                      <option value="">Não definido</option>
+                      <sc-for list="{{ p.opts }}" as="o"><option value="{{ o.id }}">{{ o.l }}</option></sc-for>
+                      <option value="__new">+ Cadastrar novo projetista…</option>
+                    </select>
+                  </sc-if>
+                </div>
+                <select value="{{ p.st }}" onChange="{{ p.onSt }}" style="border-radius:10px;width:100%;padding:8px 6px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:13px;outline:none">
+                  <sc-for list="{{ projStatus }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for>
+                </select>
+              </div>
+            </sc-for>
+            <div style="display:flex;gap:8px;padding:12px 20px;align-items:center">
+              <input list="projSug" value="{{ projNd }}" onChange="{{ onProjNd }}" placeholder="Cadastrar nova disciplina" style="border-radius:10px;flex:1;max-width:340px;padding:8px 10px;border:1px dashed var(--slate-300);font-size:13px;outline:none">
+              <datalist id="projSug"><sc-for list="{{ projSug }}" as="o"><option value="{{ o }}"></option></sc-for></datalist>
+              <button onClick="{{ addProjNd }}" style="border-radius:10px;padding:8px 14px;background:transparent;border:1px solid var(--slate-200);font-size:13px;font-weight:700;cursor:pointer" style-hover="background:var(--slate-50)">+ Adicionar</button>
+            </div>
+          </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isEscopo }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px">
+              <sc-for list="{{ phases }}" as="p" hint-placeholder-count="4">
+                <div>
+                  <sc-if value="{{ p.active }}"><div style="padding:14px 16px;border-radius:14px;border:1px solid var(--slate-100);background:var(--blue-600);color:#fff;display:flex;flex-direction:column;gap:2px;height:100%"><span style="font-weight:800;font-size:18px">{{ p.k }}</span><span style="font-size:12px;color:#fff;opacity:.85">{{ p.n }}</span><span style="font-size:11px;color:#fff;opacity:.7">{{ p.count }}</span></div></sc-if>
+                  <sc-if value="{{ p.idle }}"><div onClick="{{ p.go }}" style="padding:14px 16px;border-radius:14px;border:1px solid var(--slate-100);background:var(--card);display:flex;flex-direction:column;gap:2px;cursor:pointer;height:100%" style-hover="background:var(--slate-50)"><span style="font-weight:800;font-size:18px">{{ p.k }}</span><span style="font-size:12px;color:var(--slate-600)">{{ p.n }}</span><span style="font-size:11px;color:var(--slate-400)">{{ p.count }}</span></div></sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <p style="margin:0;font-size:14px;color:var(--slate-600);max-width:820px;text-wrap:pretty"><strong>Objetivo da fase:</strong> {{ ph.obj }}</p>
+            <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden">
+              <div style="display:grid;grid-template-columns:36px 170px minmax(0,1fr) minmax(0,1.6fr) 150px;gap:14px;padding:12px 16px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400);border-bottom:1px solid var(--slate-200)">
+                <span></span><span>Disciplina</span><span>Entrada (PO)</span><span>Entregáveis</span><span>Prazo</span>
+              </div>
+              <sc-for list="{{ ph.rows }}" as="r" hint-placeholder-count="8">
+                <div style="display:grid;grid-template-columns:36px 170px minmax(0,1fr) minmax(0,1.6fr) 150px;gap:14px;padding:12px 16px;border-bottom:1px solid var(--slate-100);align-items:start">
+                  <input type="checkbox" checked="{{ r.on }}" onChange="{{ r.toggle }}" style="border-radius:10px;width:18px;height:18px;margin-top:4px;accent-color:var(--blue-600)">
+                  <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:14px;font-weight:600">{{ r.disc }}</span><span style="font-size:12px;color:var(--slate-400)">{{ r.proj }}</span><span style="font-family:var(--font-mono);font-size:10.5px;color:var(--blue-700)">{{ r.zonasL }}</span></div>
+                  <span style="font-size:13px;color:var(--slate-500);line-height:1.45">{{ r.inp }}</span>
+                  <textarea value="{{ r.ent }}" onChange="{{ r.onEnt }}" rows="2" disabled="{{ r.off }}" style="border-radius:10px;width:100%;padding:8px 10px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:13px;line-height:1.45;outline:none;resize:vertical"></textarea>
+                  <input type="date" value="{{ r.prazo }}" onChange="{{ r.onPrazo }}" disabled="{{ r.off }}" style="border-radius:10px;width:100%;padding:8px 8px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:13px;outline:none">
+                </div>
+              </sc-for>
+              <div style="display:flex;gap:8px;padding:12px 16px;align-items:center">
+                <input list="discSug" value="{{ newDisc }}" onChange="{{ onNewDisc }}" placeholder="Adicionar disciplina ou entregável neste marco" style="border-radius:10px;flex:1;max-width:380px;padding:8px 10px;border:1px dashed var(--slate-300);font-size:13px;outline:none">
+                <datalist id="discSug"><sc-for list="{{ discSug }}" as="o"><option value="{{ o }}"></option></sc-for></datalist>
+                <button onClick="{{ addDisc }}" style="border-radius:10px;padding:8px 14px;background:transparent;border:1px solid var(--slate-200);font-size:13px;font-weight:700;cursor:pointer" style-hover="background:var(--slate-50)">+ Adicionar</button>
+              </div>
+            </div>
+            <sc-if value="{{ ph.hasFreeze }}">
+            <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);padding:20px 24px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+                <h3 style="margin:0;font-size:16px;font-weight:800">Congelamentos ao final do {{ ph.k }}</h3>
+                <span style="font-size:13px;color:var(--slate-500)">Nível de risco de alteração · PO.CM.PJC.001</span>
+              </div>
+              <sc-for list="{{ ph.freeze }}" as="f" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:minmax(0,1.2fr) 110px minmax(0,1.6fr);gap:14px;padding:8px 0;border-top:1px solid var(--slate-100);font-size:13px;align-items:center">
+                  <span style="font-weight:600">{{ f.item }}</span>
+                  <span>
+                    <sc-if value="{{ f.hi }}"><span style="padding:3px 10px;border-radius:99px;background:var(--red-50);color:#DC2626;font-weight:600;font-size:12px">{{ f.risk }}</span></sc-if>
+                    <sc-if value="{{ f.mid }}"><span style="padding:3px 10px;border-radius:99px;background:var(--amber-50);color:#D97706;font-weight:600;font-size:12px">{{ f.risk }}</span></sc-if>
+                    <sc-if value="{{ f.lo }}"><span style="padding:3px 10px;border-radius:99px;background:var(--green-50);color:#059669;font-weight:600;font-size:12px">{{ f.risk }}</span></sc-if>
+                  </span>
+                  <span style="color:var(--slate-500)">{{ f.disc }}</span>
+                </div>
+              </sc-for>
+            </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:24px">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px">
+              <sc-for list="{{ summary }}" as="s" hint-placeholder-count="8">
+                <div onClick="{{ s.go }}" style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);padding:18px 20px;display:flex;flex-direction:column;gap:4px;cursor:pointer" style-hover="background:var(--slate-50)">
+                  <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400);font-weight:600">{{ s.t }}</span>
+                  <span style="font-size:26px;font-weight:900;line-height:1.1;color:var(--slate-700)">{{ s.v }}</span>
+                  <span style="font-size:12px;color:var(--slate-400)">{{ s.sub }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <section style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden">
+              <div style="padding:16px 20px;display:flex;align-items:baseline;gap:12px;border-bottom:1px solid var(--slate-200)">
+                <h2 style="margin:0;font-size:18px;font-weight:800">{{ rv.diffTitle }}</h2>
+                <span style="font-size:13px;color:var(--slate-500)">{{ rv.diffSub }}</span>
+              </div>
+              <div style="padding:12px 20px;display:flex;flex-direction:column;gap:2px;max-height:420px;overflow:auto">
+                <sc-for list="{{ rv.diff }}" as="c" hint-placeholder-count="3">
+                  <div style="display:grid;grid-template-columns:84px minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);gap:12px;padding:8px 12px;background:var(--slate-50);font-size:13px">
+                    <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--blue-700)">{{ c.kind }}</span>
+                    <span style="font-weight:600">{{ c.l }}</span>
+                    <span style="color:var(--slate-400);text-decoration:line-through">{{ c.a }}</span>
+                    <span>{{ c.b }}</span>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ rv.noDiff }}"><div style="padding:12px 0;font-size:14px;color:var(--slate-500)">{{ rv.noDiffMsg }}</div></sc-if>
+              </div>
+            </section>
+            <section style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);padding:24px 28px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:20px">
+              <label style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:12px;font-weight:600;color:var(--slate-600)">Elaborado por *</span>
+                <input value="{{ rv.autor }}" onChange="{{ rv.onAutor }}" placeholder="Seu nome" style="border-radius:10px;width:100%;padding:10px 12px;border:1px solid var(--slate-300);font-family:inherit;font-size:14px;outline:none">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:12px;font-weight:600;color:var(--slate-600)">{{ rv.motivoLabel }}</span>
+                <input value="{{ rv.motivo }}" onChange="{{ rv.onMotivo }}" placeholder="{{ rv.motivoPh }}" style="border-radius:10px;width:100%;padding:10px 12px;border:1px solid var(--slate-300);font-family:inherit;font-size:14px;outline:none">
+              </label>
+            </section>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+              <button onClick="{{ preview }}" style="border-radius:10px;padding:12px 20px;background:transparent;border:1px solid var(--slate-200);font-family:inherit;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:var(--slate-50)">Pré-visualizar documento</button>
+              <sc-if value="{{ rv.can }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ generate }}" style="border-radius:10px;padding:12px 24px;background:var(--blue-600);color:#fff;border:0;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:var(--blue-700)">Emitir {{ ed.nextRev }}</button>
+              </sc-if>
+              <sc-if value="{{ rv.cannot }}" hint-placeholder-val="{{ true }}">
+                <button style="border-radius:10px;padding:12px 24px;background:var(--slate-200);color:var(--slate-400);border:0;font-family:inherit;font-weight:600;font-size:14px;cursor:not-allowed">Emitir {{ ed.nextRev }}</button>
+                <span style="font-size:13px;color:var(--blue-700)">{{ rv.why }}</span>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--slate-200);padding-top:20px">
+          <button onClick="{{ prev }}" style="border-radius:10px;padding:11px 18px;background:transparent;border:1px solid var(--slate-300);font-family:inherit;font-size:14px;cursor:pointer" style-hover="border-color:var(--color-text)">← Anterior</button>
+          <sc-if value="{{ hasNext }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ next }}" style="border-radius:10px;padding:11px 22px;background:var(--blue-600);color:#fff;border:0;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:var(--blue-700)">Próximo: {{ nextT }} →</button>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isDoc }}" hint-placeholder-val="{{ false }}">
+    <div data-docwrap="1" style="padding:32px;display:flex;flex-direction:column;align-items:center;gap:20px">
+      <div data-noprint="1" style="width:100%;max-width:900px;display:flex;gap:10px;align-items:center">
+        <a onClick="{{ docBack }}" style="font-size:13px;cursor:pointer;text-decoration:none;color:var(--slate-500)">← Voltar</a>
+        <div style="flex:1"></div>
+        <button onClick="{{ print }}" style="border-radius:10px;padding:10px 18px;background:var(--blue-600);color:#fff;border:0;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:var(--blue-700)">Gerar PDF</button>
+      </div>
+      <article data-sheet="1" style="width:100%;max-width:900px;background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);padding:48px 52px;box-shadow:0 3px 10px rgba(15,23,42,.08);display:flex;flex-direction:column;gap:28px;font-size:12.5px;line-height:1.5">
+        <div style="display:grid;grid-template-columns:170px minmax(0,1fr) 210px;border:1.5px solid {{ doc.ac }};border-top:6px solid {{ doc.ac }}">
+          <div style="display:flex;align-items:center;justify-content:center;border-right:1.5px solid {{ doc.ac }};padding:10px 14px;background:#fff"><sc-if value="{{ doc.isMk }}" hint-placeholder-val="{{ false }}"><img src="assets/logo-makeit-sm.png" alt="Make It" style="max-width:100%;max-height:72px;display:block"></sc-if><sc-if value="{{ doc.isGd }}" hint-placeholder-val="{{ false }}"><img src="assets/logo-gadens-inc.png" alt="Gadens Inc" style="max-width:100%;max-height:72px;display:block"></sc-if></div>
+          <div style="padding:14px 18px;display:flex;flex-direction:column;justify-content:center;gap:4px;border-right:1.5px solid {{ doc.ac }};background:{{ doc.tint }}">
+            <span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--slate-500)">Termo de Abertura de Projeto</span>
+            <span style="font-size:18px;font-weight:800">{{ doc.emp }}</span>
+            <sc-if value="{{ doc.isPreview }}"><span style="font-size:10px;letter-spacing:.12em;color:var(--blue-600);font-weight:600">PRÉVIA · NÃO EMITIDO</span></sc-if>
+          </div>
+          <div style="display:grid;grid-template-columns:auto minmax(0,1fr);font-size:11px">
+            <span style="padding:5px 10px;border-bottom:1px solid var(--slate-300);color:var(--slate-500)">Código</span><span style="padding:5px 10px;border-bottom:1px solid var(--slate-300);font-weight:600">{{ doc.codigo }}</span>
+            <span style="padding:5px 10px;border-bottom:1px solid var(--slate-300);color:var(--slate-500)">Revisão</span><span style="padding:5px 10px;border-bottom:1px solid var(--slate-300);font-weight:600">{{ doc.rev }}</span>
+            <span style="padding:5px 10px;border-bottom:1px solid var(--slate-300);color:var(--slate-500)">Data</span><span style="padding:5px 10px;border-bottom:1px solid var(--slate-300);font-weight:600">{{ doc.date }}</span>
+            <span style="padding:5px 10px;color:var(--slate-500)">Elaborado</span><span style="padding:5px 10px;font-weight:600">{{ doc.autor }}</span>
+          </div>
+        </div>
+        <sc-for list="{{ doc.sections }}" as="s" hint-placeholder-count="6">
+          <section style="display:flex;flex-direction:column;gap:10px;break-inside:auto">
+            <sc-if value="{{ s.t }}"><h2 style="margin:0;font-size:14px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;padding-bottom:6px;border-bottom:2px solid {{ doc.ac }};break-after:avoid">{{ s.t }}</h2></sc-if>
+            <sc-if value="{{ s.note }}"><p style="margin:0;color:var(--slate-600)">{{ s.note }}</p></sc-if>
+            <sc-if value="{{ s.isKv }}">
+              <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px">
+                <sc-for list="{{ s.items }}" as="i">
+                  <div style="display:grid;grid-template-columns:44% minmax(0,1fr);gap:10px;padding:5px 0;border-bottom:1px solid var(--slate-100)">
+                    <span style="color:var(--slate-500)">{{ i.l }}</span><span style="font-weight:600">{{ i.v }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ s.isText }}">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ s.items }}" as="i">
+                  <div style="display:flex;flex-direction:column;gap:2px">
+                    <span style="font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--slate-500)">{{ i.l }}</span>
+                    <span style="white-space:pre-wrap;text-wrap:pretty">{{ i.v }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ s.isPlan }}">
+              <div style="position:relative;width:100%;aspect-ratio:{{ s.ar }};border:1px solid var(--slate-200);background:#F8FAFC;break-inside:avoid">
+                <sc-if value="{{ s.hasImg }}" hint-placeholder-val="{{ false }}">{{ s.imgEl }}</sc-if>
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%"><sc-for list="{{ s.zs }}" as="z"><polygon points="{{ z.pts }}" fill="{{ z.fill }}" stroke="{{ z.c }}" stroke-width="2" style="vector-effect:non-scaling-stroke"></polygon></sc-for></svg>
+                <sc-for list="{{ s.zs }}" as="z"><span style="position:absolute;left:{{ z.l }};top:{{ z.tp }};transform:translate(3px,3px);font-family:var(--font-mono);font-size:10px;padding:0 5px;background:{{ z.c }};color:#fff">{{ z.code }}</span></sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ s.isTable }}">
+              <table style="width:100%;border-collapse:collapse;font-size:11.5px">
+                <thead><tr><sc-for list="{{ s.cols }}" as="c"><th style="text-align:left;padding:6px 8px;background:{{ doc.tint }};font-weight:700;border:1px solid var(--slate-200)">{{ c }}</th></sc-for></tr></thead>
+                <tbody>
+                  <sc-for list="{{ s.rows }}" as="r"><tr style="break-inside:avoid"><sc-for list="{{ r }}" as="c"><td style="padding:6px 8px;border:1px solid var(--slate-200);vertical-align:top">{{ c }}</td></sc-for></tr></sc-for>
+                </tbody>
+              </table>
+              <sc-if value="{{ s.empty }}"><span style="color:var(--slate-400)">Nenhum item registrado.</span></sc-if>
+            </sc-if>
+          </section>
+        </sc-for>
+      </article>
+    </div>
+  </sc-if>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const KEY = 'makeit-tap-v5';
+const API = 'api';
+const TEMA_KEY = 'gadens.tema.v1';
+const DASH_URL = 'index.html';
+const pad = n => String(n).padStart(2, '0');
+const fmtD = s => s ? s.slice(0, 10).split('-').reverse().join('/') : '';
+const today = () => { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+const uid = () => Math.random().toString(36).slice(2, 9);
+const clone = o => JSON.parse(JSON.stringify(o));
+const DISC = ["Acústica","Alvenaria Estrutural","Climatização","Contenção de Solos","Elétrica","Estrutura CA","Fundação","Gás","Hidrossanitário","PPCI","SPDA","Telecom","Terraplanagem","Vedação"];
+const DISC_ALL = ["Estrutura CA","Alvenaria Estrutural","Fundação","Contenção","Terraplanagem","Pavimentação","Hidrossanitário","Drenagem","PPCI","SDAI","Elétrico","Lógica","SPDA","Gás","Cobertura","Climatização","Exaustão","Elevadores","Sondagem","Ensaios de Solos","Canteiro de Obras","Est. Edifício Garagem","Castelo d'água","Est. Castelo d'água","Geotecnia","Macrologístico","Ancoragem","Vedação","Pré-lajes","Contrapartida"];
+const PO_ALIAS = { "Elétrico":"Elétrica", "Lógica":"Telecom", "Contenção":"Contenção de Solos" };
+const PROJ_BASE = ["Fundação","Terraplanagem","Hidrossanitário","Drenagem","PPCI","Elétrico","Lógica","SPDA","Gás","Cobertura","Elevadores","Sondagem","Ensaios de Solos","Canteiro de Obras","Macrologístico"];
+// [chave, pergunta, depende-de (Sim), resultado quando Sim, chave de quantidade]
+const PREM_ELE = [
+ ["aq","Para edificações com água quente por aquecimento de passagem ou aquecimento central, deixar circuito elétrico como espera?","","Circuito de espera para aquecimento previsto"],
+ ["res","Considerar circuito reserva?","","Circuito reserva previsto","resQtd"],
+ ["ac","Terá circuito de ar-condicionado?","","Ar-condicionado previsto no projeto"],
+ ["acAlim","Será prevista a alimentação do ar-condicionado?","ac","Alimentação de ar-condicionado prevista"],
+ ["gas","Terá alimentação de gás para cooktop?","","Cooktop a gás previsto"],
+ ["gasEsp","Deverá prever circuito elétrico como espera para o cooktop?","gas","Circuito de espera para cooktop previsto"]
+];
+const PROJ_Q = [
+ ["cas","Terá castelo d'água?",["Castelo d'água","Est. Castelo d'água"]],
+ ["cont","Terá contenções de solo e/ou pavimentação?",["Ensaios de Solos"]],
+ ["cp","O empreendimento construirá algo como contrapartida?",["Contrapartida"]],
+ ["dry","O empreendimento terá dry-wall?",["Vedação"]],
+ ["egar","O empreendimento terá edifício garagem?",["Est. Edifício Garagem"]],
+ ["prel","O empreendimento terá pré-laje nas lajes?",["Pré-lajes"]]
+];
+const EQ_Q = [
+ ["pav","Tem mais de 4 pavimentos?","Elevador","Previsão de elevador (acima de 4 pavimentos)"],
+ ["cas","Tem castelo d'água?","Bombas","Previsão de bombas de recalque do castelo d'água"],
+ ["hid","Tem hidrante?","Bombas de incêndio","Previsão de bombas de incêndio"],
+ ["ger","Tem gerador de incêndio?","Elevador de emergência","Previsão de elevador de emergência"],
+ ["esc","Tem pressurização na escada?","Pressurização de escada","Previsão de equipamento de pressurização"],
+ ["agu","Tem pressurização de água?","Pressurizador de água","Previsão de pressurizador na região do barrilete"],
+ ["dre","A drenagem não tem caimento para a rede?","Recalque pluvial","Previsão de bombas de recalque de pluvial"],
+ ["esg","O esgoto não tem caimento para a rede?","Recalque de esgoto","Previsão de bomba de recalque de esgoto"]
+];
+const FZ1 = ["Shafts e áreas técnicas","Localização de pilares e estrutura portante","Cotas, níveis e espessura de contrapiso","Layout de unidades e áreas comuns","Solução de fundação e contenção","Prumadas de instalações","Pontos de instalações (elétrica, hidro, gás)","Fachada, esquadrias e modulação","Paisagismo e definição de áreas externas","Sistemas de segurança, PPCI e SPDA"];
+const FZD = ["Elétrica, Hidro, Gás, Telecom, PPCI","Estrutura CA, Fundação, Contenção, Arquitetura","Estrutura CA, Terraplanagem, Fundação, Instalações","Alvenaria Estrutural, Vedação, Elétrica, Hidro, Climatização, PPCI, Acústica","Fundação, Contenção, Estrutura CA, Arquitetura","Elétrica, Hidro, Gás, Telecom","Elétrica, Hidrossanitário, Gás, Climatização","Vedação, Alvenaria Estrutural, PPCI, Acústica","Elétrica, Hidro, Estrutura CA","Elétrica, Telecom, Arquitetura"];
+const FZR = {
+  EP: ["Baixo","Médio/Alto","Médio","Médio","Médio/Alto","Baixo",null,"Médio",null,null],
+  AP: ["Médio/Alto","Alto","Médio/Alto","Médio/Alto","Alto","Médio","Médio","Médio","Médio/Alto","Médio"],
+  PE: ["Médio/Alto","Alto","Alto","Alto","Alto","Médio/Alto","Médio/Alto","Médio/Alto","Médio/Alto","Médio/Alto"],
+  EX: ["Alto","Alto","Alto","Alto","Alto","Alto","Médio/Alto","Alto","Alto","Alto"]
+};
+const PHASES = [
+ { k:"EP", n:"Estudo Preliminar", obj:"Definição de soluções estruturais, posicionamento de shafts e áreas técnicas.", rows:[
+  ["Acústica","EP Arquitetura + análise em campo","Relatório de Desempenho Acústico"],
+  ["Alvenaria Estrutural","EP Arquitetura","Plantas de paginações iniciais; cargas pontuais e lineares"],
+  ["Climatização","EP Arquitetura","Relatório de análise e posicionamento de máquinas em planta"],
+  ["Contenção de Solos","Relatórios de solos, Topografia, Arquitetura","Estudo comparativo, proposta preliminar e quantitativo estimativo"],
+  ["Elétrica","EP Arquitetura","Análises em planta e relatório de shafts, áreas técnicas e pontos de entrada"],
+  ["Estrutura CA","IFC EP Arquitetura (BIM), plantas e 2 cortes","3 soluções estruturais em IFC; plantas de forma básicas; quantitativos iniciais"],
+  ["Fundação","Relatório de solos, Terraplanagem, EP Arquitetura, cargas","3 soluções estimativas de fundação"],
+  ["Gás","EP Arquitetura","Relatório/planta de análise de shafts, prumadas e viabilidade GN"],
+  ["Hidrossanitário","EP Arquitetura","Relatório de análise de shafts e áreas técnicas"],
+  ["PPCI","EP Arquitetura","Plantas de análise e relatórios de shafts, hidrantes e reservatórios"],
+  ["SPDA","EP Arquitetura","Relatório de análise de risco"],
+  ["Telecom","EP Arquitetura","Análises em planta e relatório de shafts, áreas técnicas e pontos"],
+  ["Terraplanagem","Topografia e Arquitetura","Plantas com cortes e diagramas de manchas; emissão para tramitação legal"],
+  ["Vedação","Arquitetura básica + relatório de acústica","Relatório de análise de materiais e fechamentos"]]},
+ { k:"AP", n:"Anteprojeto", obj:"Consolidar soluções por disciplina, compatibilizar com a arquitetura e definir quantitativos estimativos para orçamentação.", rows:[
+  ["Alvenaria Estrutural","Arquitetura atualizada com modulações","Paginações compatibilizadas; quantitativo estimativo (blocos, aço, concreto); IFC"],
+  ["Climatização","AP Arquitetura, Layout Interiores, EP Estrutural","Plantas esquemáticas; IFC; quantitativo prévio de linhas frigorígenas e máquinas"],
+  ["Contenção de Solos","AP Arquitetura, EP Fundação/Estrutural","Plantas com espessuras de cortinas"],
+  ["Elétrica","AP Arquitetura, Luminotécnico, EP Estrutural","Plantas com distribuição de pontos e eletrodutos; IFC"],
+  ["Estrutura CA","Solução definida; EP Arquitetura","Planta de formas da solução selecionada; IFC; quantitativos estimativos"],
+  ["Fundação","Orçamentos; Arquitetura atualizada; cargas estruturais","Plantas de locação de estacas; quantitativo estimativo"],
+  ["Gás","AP Arquitetura, EP Estrutura","Plantas de distribuição; IFC; quantitativos estimativos"],
+  ["Hidrossanitário","AP Arquitetura, Projeto de pontos, Layout, EP Estrutural","IFC completo; plantas básicas de todos os pavimentos"],
+  ["PPCI","1º protocolo PPCI; definições arquitetônicas","Plantas de todos os pavimentos; IFC"],
+  ["SPDA","Análise de risco; AP Arquitetura; EP Estrutural","Plantas de todos os pavimentos; IFC; quantitativo estimativo"],
+  ["Telecom","AP Arquitetura, Luminotécnico, EP Estrutural","Plantas com distribuição de pontos e eletrodutos; IFC"],
+  ["Vedação","Arquitetura + EP Acústica","Plantas com vedações compatibilizadas de todos os pavimentos"]]},
+ { k:"PE", n:"Pré-executivo", obj:"Compatibilização final entre disciplinas, absorção de interferências do AP, solicitações de furações e consolidação de IFCs.", rows:[
+  ["Alvenaria Estrutural","Arquitetura compatibilizada","Plantas de paginações; planta de forma das lajes; IFC"],
+  ["Climatização","Elétrico compatibilizado; drenos posicionados; PE Arquitetônico","Plantas compatibilizadas; IFC"],
+  ["Contenção de Solos","AP Arquitetura/Garagem/Instalações/Estrutural","Planta de contenções com trechos; detalhamentos executivos; quantitativo final"],
+  ["Elétrica","Apontamentos de Anteprojeto","Plantas compatibilizadas de eletrodutos e pontos; IFC; diagramas unifilares e quantitativos"],
+  ["Estrutura CA","Compatibilizações do AP","Plantas de todos os pavimentos; modelo IFC atualizado"],
+  ["Fundação","AP Arquitetura/Garagem/Instalações/Estrutural","Planta de locação de estacas; detalhes executivos; quantitativo final"],
+  ["Gás","Instalações prediais; PE Arquitetura; AP Estrutural","Plantas de distribuição de rede de gás; quantitativo final; detalhes executivos"],
+  ["Hidrossanitário","AP Instalações; PE Arquitetura; AP Estrutural","Plantas compatibilizadas com furações e elementos estruturais; IFC; quantitativo final"],
+  ["PPCI","Apontamentos AP + projeto legal dos bombeiros","Plantas compatibilizadas; quantitativo final"],
+  ["SPDA","Arquitetura e Estrutura","Plantas compatibilizadas; quantitativo final"],
+  ["Telecom","Apontamentos de Anteprojeto","Plantas compatibilizadas de eletrodutos e pontos; IFC"],
+  ["Vedação","AP Acústica; Arquitetura PE","Plantas compatibilizadas de todos os pavimentos; quantitativo final"]]},
+ { k:"EX", n:"Projeto Executivo", obj:"Detalhamento completo para execução em obra. Nenhuma alteração de escopo é permitida, somente correções de compatibilização residual do PE.", rows:[
+  ["Acústica","Layouts Interiores; EX Arquitetura","Plantas com detalhamento de medidas de tratamento; memoriais"],
+  ["Alvenaria Estrutural","Elétrico, Hidro, Telecom e Arquitetura compatibilizados","Paginação; detalhe de lajes e furações; elevações; cortes; detalhes executivos"],
+  ["Climatização","Relatório de compatibilização PE; EX Arquitetura","Plantas de todos os pavimentos; detalhes executivos e genéricos; quantitativo final"],
+  ["Contenção de Solos","Relatório de compatibilizações PE","Revisão de planta de locação; detalhes executivos; quantitativo final"],
+  ["Elétrica","Compatibilizações anteriores; Luminotécnico atualizado","Plantas com circuitos; diagramas unifilares; tabelas de carga; memoriais; quantitativos definitivos"],
+  ["Estrutura CA","Compatibilizações PE; análise de furações","Plantas de formas e aço; detalhamento de vigas, lajes, pilares, blocos; memoriais; quantitativos finais"],
+  ["Fundação","Relatório de compatibilizações PE","Revisão de planta de locação de estacas; detalhes executivos; quantitativo final"],
+  ["Gás","Compatibilizações anteriores; PE Arquitetura","Plantas e modelos compatibilizados com quantitativos finais"],
+  ["Hidrossanitário","Relatório de compatibilização anterior; revisão de pontos","Plantas executivas; isométricos; detalhes ampliados e genéricos"],
+  ["PPCI","PPCI aprovado; Arquitetura e Estrutura executiva","Plantas de detalhamento; memorial descritivo"],
+  ["SPDA","EX Arquitetura; PE Estrutural; compatibilizações PE","Plantas finais; detalhes executivos e genéricos; quantitativo final"],
+  ["Telecom","Compatibilizações anteriores; Luminotécnico atualizado","Plantas com circuitos; diagramas; tabelas; memoriais; quantitativos definitivos"],
+  ["Terraplanagem","PE Arquitetura; PE Pavimentação; Topografia","Plantas executivas com cortes e diagramas de manchas revisados"],
+  ["Vedação","Apontamentos PE; EX Arquitetura; EX Acústica","Plantas e detalhamentos executivos e genéricos; quantitativos definitivos"]]}
+];
+PHASES.forEach(p => { p.freeze = FZ1.map((it, i) => [it, FZR[p.k][i], FZD[i]]).filter(r => r[1]); });
+const ZT = [
+ { k:"TOR", n:"Torre", c:"#2563EB", ar:["Infraestrutura","Subsolo","Térreo","Tipo","Cobertura","Ático"], di:["Estrutura CA","Fundação","Elétrico","Hidrossanitário","Gás","PPCI","SPDA","Lógica","Vedação","Climatização"] },
+ { k:"CAS", n:"Castelo d'água", c:"#0891B2", ar:["Infraestrutura","Reservatório","Cobertura"], di:["Castelo d'água","Est. Castelo d'água","Estrutura CA","Fundação","Hidrossanitário","SPDA"] },
+ { k:"GUA", n:"Guarita e pórtico", c:"#7C3AED", ar:["Infraestrutura","Térreo","Cobertura"], di:["Estrutura CA","Elétrico","Lógica","Hidrossanitário"] },
+ { k:"GAS", n:"Casa de gás", c:"#DC2626", ar:["Infraestrutura","Térreo"], di:["Estrutura CA","Gás","PPCI"] },
+ { k:"QUI", n:"Quiosque", c:"#D97706", ar:["Infraestrutura","Térreo","Cobertura"], di:["Estrutura CA","Elétrico","Hidrossanitário"] },
+ { k:"SAL", n:"Salão de festas", c:"#DB2777", ar:["Infraestrutura","Térreo","Cobertura"], di:["Estrutura CA","Elétrico","Hidrossanitário","PPCI","Climatização"] },
+ { k:"PIS", n:"Piscina", c:"#0EA5E9", ar:["Infraestrutura","Térreo"], di:["Estrutura CA","Hidrossanitário","Elétrico"] },
+ { k:"PLA", n:"Playground", c:"#65A30D", ar:["Térreo"], di:["Estrutura CA","Drenagem"] },
+ { k:"PAV", n:"Pavimentação", c:"#64748B", ar:["Terraplanagem","Pavimento"], di:["Pavimentação","Drenagem","Terraplanagem","Hidrossanitário","Elétrico"] },
+ { k:"PAI", n:"Paisagismo", c:"#16A34A", ar:["Térreo"], di:["Hidrossanitário","Elétrico"] },
+ { k:"OUT", n:"Outro", c:"#475569", ar:["Térreo"], di:["Estrutura CA"] }
+];
+const PJ_ST = ["A contratar","Em cotação","Contratado"];
+const UN = { "Make It": { logo:"assets/logo-makeit-sm.png", ac:"#FF9100", tint:"#FFF4E5" }, "Gadens Inc": { logo:"assets/logo-gadens-inc.png", ac:"#4F6378", tint:"#EEF1F4" } };
+const MARCOS = [["EP","Entrega Estudo Preliminar"],["AP","Entrega de Anteprojeto"],["PE","Entrega de Pré-executivo"],["EX","Entrega de Executivo"]];
+const FG = [
+ { k:"ident", t:"Identificação", d:"Dados básicos do empreendimento e responsáveis. A sigla compõe o código do TAP e das zonas.", f:[
+  ["nome","Nome do empreendimento","text",2],["sigla","Sigla (3 letras)","text",1,"Ex.: RVA"],["spe","SPE / Razão social","text",1],
+  ["endereco","Endereço do terreno","text",2],["cidade","Cidade","text",1],["uf","UF","text",1],["matricula","Matrícula(s)","text",1],
+  ["gerente","Gerente do projeto","text",1],["coord","Coordenador de projetos","text",1],["sponsor","Patrocinador / Diretoria","text",1]]},
+ { k:"produto", t:"Produto", d:"A unidade de negócio define o tema e o logo do documento emitido.", f:[
+  ["unidade","Unidade de negócio","select",1,null,["Make It","Gadens Inc"]],
+  ["padrao","Padrão","select",1,null,["Econômico","Médio","Médio-alto","Alto","Luxo"]],
+  ["lancamento","Data de lançamento","date",1],
+  ["aTerreno","Área do terreno (m²)","number",1],["aConst","Área construída (m²)","number",1],["aPriv","Área privativa (m²)","number",1],
+  ["torres","Torres / blocos","number",1],["pav","Pavimentos","number",1],["subsolos","Subsolos","number",1],
+  ["unid","Unidades","number",1],["vagas","Vagas","number",1],["vgv","VGV estimado (R$)","text",1]]}
+];
+const STEPS = [
+ { t:"Identificação", d:FG[0].d }, { t:"Produto", d:FG[1].d },
+ { t:"Objetivo e restrições", d:"O objetivo é montado automaticamente a partir do Produto. Informe as restrições legais e de engenharia." },
+ { t:"Marcos", d:"Entregas de projeto e datas-alvo. Cada marco vira uma fase no Escopo por entrega." },
+ { t:"Zonas de construção", d:"Envie a implantação e demarque as zonas. Para cada zona são propostos código, áreas e disciplinas, todos editáveis." },
+ { t:"Premissas de Projetos", d:"Premissas por disciplina e equipamentos por zona. Responda às perguntas para registrar as premissas e lançar as previsões automaticamente." },
+ { t:"Projetistas", d:"Disciplinas padrão do empreendimento, as definidas nas zonas e as adicionadas pelas perguntas abaixo. Defina o escritório e o status de contratação." },
+ { t:"Escopo por entrega", d:"Entregáveis por marco e disciplina, pré-preenchidos conforme o PO.CM.PJC.001 e as zonas. Tudo editável." },
+ { t:"Revisar e emitir", d:"Confira o resumo e as alterações em relação à revisão vigente antes de emitir." }
+];
+function blank() {
+  return { ident:{}, produto:{}, restr:{ legal:'', legalTxt:'', eng:'', engTxt:'' }, riscos:'', planta:null,
+    marcos:MARCOS.map(m => ({ id:uid(), k:m[0], n:m[1], d:'' })), zonas:[], equip:[], proj:{}, escopo:{}, autor:'', motivo:'' };
+}
+function seed() {
+  const designers = [
+    { id:'d1', n:'Estrutural Engenharia', d:['Estrutura CA','Fundação','Contenção','Est. Castelo d\'água'] },
+    { id:'d2', n:'Prediais Instalações', d:['Elétrico','Hidrossanitário','Drenagem','Gás','Lógica','SPDA'] },
+    { id:'d3', n:'Fogo Zero PPCI', d:['PPCI','SDAI'] },
+    { id:'d4', n:'Sonora Acústica', d:['Acústica','Vedação'] },
+    { id:'d5', n:'Elevar Consultoria', d:['Elevadores'] },
+    { id:'d6', n:'Solo Firme Sondagens', d:['Sondagem','Ensaios de Solos','Geotecnia'] },
+    { id:'d7', n:'Terra Geotecnia', d:['Terraplanagem'] }
+  ];
+  const d0 = blank();
+  Object.assign(d0.ident, { nome:'Residencial Exemplo', sigla:'REX', spe:'REX Empreendimentos SPE Ltda.', cidade:'Curitiba', uf:'PR', gerente:'Gerente Exemplo', coord:'Coordenação de Projetos' });
+  Object.assign(d0.produto, { unidade:'Make It', padrao:'Médio-alto', lancamento:'2027-03-10', aTerreno:'2400', aConst:'14800', torres:'2', pav:'18', subsolos:'1', unid:'96', vagas:'120' });
+  Object.assign(d0.restr, { legal:'Sim', legalTxt:'Recuo frontal de 8 m e gabarito máximo de 60 m (zoneamento).', eng:'Não' });
+  ['2026-11-30','2027-02-15','2027-05-30','2027-09-30'].forEach((x, i) => { d0.marcos[i].d = x; });
+  const z = (id, t, nn, nome, r, ar, di) => ({ id, t, code:t + '-' + pad(nn), nome, r, ar, di, obs:'' });
+  d0.zonas = [
+    z('z1','TOR',1,'Torre A',{x:14,y:14,w:22,h:34},["Infraestrutura","Subsolo","Térreo","Tipo","Cobertura"],["Estrutura CA","Fundação","Elétrico","Hidrossanitário","Gás","PPCI"]),
+    z('z2','TOR',2,'Torre B',null,["Infraestrutura","Subsolo","Térreo","Tipo","Cobertura"],["Estrutura CA","Fundação","Elétrico","Hidrossanitário","Gás","PPCI"]),
+    z('z3','GUA',1,'Guarita e pórtico',{x:4,y:80,w:12,h:14},["Infraestrutura","Térreo","Cobertura"],["Estrutura CA","Elétrico"]),
+    z('z4','SAL',1,'Salão de festas',{x:62,y:60,w:22,h:20},["Infraestrutura","Térreo","Cobertura"],["Estrutura CA","Elétrico","Hidrossanitário","PPCI"]),
+    z('z5','PAV',1,'Pavimentação geral',{x:20,y:62,w:34,h:14},["Terraplanagem","Pavimento"],["Terraplanagem","Hidrossanitário"])
+  ];
+  d0.zonas[1].pts = [[52,10],[72,18],[64,46],[44,38]];
+  d0.zonas[0].q = { pav:'Sim', hid:'Sim', esc:'Sim' }; d0.zonas[1].q = { pav:'Sim' };
+  d0.equip = [
+    { id:'q1', cat:'Elevador', desc:'Elevador social 8 pax', qtd:'2', zona:'TOR-01', spec:'1,0 m/s', status:'Previsto', auto:'z1:pav' },
+    { id:'q2', cat:'Bombas de incêndio', desc:'Previsão de bombas de incêndio', qtd:'1', zona:'TOR-01', spec:'', status:'Previsto', auto:'z1:hid' },
+    { id:'q3', cat:'Pressurização de escada', desc:'Previsão de equipamento de pressurização', qtd:'1', zona:'TOR-01', spec:'', status:'Previsto', auto:'z1:esc' },
+    { id:'q4', cat:'Elevador', desc:'Previsão de elevador (acima de 4 pavimentos)', qtd:'2', zona:'TOR-02', spec:'', status:'Previsto', auto:'z2:pav' }
+  ];
+  d0.proj = { 'Estrutura CA':{ v:'d1', st:'Contratado' }, 'Fundação':{ v:'d1', st:'Contratado' }, 'Elétrico':{ v:'d2', st:'Em cotação' }, 'Hidrossanitário':{ v:'d2', st:'Em cotação' } };
+  d0.pq = { dry:'Não', prel:'Sim' }; d0.projExtra = ['Pré-lajes'];
+  const d1 = clone(d0);
+  d1.proj['Elétrico'].st = 'Contratado'; d1.proj['Hidrossanitário'].st = 'Contratado'; d1.proj['PPCI'] = { v:'d3', st:'Contratado' };
+  d1.equip[0].qtd = '4';
+  return { designers, emps:[{ id:'e1', nome:'Residencial Exemplo', sigla:'REX' }], drafts:{},
+    taps:[
+      { id:'t0', empId:'e1', rev:0, date:'2026-07-14', autor:'Coordenação de Projetos', motivo:'Emissão inicial', data:d0 },
+      { id:'t1', empId:'e1', rev:1, date:'2026-09-02', autor:'Coordenação de Projetos', motivo:'PPCI contratado e 4 elevadores', data:d1 }
+    ] };
+}
+
+class Component extends DCLogic {
+  planRef = React.createRef();
+  state = { zoom:1, ortho:true, nt:null, tool:'poly', poly:null, hover:null, mv:null, live:null, zTipo:null, zSel:null, drag:null, newDisc:'', zArea:'', tema:'claro', db:null, view:'home', empId:null, step:0, phase:0, docId:null, docBackTo:'emp', openDiff:null, q:'', zCustom:{}, newDes:{} };
+  async cofre() {
+    if (window.Cofre) return window.Cofre;
+    if (!window.__cofreP) window.__cofreP = new Promise((res, rej) => {
+      const s = document.createElement("script"); s.src = "data/cofre.js";
+      s.onload = () => res(window.Cofre); s.onerror = () => res(null);
+      document.head.appendChild(s);
+    });
+    return window.__cofreP;
+  }
+  sb(path, opt) {
+    const c = this.sbCfg; opt = opt || {};
+    return fetch(c.url.replace(/\/$/, '') + '/rest/v1/' + path, Object.assign({}, opt, {
+      headers: Object.assign({ apikey: c.anon, Authorization: 'Bearer ' + c.anon, 'x-tap-chave': c.chave,
+        'Content-Type': 'application/json' }, opt.headers || {}) }));
+  }
+  async loadDb() {
+    const C = await this.cofre();
+    if (C) {
+      if ((await C.modo()) === 'protegido' && !C.sessao()) { location.href = DASH_URL; return seed(); }
+      let cfg = null; try { cfg = await C.carregar('data/config.json'); } catch (e) {}
+      if (cfg && cfg.url && cfg.anon && cfg.chave) {
+        this.sbCfg = cfg;
+        try {
+          const [rb, rt] = await Promise.all([this.sb('tap_base?id=eq.1&select=dados'), this.sb('taps?select=tap&order=criado_em.asc')]);
+          if (!rb.ok || !rt.ok) throw new Error('Supabase ' + rb.status + '/' + rt.status);
+          const b = (await rb.json())[0], ts = await rt.json();
+          const s0 = seed();
+          const db = Object.assign({}, s0, b && b.dados ? b.dados : {}, { taps: ts.map(x => x.tap) });
+          this.mode = 'supabase'; return db;
+        } catch (e) { console.warn('TAP: Supabase indisponível', e); }
+      }
+    }
+    try {
+      const r = await fetch(API + '/db', { cache:'no-store' });
+      const ct = r.headers.get('content-type') || '';
+      if (r.ok && ct.includes('json')) { const db = await r.json(); this.mode = 'server'; return db; }
+    } catch (e) {}
+    this.mode = 'local';
+    let db = null; try { db = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+    return db && db.taps ? db : seed();
+  }
+  base(db) { const o = {}; ['emps','designers','drafts','ztCustom','discCustom'].forEach(k => { if (db[k] !== undefined) o[k] = db[k]; }); return o; }
+  pushBase(db) {
+    clearTimeout(this.tSave); this.setState({ sync:'Salvando…' });
+    this.tSave = setTimeout(async () => {
+      if (this.mode === 'supabase') {
+        try { const r = await this.sb('tap_base', { method:'POST', headers:{ Prefer:'resolution=merge-duplicates' },
+            body: JSON.stringify({ id:1, dados: this.base(this.pending || this.state.db), atualizado: new Date().toISOString() }) });
+          this.setState({ sync: r.ok ? 'Salvo no Supabase' : 'Falha ao salvar (' + r.status + ')' }); }
+        catch (e) { this.setState({ sync:'Supabase indisponível' }); }
+        return;
+      }
+      try { const r = await fetch(API + '/base', { method:'PUT', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(this.base(this.pending || this.state.db)) });
+        this.setState({ sync: r.ok ? 'Salvo no servidor' : 'Falha ao salvar (' + r.status + ')' }); }
+      catch (e) { this.setState({ sync:'Servidor indisponível' }); }
+    }, 700);
+  }
+  async publishTap(tap, sigla) {
+    if (this.mode === 'supabase') {
+      const C = window.Cofre, s = C && C.sessao();
+      const r = await this.sb('taps', { method:'POST', headers:{ Prefer:'return=minimal' },
+        body: JSON.stringify({ sigla, rev: tap.rev, tap, emitido_por: s ? s.login : null }) });
+      if (r.status === 409) throw new Error('Esta revisão já foi emitida por outro usuário. A página será recarregada.');
+      if (!r.ok) throw new Error('Falha ao emitir (' + r.status + ')');
+      return;
+    }
+    const r = await fetch(API + '/taps', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ sigla, tap }) });
+    if (r.status === 409) throw new Error('Esta revisão já foi emitida por outro usuário. A página será recarregada.');
+    if (!r.ok) throw new Error('Falha ao emitir (' + r.status + ')');
+    setTimeout(() => this.publishHtml(sigla, tap.rev), 900);
+  }
+  async publishHtml(sigla, rev) {
+    const el = document.querySelector('[data-sheet]'); if (!el) return;
+    const css = [...document.querySelectorAll('style')].map(s => s.textContent).join('\n');
+    const body = el.outerHTML.split('src="assets/').join('src="../../assets/');
+    const html = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>TAP.' + sigla + '.001 Rev. ' + pad(rev) + '</title>' +
+      '<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">' +
+      '<style>' + css + ' body{background:#F1F5F9;padding:24px} [data-sheet]{margin:0 auto}</style></head><body>' + body + '</body></html>';
+    if (this.mode === 'supabase') { try { await this.sb('taps?sigla=eq.' + encodeURIComponent(sigla) + '&rev=eq.' + rev, { method:'PATCH', body: JSON.stringify({ html }) }); } catch (e) {} return; }
+    try { await fetch(API + '/taps/html?sigla=' + encodeURIComponent(sigla) + '&rev=' + rev, { method:'POST', headers:{ 'Content-Type':'text/html; charset=utf-8' }, body: html }); } catch (e) {}
+  }
+  async componentDidMount() {
+    const db = await this.loadDb();
+    let tema = 'claro'; try { tema = localStorage.getItem(TEMA_KEY) || 'claro'; } catch (e) {}
+    document.documentElement.setAttribute('data-tema', tema);
+    this.setState({ db, tema, sync: this.mode === 'supabase' ? 'Conectado ao Supabase' : this.mode === 'server' ? 'Conectado ao servidor' : 'Modo local (navegador)' });
+    this.onAlt = e => { this.altKey = e.altKey; }; window.addEventListener('keyup', this.onAlt);
+    this.onEsc = e => { this.altKey = e.altKey; const s = this.state; const tag = (e.target.tagName || '').toLowerCase(); if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      if (e.key === 'Escape') { this.setState({ zTipo:null, drag:null, poly:null, hover:null }); return; }
+      if (s.poly && e.key === 'Enter') { e.preventDefault(); this.closePoly(); return; }
+      if (s.poly && e.key === 'Backspace') { e.preventDefault(); this.setState({ poly: s.poly.slice(0, -1) }); return; }
+      if (s.view === 'edit' && s.step === 4 && s.zSel && !s.zTipo && (e.key === 'Delete' || e.key === 'Backspace')) { e.preventDefault(); this.setD(x => { x.zonas = x.zonas.filter(z => z.id !== s.zSel); }); this.setState({ zSel:null }); } }; window.addEventListener('keydown', this.onEsc);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this.onEsc);
+  }
+  setTema(x) { try { localStorage.setItem(TEMA_KEY, x); } catch (e) {} document.documentElement.setAttribute('data-tema', x); this.setState({ tema:x }); }
+  save(db) { this.setState({ db }); if (this.mode === 'server' || this.mode === 'supabase') { this.pending = db; this.pushBase(db); return; } try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} }
+  setD(fn) { const db = clone(this.state.db); fn(db.drafts[this.state.empId], db); this.save(db); }
+  taps(empId) { return this.state.db.taps.filter(t => t.empId === empId).sort((a, b) => a.rev - b.rev); }
+  last(empId) { const t = this.taps(empId); return t[t.length - 1] || null; }
+  desName(id) { const d = this.state.db.designers.find(x => x.id === id); return d ? d.n : ''; }
+  sig(d) { return (d.ident.sigla || 'XXX').toUpperCase(); }
+
+  allZT() { const db = this.state.db; return ZT.slice(0, -1).concat((db && db.ztCustom) || []).concat([ZT[ZT.length - 1]]); }
+  zt(k) { return this.allZT().find(z => z.k === k) || ZT[ZT.length - 1]; }
+  zc(z) { return z.cor || this.zt(z.t).c; }
+  snap(from, p, ref) {
+    if (!this.state.ortho || this.altKey || !from) return { x:p.x, y:p.y, snapped:false };
+    const A = this.ar || 1.6; const dX = (p.x - from[0]) * A, dY = p.y - from[1]; const len = Math.hypot(dX, dY); if (len < 0.5) return { x:p.x, y:p.y, snapped:false };
+    const ang = Math.atan2(dY, dX); const cands = [0, Math.PI / 2]; if (ref != null) cands.push(ref, ref + Math.PI / 2);
+    let best = null, bd = 1e9; cands.forEach(c => { let df = Math.abs(((ang - c) % Math.PI + Math.PI) % Math.PI); df = Math.min(df, Math.PI - df); if (df < bd) { bd = df; best = c; } });
+    if (bd > 7 * Math.PI / 180) return { x:p.x, y:p.y, snapped:false };
+    const L = dX * Math.cos(best) + dY * Math.sin(best); const c2 = v => Math.max(0, Math.min(100, Math.round(v * 10) / 10));
+    return { x: c2(from[0] + L * Math.cos(best) / A), y: c2(from[1] + L * Math.sin(best)), snapped:true };
+  }
+  segAng(a, b) { if (!a || !b) return null; return Math.atan2(b[1] - a[1], (b[0] - a[0]) * (this.ar || 1.6)); }
+  setZoom(z, ev) { const el = this.scrollEl; z = Math.max(1, Math.min(8, Math.round(z * 100) / 100)); const z0 = this.state.zoom || 1;
+    if (!el) { this.setState({ zoom:z }); return; }
+    const r = el.getBoundingClientRect(); const ox = ev ? ev.clientX - r.left : el.clientWidth / 2, oy = ev ? ev.clientY - r.top : el.clientHeight / 2;
+    const sx = (el.scrollLeft + ox) / z0, sy = (el.scrollTop + oy) / z0;
+    this.setState({ zoom:z }, () => { el.scrollLeft = sx * z - ox; el.scrollTop = sy * z - oy; }); }
+  scrollRef = el => { this.scrollEl = el; if (el && !el._wz) { el._wz = 1; el.addEventListener('wheel', ev => { if (ev.ctrlKey || ev.metaKey) { ev.preventDefault(); this.setZoom((this.state.zoom || 1) * (ev.deltaY < 0 ? 1.15 : 1 / 1.15), ev); } }, { passive:false }); } };
+  un(d) { return UN[d.produto.unidade] || UN['Make It']; }
+  objetivo(d) {
+    const p = d.produto, h = v => v ? v : '[—]';
+    return 'Construção de Habitação Multifamiliar ' + h(p.unidade) + ' com ' + h(p.torres) + ' torre' + (p.torres === '1' ? '' : 's') + ' de ' + h(p.pav) + ' pavimentos, totalizando ' + h(p.unid) + ' unidades, que será lançado na data de ' + h(fmtD(p.lancamento)) + '.';
+  }
+  allDisc() { const db = this.state.db; return DISC_ALL.concat((db && db.discCustom) || []); }
+  dOrd(a, b) { const A = this.allDisc(); const ia = A.indexOf(a), ib = A.indexOf(b); return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib); }
+  zDiscs(d) { const o = []; d.zonas.forEach(z => z.di.forEach(x => { if (!o.includes(x)) o.push(x); })); return o.sort((a, b) => this.dOrd(a, b)); }
+  projDiscs(d) { const o = PROJ_BASE.slice(); this.zDiscs(d).concat(d.projExtra || []).forEach(x => { if (!o.includes(x)) o.push(x); }); return o.sort((a, b) => this.dOrd(a, b)); }
+  zOf(d, disc) { return d.zonas.filter(z => z.di.includes(disc)).map(z => z.code); }
+  escRows(d, m) {
+    const st = d.escopo[m.id] || {}; const P = PHASES.find(p => p.k === m.k);
+    const discs = this.projDiscs(d); Object.keys(st).forEach(k => { if (!discs.includes(k)) discs.push(k); });
+    return discs.map(disc => { const po = P && P.rows.find(r => r[0] === disc || r[0] === PO_ALIAS[disc]); const e = st[disc];
+      return { disc, inp: po ? po[1] : '', ent: e && e.ent != null ? e.ent : (po ? po[2] : ''), prazo: (e && e.prazo) || m.d || '', on: e ? e.on !== false : true, zonas: this.zOf(d, disc).join(', ') }; });
+  }
+  flat(d) {
+    const o = {}; const put = (k, l, v) => o[k] = { l, v: String(v == null ? '' : v).trim() };
+    FG.forEach(g => g.f.forEach(f => put(g.k + '.' + f[0], g.t + ' › ' + f[1], f[2] === 'date' ? fmtD(d[g.k][f[0]]) : d[g.k][f[0]])));
+    put('r.l', 'Restrições legais', d.restr.legal + (d.restr.legal === 'Sim' ? ': ' + d.restr.legalTxt : ''));
+    put('r.e', 'Restrições de engenharia', d.restr.eng + (d.restr.eng === 'Sim' ? ': ' + d.restr.engTxt : ''));
+    put('pl', 'Implantação', d.planta ? 'Imagem #' + (d.planta.length % 99991) : '');
+    d.marcos.forEach(m => put('m.' + m.id, 'Marco › ' + m.n, fmtD(m.d)));
+    d.zonas.forEach(z => put('z.' + z.id, 'Zona ' + z.code + (z.nome ? ' · ' + z.nome : ''), [this.zt(z.t).n, 'Áreas: ' + (z.ar.join(', ') || '—'), 'Disciplinas: ' + (z.di.join(', ') || '—'), z.obs].filter(Boolean).join(' | ')));
+    d.equip.forEach(e => put('e.' + e.id, 'Equipamento › ' + (e.cat || '—') + (e.desc ? ' · ' + e.desc : ''), [e.qtd && ('Qtd ' + e.qtd), e.zona && ('Zona ' + e.zona), e.spec, e.status].filter(Boolean).join(' | ')));
+    d.zonas.forEach(z => EQ_Q.forEach(q => { if (z.q && z.q[q[0]]) put('zq.' + z.id + q[0], 'Zona ' + z.code + ' › ' + q[1], z.q[q[0]]); }));
+    PROJ_Q.forEach(q => { if (d.pq && d.pq[q[0]]) put('pq.' + q[0], 'Projetistas › ' + q[1], d.pq[q[0]]); });
+    PREM_ELE.forEach(q => { const pe = (d.prem && d.prem.ele) || {}; if (pe[q[0]]) put('pe.' + q[0], 'Premissas Elétrico › ' + q[1], pe[q[0]] + (q[4] && pe[q[4]] ? ' (' + pe[q[4]] + ')' : '')); });
+    this.projDiscs(d).forEach(x => { const p = d.proj[x]; put('p.' + x, 'Projetista › ' + x, p && p.v ? this.desName(p.v) + ' (' + p.st + ')' : ''); });
+    d.marcos.forEach(m => this.escRows(d, m).forEach(r => put('s.' + m.id + r.disc, 'Escopo ' + m.n + ' › ' + r.disc, r.on ? r.ent + (r.prazo ? ' | prazo ' + fmtD(r.prazo) : '') : 'Não incluso')));
+    return o;
+  }
+  diff(a, b) {
+    const A = this.flat(a), B = this.flat(b), out = [];
+    new Set([...Object.keys(A), ...Object.keys(B)]).forEach(k => {
+      const va = A[k] ? A[k].v : '', vb = B[k] ? B[k].v : '';
+      if (va !== vb) out.push({ l:(B[k] || A[k]).l, a:va || '—', b:vb || '—', kind: !va ? 'Incluído' : !vb ? 'Removido' : 'Alterado' });
+    });
+    return out;
+  }
+  docSections(d) {
+    const S = []; let n = 0;
+    const tbl = (t, cols, rows, note) => ({ t, note: note || '', isTable:true, cols, rows, empty: rows.length === 0 });
+    FG.forEach(g => S.push({ t:(++n) + '. ' + g.t, isKv:true, items: g.f.map(f => ({ l:f[1], v:(f[2] === 'date' ? fmtD(d[g.k][f[0]]) : d[g.k][f[0]]) || '—' })) }));
+    S.push({ t:(++n) + '. Objetivo e restrições', isText:true, items:[
+      { l:'Objetivo do projeto', v:this.objetivo(d) },
+      { l:'Restrições legais', v: d.restr.legal === 'Sim' ? d.restr.legalTxt || 'Sim' : (d.restr.legal || '—') },
+      { l:'Restrições de engenharia', v: d.restr.eng === 'Sim' ? d.restr.engTxt || 'Sim' : (d.restr.eng || '—') }] });
+    S.push(tbl((++n) + '. Marcos', ['Marco','Data'], d.marcos.map(m => [m.n, fmtD(m.d) || '—'])));
+    S.push({ t:(++n) + '. Zonas de construção', isPlan:true, note:'', hasImg: !!d.planta, imgEl: d.planta ? React.createElement('img', { src:d.planta, alt:'Implantação', style:{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'fill' } }) : null, ar: d.plantaAR || 1.6,
+      zs: d.zonas.map(z => { const p = this.getPts(z); return { code:z.code, pts:this.ptsStr(p), l:Math.min(...p.map(q => q[0])) + '%', tp:Math.min(...p.map(q => q[1])) + '%', c:this.zc(z), fill:this.zc(z) + '22' }; }) });
+    S.push(tbl('', ['Código','Zona','Tipo','Áreas','Disciplinas'], d.zonas.map(z => [this.sig(d) + '-' + z.code, z.nome || '—', this.zt(z.t).n, z.ar.join(', ') || '—', z.di.join(', ') || '—'])));
+    S.push(tbl((++n) + '. Equipamentos', ['Equipamento','Descrição','Qtd','Zona','Especificação','Status'], d.equip.map(e => [e.cat || '—', e.desc || '—', e.qtd || '—', e.zona || '—', e.spec || '—', e.status])));
+    { const pe = (d.prem && d.prem.ele) || {};
+      const lin = PREM_ELE.filter(q => pe[q[0]] && (!q[2] || pe[q[2]] === 'Sim')).map(q => [q[1], pe[q[0]] + (q[4] && pe[q[4]] && pe[q[0]] === 'Sim' ? ' · ' + pe[q[4]] + ' circuito(s)' : '')]);
+      if (lin.length) S.push(tbl((++n) + '. Premissas de projeto · Elétrico', ['Premissa','Resposta'], lin)); }
+    S.push(tbl((++n) + '. Projetistas', ['Disciplina','Projetista','Zonas','Contratação'], this.projDiscs(d).map(x => { const p = d.proj[x] || {}; return [x, p.v ? this.desName(p.v) : 'A definir', this.zOf(d, x).join(', '), p.st || 'A contratar']; })));
+    const en = ++n;
+    d.marcos.forEach((m, i) => {
+      const P = PHASES.find(p => p.k === m.k);
+      const rows = this.escRows(d, m).filter(r => r.on).map(r => { const pj = d.proj[r.disc]; return [r.disc, pj && pj.v ? this.desName(pj.v) : '—', r.ent || '—', fmtD(r.prazo) || '—']; });
+      S.push(tbl(en + '.' + (i + 1) + ' Escopo · ' + m.n, ['Disciplina','Projetista','Entregáveis','Prazo'], rows, P ? P.obj : ''));
+      if (P) S.push(tbl('Congelamentos · ' + m.n, ['Item','Risco de alteração','Disciplinas impactadas'], P.freeze.map(f => [f[0], f[1], f[2]])));
+    });
+    return S;
+  }
+
+  getPts(z) { if (z.pts && z.pts.length) return z.pts; const r = z.r || { x:0, y:0, w:5, h:5 }; return [[r.x, r.y], [r.x + r.w, r.y], [r.x + r.w, r.y + r.h], [r.x, r.y + r.h]]; }
+  ptsStr(p) { return p.map(q => q[0] + ',' + q[1]).join(' '); }
+  closePoly() { const P = (this.state.poly || []).filter((q, i, a) => i === 0 || Math.hypot(q[0] - a[i - 1][0], q[1] - a[i - 1][1]) > 0.6);
+    this.setState({ poly:null, hover:null }); if (P.length >= 3) this.addZone(this.state.zTipo, P); }
+  addZone(tipo, pts) { this.lastTipo = tipo; const T = this.zt(tipo); const id = uid();
+    this.setD(x => { const nums = x.zonas.filter(z => z.t === tipo).map(z => parseInt(z.code.split('-')[1], 10) || 0);
+      const nn = (nums.length ? Math.max(...nums) : 0) + 1;
+      x.zonas.push({ id, t:tipo, code:tipo + '-' + pad(nn), nome: T.n + (tipo === 'TOR' ? ' ' + String.fromCharCode(64 + nn) : nn > 1 ? ' ' + nn : ''), pts, ar:T.ar.slice(), di:T.di.slice(), obs:'' }); });
+    this.setState({ zSel:id, zTipo:null }); }
+  pt(e) { const el = this.planRef.current; if (!el) return { x:0, y:0 }; const r = el.getBoundingClientRect(); const c = v => Math.max(0, Math.min(100, Math.round(v * 10) / 10));
+    return { x: c((e.clientX - r.left) / r.width * 100), y: c((e.clientY - r.top) / r.height * 100) }; }
+  upload(e) {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => { const img = new Image(); img.onload = () => {
+      const k = Math.min(1, 1400 / Math.max(img.width, img.height)); const cv = document.createElement('canvas');
+      cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+      const cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height); cx.drawImage(img, 0, 0, cv.width, cv.height);
+      const url = cv.toDataURL('image/jpeg', 0.8); this.setD(x => { x.planta = url; x.plantaAR = cv.width / cv.height; });
+    }; img.src = rd.result; };
+    rd.readAsDataURL(f); e.target.value = '';
+  }
+  zonasVals(v, d, sg) {
+    const s = this.state, db = s.db;
+    v.zoneFmt = sg + '-[TIPO]-[NN]';
+    v.uploadLabel = d.planta ? 'Trocar implantação' : 'Enviar implantação';
+    v.hasPlanta = !!d.planta; v.noPlanta = !d.planta; v.planta = d.planta || ''; v.plantaImg = d.planta ? React.createElement('img', { src:d.planta, alt:'Implantação', draggable:false, style:{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'fill', pointerEvents:'none' } }) : null; v.planAR = String(d.plantaAR || 1.6);
+    v.onUpload = e => this.upload(e);
+    v.rmPlanta = () => this.setD(x => { x.planta = null; });
+    v.planRef = this.planRef; v.drawing = !!s.zTipo; v.notDrawing = !s.zTipo;
+    v.planCursor = s.zTipo || s.tool === 'rect' ? 'crosshair' : 'default';
+    this.ar = d.plantaAR || 1.6;
+    v.scrollRef = this.scrollRef; v.zoomW = ((s.zoom || 1) * 100) + '%'; v.zoomL = Math.round((s.zoom || 1) * 100) + '%';
+    v.zIn = () => this.setZoom((s.zoom || 1) * 1.25); v.zOut = () => this.setZoom((s.zoom || 1) / 1.25); v.zFit = () => this.setZoom(1);
+    v.orthoOn = !!s.ortho; v.orthoOff = !s.ortho; v.togOrtho = () => this.setState({ ortho: !s.ortho });
+    const pl = s.poly;
+    v.drawHint = s.zTipo ? (s.tool === 'poly' ? (pl && pl.length ? pl.length + ' vértices · clique no 1º vértice, duplo clique ou Enter para fechar · Backspace desfaz · Esc cancela' : 'Clique para marcar cada vértice da poligonal de ' + this.zt(s.zTipo).n + '.') : 'Arraste para demarcar um retângulo de ' + this.zt(s.zTipo).n + '. Esc cancela.') : s.tool === 'rect' ? 'Retângulo: arraste em área livre da implantação para criar uma zona (tipo ' + this.zt(this.lastTipo || 'OUT').n + ', altere no painel). Clique numa zona para editar.'
+      : (s.zSel ? 'Arraste a zona para mover · arraste um vértice para editar · duplo clique na borda adiciona vértice · botão direito no vértice remove · Delete exclui a zona' : 'Escolha um tipo de zona e a ferramenta. Clique numa zona para selecionar.');
+    v.tools = [['poly','Poligonal'],['rect','Retângulo']].map(o => ({ l:o[1], on: s.tool === o[0], off: s.tool !== o[0], go: () => this.setState({ tool:o[0], poly:null }) }));
+    v.cancelDraw = () => this.setState({ zTipo:null, poly:null });
+    v.planDown = e => { const st = this.state;
+      if (!st.zTipo) { const bg = e.target === e.currentTarget || e.target.tagName === 'IMG' || e.target.tagName === 'svg';
+        if (bg && st.tool === 'rect') { e.preventDefault(); const p = this.pt(e); this.setState({ drag:{ x0:p.x, y0:p.y, x1:p.x, y1:p.y, free:true } }); return; }
+        if (bg) this.setState({ zSel:null }); return; }
+      e.preventDefault(); const p = this.pt(e);
+      if (st.tool === 'rect') { this.setState({ drag:{ x0:p.x, y0:p.y, x1:p.x, y1:p.y } }); return; }
+      const P = st.poly || [];
+      if (P.length >= 3 && Math.hypot(p.x - P[0][0], p.y - P[0][1]) < 1.8) { this.closePoly(); return; }
+      const sp = this.snap(P[P.length - 1], p, this.segAng(P[P.length - 2], P[P.length - 1]));
+      this.setState({ poly: P.concat([[sp.x, sp.y]]) }); };
+    v.planDbl = e => { if (this.state.zTipo && this.state.poly) { e.preventDefault(); this.closePoly(); } };
+    v.planMove = e => { const st = this.state; const p = this.pt(e);
+      if (st.drag) { this.setState({ drag:{ ...st.drag, x1:p.x, y1:p.y } }); return; }
+      if (st.poly) { this.altKey = e.altKey; const P = st.poly; const sp = this.snap(P[P.length - 1], p, this.segAng(P[P.length - 2], P[P.length - 1])); this.setState({ hover:[sp.x, sp.y], snapped:sp.snapped }); return; }
+      if (st.mv) { const m = st.mv; let pts;
+        if (m.t === 'z') { const dx = p.x - m.p0.x, dy = p.y - m.p0.y; pts = m.pts0.map(q => [Math.round((q[0] + dx) * 10) / 10, Math.round((q[1] + dy) * 10) / 10]); }
+        else { this.altKey = e.altKey; const P0 = m.pts0, n = P0.length, k = m.vi; const prev = P0[(k - 1 + n) % n], pp = P0[(k - 2 + n) % n];
+          const sp = this.snap(prev, p, this.segAng(pp, prev)); pts = P0.map((q, j) => j === k ? [sp.x, sp.y] : q); }
+        this.setState({ live:{ id:m.id, pts } }); } };
+    v.planUp = () => { const st = this.state;
+      if (st.drag) { const g = st.drag; this.setState({ drag:null });
+        const r = { x:Math.min(g.x0, g.x1), y:Math.min(g.y0, g.y1), w:Math.abs(g.x1 - g.x0), h:Math.abs(g.y1 - g.y0) };
+        if (r.w < 1.5 || r.h < 1.5) { if (g.free) this.setState({ zSel:null }); return; }
+        this.addZone(st.zTipo || this.lastTipo || 'OUT', [[r.x, r.y], [r.x + r.w, r.y], [r.x + r.w, r.y + r.h], [r.x, r.y + r.h]]); return; }
+      if (st.mv) { const L = st.live; this.setState({ mv:null, live:null }); if (L) this.setD(x => { const z = x.zonas.find(q => q.id === L.id); if (z) { z.pts = L.pts; delete z.r; } }); } };
+    const g = s.drag; v.dragging = !!g;
+    v.dragBox = g ? { l:Math.min(g.x0, g.x1) + '%', tp:Math.min(g.y0, g.y1) + '%', w:Math.abs(g.x1 - g.x0) + '%', h:Math.abs(g.y1 - g.y0) + '%', c:this.zt(s.zTipo || this.lastTipo || 'OUT').c } : { l:'0', tp:'0', w:'0', h:'0', c:'#000' };
+    v.hasPoly = !!(pl && pl.length); const pc = this.zt(s.zTipo || 'OUT').c;
+    v.polyV = { pts: pl ? this.ptsStr(pl.concat(s.hover ? [s.hover] : [])) : '', c: pc,
+      snapC: s.snapped ? '#16A34A' : pc, dash: s.snapped ? '0' : '6 4',
+      dots: (pl || []).map((q, k) => ({ l:q[0] + '%', tp:q[1] + '%', c:pc, sz: k === 0 && pl.length >= 3 ? '14px' : '9px' })) };
+    v.ztypes = this.allZT().map(T => ({ k:T.k, n:T.n, c:T.c, on: s.zTipo === T.k, off: s.zTipo !== T.k, go: () => this.setState({ zTipo: s.zTipo === T.k ? null : T.k, poly:null, zSel:null }) }));
+    const SW = ['#2563EB','#0891B2','#7C3AED','#DC2626','#D97706','#DB2777','#16A34A','#65A30D','#0F766E','#9333EA','#EA580C','#475569'];
+    v.ntOpen = !!s.nt; v.ntClosed = !s.nt;
+    v.ntStart = () => this.setState({ nt:{ n:'', k:'', c:SW[Math.floor(Math.random() * SW.length)] } });
+    if (s.nt) { const nt = s.nt; const used = this.allZT().map(q => q.k); const k = (nt.k || nt.n.normalize('NFD').replace(/[^A-Za-z]/g, '').slice(0, 3)).toUpperCase();
+      const err = !nt.n.trim() ? 'Informe o nome.' : k.length < 2 ? 'Sigla com 2 a 4 letras.' : used.includes(k) ? 'Sigla ' + k + ' já existe.' : '';
+      v.nt = { n:nt.n, k:nt.k, kPh:k || 'SIG', c:nt.c, err, hasErr: !!err, ok: !err,
+        sw: SW.map(c => ({ c, on: c === nt.c, off: c !== nt.c, go: () => this.setState({ nt:{ ...this.state.nt, c } }) })),
+        onN: e => this.setState({ nt:{ ...this.state.nt, n:e.target.value } }), onK: e => this.setState({ nt:{ ...this.state.nt, k:e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4) } }),
+        onC: e => this.setState({ nt:{ ...this.state.nt, c:e.target.value } }),
+        cancel: () => this.setState({ nt:null }),
+        save: () => { if (err) return; const db2 = clone(this.state.db); db2.ztCustom = db2.ztCustom || []; db2.ztCustom.push({ k, n:nt.n.trim(), c:nt.c, ar:['Infraestrutura','Térreo'], di:['Estrutura CA'] }); this.save(db2); this.setState({ nt:null, zTipo:k, poly:null, zSel:null }); } }; }
+    v.zonesP = d.zonas.map(z => { const T = { ...this.zt(z.t), c:this.zc(z) }; const sel = s.zSel === z.id;
+      const P = s.live && s.live.id === z.id ? s.live.pts : this.getPts(z);
+      const startMv = ev => { if (this.state.zTipo) return; ev.stopPropagation(); ev.preventDefault(); const p = this.pt(ev); this.setState({ zSel:z.id, mv:{ t:'z', id:z.id, p0:p, pts0:P } }); };
+      return { code:z.code, pts:this.ptsStr(P), l:Math.min(...P.map(q => q[0])) + '%', tp:Math.min(...P.map(q => q[1])) + '%', c:T.c, fill: T.c + (sel ? '44' : '22'), sw: sel ? '3' : '2', pe: s.zTipo ? 'none' : 'auto', cur: sel ? 'move' : 'pointer',
+        down: startMv,
+        dbl: ev => { if (!sel) return; ev.stopPropagation(); const p = this.pt(ev); let best = 0, bd = 1e9;
+          P.forEach((q, k) => { const r = P[(k + 1) % P.length]; const dx = r[0] - q[0], dy = r[1] - q[1]; const L2 = dx * dx + dy * dy || 1;
+            const u = Math.max(0, Math.min(1, ((p.x - q[0]) * dx + (p.y - q[1]) * dy) / L2)); const dd = Math.hypot(p.x - (q[0] + u * dx), p.y - (q[1] + u * dy)); if (dd < bd) { bd = dd; best = k; } });
+          const np = P.slice(); np.splice(best + 1, 0, [p.x, p.y]); this.setD(x => { const zz = x.zonas.find(q => q.id === z.id); zz.pts = np; delete zz.r; }); },
+        handles: sel && !s.zTipo ? P.map((q, k) => ({ l:q[0] + '%', tp:q[1] + '%', c:T.c,
+          down: ev => { ev.stopPropagation(); ev.preventDefault(); this.setState({ mv:{ t:'v', id:z.id, vi:k, pts0:P } }); },
+          ctx: ev => { ev.preventDefault(); ev.stopPropagation(); if (P.length <= 3) return; const np = P.filter((_, j) => j !== k); this.setD(x => { const zz = x.zonas.find(q => q.id === z.id); zz.pts = np; delete zz.r; }); } })) : [] }; });
+    v.zList = d.zonas.map(z => { const T = { ...this.zt(z.t), c:this.zc(z) }; return { code:z.code, nome:z.nome || T.n, c:T.c, n:z.di.length, on: s.zSel === z.id, off: s.zSel !== z.id, go: () => this.setState({ zSel:z.id }) }; });
+    v.noZonas = d.zonas.length === 0;
+    const i = d.zonas.findIndex(z => z.id === s.zSel); v.hasSel = i >= 0; v.noSel = i < 0;
+    if (i >= 0) {
+      const z = d.zonas[i], T = { ...this.zt(z.t), c:this.zc(z) };
+      const tog = (key, val) => () => this.setD(x => { const a = x.zonas[i][key]; const j = a.indexOf(val); j >= 0 ? a.splice(j, 1) : a.push(val); });
+      const areas = Array.from(new Set(T.ar.concat(['Infraestrutura','Subsolo','Térreo','Tipo','Cobertura']).concat(z.ar)));
+      const addA = () => { const val = (s.zArea || '').trim(); if (!val) return; this.setD(x => { if (!x.zonas[i].ar.includes(val)) x.zonas[i].ar.push(val); }); this.setState({ zArea:'' }); };
+      v.selSw = SW.map(c => ({ c, on: this.zc(z) === c, off: this.zc(z) !== c, go: () => this.setD(x => { x.zonas[i].cor = c; }) }));
+      v.selColor = this.zc(z); v.onSelColor = e => { const c = e.target.value; this.setD(x => { x.zonas[i].cor = c; }); };
+      v.sel = { full: sg + '-' + z.code, code:z.code, nome:z.nome, obs:z.obs, tipo:z.t, tipoN:T.n, c:T.c,
+        types: this.allZT().map(q => ({ k:q.k, n:q.n })),
+        onCode: e => { const val = e.target.value.toUpperCase(); this.setD(x => x.zonas[i].code = val); },
+        onNome: e => { const val = e.target.value; this.setD(x => x.zonas[i].nome = val); },
+        onObs: e => { const val = e.target.value; this.setD(x => x.zonas[i].obs = val); },
+        onTipo: e => { const k = e.target.value; const Q = this.zt(k); this.setD(x => { const zz = x.zonas[i]; zz.t = k; zz.code = k + '-' + (zz.code.split('-')[1] || '01'); zz.ar = Q.ar.slice(); zz.di = Q.di.slice(); }); },
+        area: s.zArea || '', onArea: e => this.setState({ zArea:e.target.value }), onAreaKey: e => { if (e.key === 'Enter') { e.preventDefault(); addA(); } },
+        areas: areas.map(l => ({ l, on: z.ar.includes(l), off: !z.ar.includes(l), toggle: tog('ar', l) })),
+        discs: Array.from(new Set(this.allDisc().concat(z.di))).map(l => ({ l, on: z.di.includes(l), off: !z.di.includes(l), toggle: tog('di', l) })),
+        nd: s.newDiscZ || '', onNd: e => this.setState({ newDiscZ:e.target.value }),
+        onNdKey: e => { if (e.key !== 'Enter') return; e.preventDefault(); const val = (this.state.newDiscZ || '').trim(); if (!val) return;
+          this.setD((x, db2) => { db2.discCustom = db2.discCustom || []; if (!DISC_ALL.includes(val) && !db2.discCustom.includes(val)) db2.discCustom.push(val); if (!x.zonas[i].di.includes(val)) x.zonas[i].di.push(val); }); this.setState({ newDiscZ:'' }); },
+        projs: z.di.slice().sort((a, b) => this.dOrd(a, b)).map(disc => { const p = d.proj[disc] || { v:'', st:'A contratar' };
+          return { disc, v:p.v, opts: db.designers.slice().sort((a, b) => (b.d.includes(disc) - a.d.includes(disc)) || a.n.localeCompare(b.n)).map(o => ({ id:o.id, l:o.n + (o.d.includes(disc) ? '  ★' : '') })),
+            onSel: e => { const val = e.target.value; this.setD(x => x.proj[disc] = { v:val, st:p.st || 'A contratar' }); } }; }),
+        del: () => { this.setD(x => x.zonas.splice(i, 1)); this.setState({ zSel:null }); },
+        close: () => this.setState({ zSel:null }) };
+    }
+  }
+  renderVals() {
+    const v = this.rv0(); const s = this.state, db = s.db; const nav = [];
+    const item = (label, active, go, mark, num) => nav.push({ label, isHead:false, isActive:!!active, isIdle:!active, go, mark: mark == null ? '' : String(mark), hasMark: mark != null && mark !== '', num: num || '', hasNum: !!num });
+    const head = l => nav.push({ label:l, isHead:true, isActive:false, isIdle:false, hasMark:false, hasNum:false, mark:'', num:'' });
+    if (db) {
+      item('← Dashboard', false, () => { location.href = DASH_URL; }, null);
+      item('Termo de Abertura de Projeto (TAP)', s.view === 'home', () => this.setState({ view:'home', empId:null }), db.emps.length);
+      const emp = s.empId && db.emps.find(e => e.id === s.empId);
+      if (emp) {
+        head(emp.sigla ? emp.sigla + ' · ' + emp.nome : emp.nome);
+        const taps = this.taps(emp.id), last = taps[taps.length - 1];
+        if (taps.length) item('Controle de revisões', s.view === 'emp', () => this.setState({ view:'emp', openDiff:null }), taps.length);
+        if (last) item('Documento vigente', s.view === 'doc' && s.docId === last.id, () => this.setState({ view:'doc', docId:last.id, docBackTo:'emp' }), 'Rev. ' + pad(last.rev));
+        if (s.view === 'edit' && v.steps) { head('Preenchimento'); v.steps.forEach(st => item(st.t, st.active, st.go, st.count, st.n)); }
+        else if (db.drafts[emp.id]) item('Continuar rascunho', false, () => this.setState({ view:'edit', step:0 }), null);
+      }
+    }
+    v.nav = nav;
+    v.temaOpts = [['claro','Claro'],['escuro','Escuro']].map(o => ({ label:o[1], on: s.tema === o[0], off: s.tema !== o[0], go: () => this.setTema(o[0]) }));
+    v.totTaps = db ? (s.sync || '') + ' · ' + db.taps.length + ' revisões' : '';
+    return v;
+  }
+  rv0() {
+    const s = this.state, db = s.db;
+    const base = { isHome:false, isEmp:false, isEdit:false, isDoc:false, crumb:'' };
+    const goHome = () => this.setState({ view:'home', empId:null });
+    if (!db) return { ...base, isHome:true, goHome, emps:[], noEmps:false };
+    base.goHome = goHome;
+
+    if (s.view === 'home') {
+      const q = s.q.toLowerCase();
+      const emps = db.emps.map(e => {
+        const l = this.last(e.id); const dd = l ? l.data : db.drafts[e.id];
+        return { id:e.id, sigla:e.sigla || '—', nome:e.nome, cidade: dd ? [dd.ident.cidade, dd.ident.uf].filter(Boolean).join(' / ') : '', rev: l ? 'Rev. ' + pad(l.rev) : '—', date: l ? fmtD(l.date) : '', autor: l ? l.autor : '', hasDraft: !!db.drafts[e.id], open: () => this.setState({ view:'emp', empId:e.id, openDiff:null }) };
+      }).filter(e => !q || (e.nome + e.sigla + e.cidade).toLowerCase().includes(q));
+      return { ...base, isHome:true, crumb: db.emps.length + ' empreendimentos · ' + db.taps.length + ' revisões emitidas', q:s.q, onQ: e => this.setState({ q:e.target.value }), emps, noEmps: emps.length === 0,
+        newEmp: () => { const db2 = clone(db); const id = uid(); db2.emps.push({ id, nome:'Novo empreendimento', sigla:'' }); db2.drafts[id] = blank(); this.save(db2); this.setState({ view:'edit', empId:id, step:0 }); } };
+    }
+
+    const emp = db.emps.find(e => e.id === s.empId);
+    const taps = this.taps(s.empId), last = taps[taps.length - 1] || null;
+    const openEditor = () => { if (!db.drafts[s.empId]) { const db2 = clone(db); const nd = clone(last.data); nd.autor = ''; nd.motivo = ''; db2.drafts[s.empId] = nd; this.save(db2); } this.setState({ view:'edit', step:0 }); };
+
+    if (s.view === 'emp') {
+      const revs = taps.slice().reverse().map(t => {
+        const prev = taps.find(x => x.rev === t.rev - 1);
+        const open = s.openDiff === t.id;
+        const dif = prev && open ? this.diff(prev.data, t.data) : [];
+        return { revL:'Rev. ' + pad(t.rev), date:fmtD(t.date), autor:t.autor, motivo:t.motivo, isLast:t === last, hasDiff:!!prev, open, diff:dif,
+          diffLabel: open ? 'Ocultar alterações' : 'Ver alterações', toggle: () => this.setState({ openDiff: open ? null : t.id }),
+          view: () => this.setState({ view:'doc', docId:t.id, docBackTo:'emp' }) };
+      });
+      const dd = last ? last.data : db.drafts[s.empId];
+      return { ...base, isEmp:true, crumb:emp.nome, empV: {
+        codigo: 'TAP.' + (emp.sigla || 'XXX') + '.001', nome:emp.nome,
+        meta: dd ? [dd.produto.unidade, [dd.ident.cidade, dd.ident.uf].filter(Boolean).join(' / '), dd.produto.unid && dd.produto.unid + ' unidades'].filter(Boolean).join(' · ') : '',
+        hasLast:!!last, lastRev: last ? 'Rev. ' + pad(last.rev) : '', viewLast: () => last && this.setState({ view:'doc', docId:last.id, docBackTo:'emp' }),
+        editLabel: db.drafts[s.empId] ? 'Continuar rascunho' : 'Nova revisão', edit: openEditor, revs, noRevs: revs.length === 0 } };
+    }
+
+    const d = db.drafts[s.empId];
+
+    if (s.view === 'doc') {
+      const t = s.docId ? db.taps.find(x => x.id === s.docId) : null;
+      const data = t ? t.data : d;
+      const revNo = t ? t.rev : (last ? last.rev + 1 : 0);
+      const upto = taps.filter(x => x.rev <= revNo);
+      const sections = this.docSections(data);
+      const revRows = upto.map(x => ['Rev. ' + pad(x.rev), fmtD(x.date), x.autor, x.motivo]);
+      if (!t) revRows.push(['Rev. ' + pad(revNo), 'prévia', d.autor || '—', d.motivo || '—']);
+      sections.push({ t:'Controle de revisões', isTable:true, cols:['Revisão','Data','Elaborado por','Descrição'], rows:revRows, empty:false, note:'' });
+      return { ...base, isDoc:true, crumb:emp.nome,
+        doc: { isMk: (data.produto.unidade || 'Make It') !== 'Gadens Inc', isGd: data.produto.unidade === 'Gadens Inc', logo:this.un(data).logo, ac:this.un(data).ac, tint:this.un(data).tint, un:data.produto.unidade || 'Make It', emp:data.ident.nome || emp.nome, codigo:'TAP.' + this.sig(data) + '.001', rev:pad(revNo), date: t ? fmtD(t.date) : fmtD(today()), autor: (t ? t.autor : d.autor) || '—', isPreview:!t, sections },
+        docBack: () => this.setState({ view: s.docBackTo }), print: () => window.print() };
+    }
+
+    // edit
+    if (!d) return { ...base, isEmp:false, isHome:true, emps:[], noEmps:true };
+    const step = s.step, LAST = STEPS.length - 1;
+    const nextRev = last ? last.rev + 1 : 0;
+    const sg = this.sig(d);
+    const zd = this.zDiscs(d);
+    const counts = [null, null, null, d.marcos.filter(m => m.d).length + '/' + d.marcos.length, d.zonas.length || '', d.equip.length || '', this.projDiscs(d).length, null, null];
+    const steps = STEPS.map((x, i) => ({ n:pad(i + 1), t:x.t, active:i === step, idle:i !== step, count:counts[i] == null ? '' : String(counts[i]), go: () => this.setState({ step:i }) }));
+    const v = { ...base, isEdit:true, crumb: emp.nome, steps, cur:{ n:pad(step + 1), tot:pad(STEPS.length), t:STEPS[step].t, d:STEPS[step].d },
+      ed:{ title: d.ident.nome || 'Novo empreendimento', revLabel: 'Rascunho da Rev. ' + pad(nextRev) + (last ? ' · base Rev. ' + pad(last.rev) : ''), nextRev:'Rev. ' + pad(nextRev) },
+      prev: () => this.setState({ step: Math.max(0, step - 1) }), next: () => this.setState({ step: Math.min(LAST, step + 1) }),
+      hasNext: step < LAST, nextT: STEPS[Math.min(LAST, step + 1)].t,
+      isFields: step <= 1, isObj: step === 2, isMarcos: step === 3, isZonas: step === 4, isEquip: step === 5, isProj: step === 6, isEscopo: step === 7, isReview: step === LAST };
+
+    if (step <= 1) {
+      const g = FG[step];
+      v.fields = g.f.map(f => ({ l:f[1], v:d[g.k][f[0]] || '', ph:f[4] || '', type:f[2] === 'number' ? 'number' : f[2] === 'date' ? 'date' : 'text', span: f[3] === 2 ? '1 / -1' : 'auto',
+        isInput: f[2] === 'text' || f[2] === 'number' || f[2] === 'date', isSel: f[2] === 'select', isArea: false, opts: f[5] || [],
+        on: e => { const val = e.target.value; this.setD((x, db2) => { x[g.k][f[0]] = f[0] === 'sigla' ? val.toUpperCase().slice(0, 4) : val; const em = db2.emps.find(z => z.id === s.empId); if (f[0] === 'nome' && !this.last(s.empId)) em.nome = val || 'Novo empreendimento'; if (f[0] === 'sigla' && !this.last(s.empId)) em.sigla = val.toUpperCase().slice(0, 4); }); } }));
+    }
+    if (step === 2) {
+      v.objTxt = this.objetivo(d);
+      v.restr = [['legal','legalTxt','Temos restrições legais?','Quais? Ex.: zoneamento, recuos, gabarito, APP, tombamento…'],['eng','engTxt','Temos restrições de engenharia?','Quais? Ex.: solo, lençol freático, divisas, redes existentes…']].map(r => ({
+        l:r[2], ph:r[3], txt:d.restr[r[1]] || '', sim: d.restr[r[0]] === 'Sim', nao: d.restr[r[0]] === 'Não', simOff: d.restr[r[0]] !== 'Sim', naoOff: d.restr[r[0]] !== 'Não',
+        setSim: () => this.setD(x => x.restr[r[0]] = 'Sim'), setNao: () => this.setD(x => x.restr[r[0]] = 'Não'),
+        onTxt: e => { const val = e.target.value; this.setD(x => x.restr[r[1]] = val); } }));
+    }
+    if (step === 3) {
+      v.marcos = d.marcos.map((m, i) => ({ n:m.n, d:m.d, k:m.k || '—',
+        onN: e => { const val = e.target.value; this.setD(x => x.marcos[i].n = val); },
+        onD: e => { const val = e.target.value; this.setD(x => x.marcos[i].d = val); },
+        del: () => this.setD(x => x.marcos.splice(i, 1)) }));
+      v.addMarco = () => this.setD(x => x.marcos.push({ id:uid(), k:'', n:'Novo marco', d:'' }));
+    }
+    if (step === 4) this.zonasVals(v, d, sg);
+    if (step === 5) {
+      v.eqStatus = ["Previsto","Definido","Cotado","Comprado"];
+      const pavN = parseInt(d.produto.pav, 10) || 0;
+      const row = r => { const i = d.equip.findIndex(q => q.id === r.id); const set = k => e => { const val = e.target.value; this.setD(x => x.equip[i][k] = val); };
+        return { cat:r.cat, desc:r.desc, qtd:r.qtd, spec:r.spec, status:r.status, isAuto: !!r.auto, onCat:set('cat'), onDesc:set('desc'), onQtd:set('qtd'), onSpec:set('spec'), onStatus:set('status'), del: () => this.setD(x => x.equip.splice(i, 1)) }; };
+      const groups = d.zonas.map((z, zi) => { const T = { ...this.zt(z.t), c:this.zc(z) };
+        const items = d.equip.filter(e => e.zona === z.code).map(row);
+        const ans = z.q || {};
+        const qs = EQ_Q.map(q => { const a = ans[q[0]] || '';
+          const setA = val => () => this.setD(x => { const zz = x.zonas[zi]; zz.q = zz.q || {}; zz.q[q[0]] = val; const key = zz.id + ':' + q[0];
+            if (val === 'Sim') { if (!x.equip.some(e => e.auto === key)) x.equip.push({ id:uid(), cat:q[2], desc:q[3], qtd:'1', zona:zz.code, spec:'', status:'Previsto', auto:key }); }
+            else x.equip = x.equip.filter(e => e.auto !== key); });
+          const hint = q[0] === 'pav' && pavN ? 'Produto: ' + pavN + ' pavimentos' : '';
+          return { l:q[1], res:'→ ' + q[3].replace('Previsão de ', ''), hint, hasHint: !!hint, sim: a === 'Sim', simNao: a !== 'Não', nao: a === 'Não', naoSim: a !== 'Sim', setSim:setA('Sim'), setNao:setA('Não'), pend: !a }; });
+        return { code:z.code, nome:z.nome || T.n, c:T.c, items, has: items.length > 0, none: items.length === 0, qs, nAns: qs.filter(q => !q.pend).length + '/' + qs.length,
+          add: () => this.setD(x => x.equip.push({ id:uid(), cat:'', desc:'', qtd:'1', zona:z.code, spec:'', status:'Previsto' })) }; });
+      const codes = d.zonas.map(z => z.code); const loose = d.equip.filter(e => !codes.includes(e.zona)).map(row);
+      groups.push({ code:'GERAL', nome:'Sem zona / geral', c:'#94A3B8', items:loose, has: loose.length > 0, none: loose.length === 0, qs:[], nAns:'', add: () => this.setD(x => x.equip.push({ id:uid(), cat:'', desc:'', qtd:'1', zona:'', spec:'', status:'Previsto' })) });
+      v.eqGroups = groups; v.noZonasEq = d.zonas.length === 0;
+      const temEle = this.projDiscs(d).includes('Elétrico');
+      v.temEletrico = temEle; v.semEletrico = !temEle;
+      const pe = (d.prem && d.prem.ele) || {};
+      const vis = PREM_ELE.filter(q => !q[2] || pe[q[2]] === 'Sim');
+      v.elQs = vis.map(q => { const a = pe[q[0]] || '';
+        const setA = val => () => this.setD(x => { x.prem = x.prem || {}; x.prem.ele = x.prem.ele || {}; x.prem.ele[q[0]] = val; });
+        const res = a === 'Sim' ? q[3] + (q[4] && pe[q[4]] ? ' · ' + pe[q[4]] + ' circuito(s)' : '') : '';
+        return { l:q[1], sim:a === 'Sim', naoSim:a !== 'Sim', nao:a === 'Não', simNao:a !== 'Não', setSim:setA('Sim'), setNao:setA('Não'),
+          hasRes: !!res, res, hasQtd: !!q[4] && a === 'Sim', qtd: q[4] ? (pe[q[4]] || '') : '',
+          onQtd: e => { const val = e.target.value; this.setD(x => { x.prem = x.prem || {}; x.prem.ele = x.prem.ele || {}; x.prem.ele[q[4]] = val; }); },
+          rowStyle: 'display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:11px 0;border-bottom:1px solid var(--slate-100)' + (q[2] ? ';margin-left:22px;padding-left:14px;border-left:2px solid var(--slate-200)' : '') };
+      });
+      v.elAns = vis.filter(q => pe[q[0]]).length + '/' + vis.length;
+    }
+    if (step === 6) {
+      v.projStatus = PJ_ST; v.noProj = false;
+      const extra = d.projExtra || [];
+      const pd = this.projDiscs(d);
+      v.pqs = PROJ_Q.map(q => { const a = (d.pq || {})[q[0]] || '';
+        const setA = val => () => this.setD(x => { x.pq = x.pq || {}; x.pq[q[0]] = val; });
+        return { l:q[1], sim: a === 'Sim', simNao: a !== 'Não', nao: a === 'Não', naoSim: a !== 'Sim', setSim:setA('Sim'), setNao:setA('Não'),
+          adds: q[2].map(disc => { const inc = pd.includes(disc); return { disc, can: !inc, done: inc, lbl:'+ Adicionar disciplina de ' + disc, doneL:disc + ' incluída',
+            add: () => this.setD(x => { x.projExtra = x.projExtra || []; if (!x.projExtra.includes(disc)) x.projExtra.push(disc); }) }; }) }; });
+      v.projNd = s.projNd || ''; v.onProjNd = e => this.setState({ projNd:e.target.value });
+      v.projSug = this.allDisc().filter(x => !pd.includes(x));
+      v.addProjNd = () => { const val = (this.state.projNd || '').trim(); if (!val) return;
+        this.setD((x, db2) => { db2.discCustom = db2.discCustom || []; if (!DISC_ALL.includes(val) && !db2.discCustom.includes(val)) db2.discCustom.push(val); x.projExtra = x.projExtra || []; if (!x.projExtra.includes(val)) x.projExtra.push(val); }); this.setState({ projNd:'' }); };
+      v.proj = pd.map(disc => {
+        const p = d.proj[disc] || { v:'', st:'A contratar' };
+        const isNew = s.newDes[disc] !== undefined;
+        const opts = db.designers.slice().sort((a, b) => (b.d.includes(disc) - a.d.includes(disc)) || a.n.localeCompare(b.n)).map(o => ({ id:o.id, l: o.n + (o.d.includes(disc) ? '  ★' : '') }));
+        const confirm = () => { const name = (s.newDes[disc] || '').trim(); if (!name) return; const id = uid();
+          this.setD((x, db2) => { db2.designers.push({ id, n:name, d:[disc] }); x.proj[disc] = { v:id, st:p.st || 'Contratado' }; });
+          const nd = { ...s.newDes }; delete nd[disc]; this.setState({ newDes:nd }); };
+        const zon = this.zOf(d, disc).join(', '); const base = PROJ_BASE.includes(disc), ex = extra.includes(disc) && !base && !zon;
+        return { disc, zonas: zon || (base ? 'Padrão' : 'Adicionada'), canRm: ex, rm: () => this.setD(x => { x.projExtra = (x.projExtra || []).filter(q => q !== disc); }), v:p.v, st:p.st, opts, isNew, notNew:!isNew, newName: s.newDes[disc] || '',
+          onSel: e => { const val = e.target.value; if (val === '__new') { this.setState({ newDes:{ ...s.newDes, [disc]:'' } }); return; } this.setD(x => x.proj[disc] = { v:val, st:p.st }); },
+          onSt: e => { const val = e.target.value; this.setD(x => x.proj[disc] = { v:p.v, st:val }); },
+          onNew: e => this.setState({ newDes:{ ...s.newDes, [disc]:e.target.value } }),
+          onNewKey: e => { if (e.key === 'Enter') confirm(); }, confirm,
+          cancel: () => { const nd = { ...s.newDes }; delete nd[disc]; this.setState({ newDes:nd }); } };
+      });
+    }
+    if (step === 7) {
+      const mi = Math.min(s.phase, d.marcos.length - 1); const M = d.marcos[mi];
+      v.phases = d.marcos.map((m, i) => ({ k:m.k || pad(i + 1), n:m.n, active:i === mi, idle:i !== mi, count: this.escRows(d, m).filter(r => r.on).length + ' entregas · ' + (fmtD(m.d) || 'sem data'), go: () => this.setState({ phase:i }) }));
+      v.noMarcos = !M;
+      if (M) {
+        const P = PHASES.find(p => p.k === M.k);
+        const upd = (disc, fn) => this.setD(x => { const mm = x.marcos.find(q => q.id === M.id); const r = this.escRows(x, mm).find(q => q.disc === disc) || { on:true, ent:'', prazo:'' };
+          x.escopo[M.id] = x.escopo[M.id] || {}; const cur = x.escopo[M.id][disc] || { on:r.on, ent:r.ent, prazo:r.prazo }; fn(cur); x.escopo[M.id][disc] = cur; });
+        v.ph = { k:M.n, obj: P ? P.obj : 'Marco personalizado: defina os entregáveis de cada disciplina.', hasFreeze: !!P,
+          rows: this.escRows(d, M).map(r => { const pj = d.proj[r.disc];
+            return { ...r, off:!r.on, inp: r.inp || 'Sem referência no PO', proj: pj && pj.v ? this.desName(pj.v) : 'Projetista não definido', zonasL: r.zonas ? 'Zonas: ' + r.zonas : 'Adicionada manualmente',
+              toggle: () => upd(r.disc, c => c.on = !c.on),
+              onEnt: ev => { const val = ev.target.value; upd(r.disc, c => c.ent = val); },
+              onPrazo: ev => { const val = ev.target.value; upd(r.disc, c => c.prazo = val); } }; }),
+          freeze: P ? P.freeze.map(f => ({ item:f[0], risk:f[1], disc:f[2], hi:f[1] === 'Alto', mid:f[1].startsWith('Médio'), lo:f[1] === 'Baixo' })) : [] };
+        v.newDisc = s.newDisc || '';
+        v.onNewDisc = e => this.setState({ newDisc:e.target.value });
+        v.addDisc = () => { const val = (s.newDisc || '').trim(); if (!val) return; this.setD(x => { x.escopo[M.id] = x.escopo[M.id] || {}; if (!x.escopo[M.id][val]) x.escopo[M.id][val] = { on:true, ent:'', prazo:M.d || '' }; }); this.setState({ newDisc:'' }); };
+        v.discSug = this.allDisc().filter(x => !this.projDiscs(d).includes(x));
+      }
+    }
+    if (step === LAST) {
+      const identFill = FG[0].f.filter(f => d.ident[f[0]]).length;
+      const prodFill = FG[1].f.filter(f => d.produto[f[0]]).length;
+      const pdl = this.projDiscs(d); const projN = pdl.filter(x => d.proj[x] && d.proj[x].v).length;
+      const projC = pdl.filter(x => d.proj[x] && d.proj[x].st === 'Contratado' && d.proj[x].v).length;
+      const entN = d.marcos.reduce((a, m) => a + this.escRows(d, m).filter(r => r.on).length, 0);
+      const go = i => () => this.setState({ step:i });
+      v.summary = [
+        { t:'Identificação', v: identFill + '/' + FG[0].f.length, sub:'campos preenchidos', go:go(0) },
+        { t:'Produto', v: prodFill + '/' + FG[1].f.length, sub: d.produto.unidade || 'unidade não definida', go:go(1) },
+        { t:'Marcos', v: d.marcos.filter(m => m.d).length + '/' + d.marcos.length, sub:'com data', go:go(3) },
+        { t:'Zonas', v: String(d.zonas.length), sub: d.zonas.map(z => z.code).join(', ') || 'nenhuma', go:go(4) },
+        { t:'Equipamentos', v: String(d.equip.reduce((a, e) => a + (parseInt(e.qtd, 10) || 0), 0)), sub: d.equip.length + ' itens na lista', go:go(5) },
+        { t:'Projetistas', v: projN + '/' + pdl.length, sub: projC + ' contratados', go:go(6) },
+        { t:'Entregas', v: String(entN), sub:'em ' + d.marcos.length + ' marcos', go:go(7) }
+      ];
+      const dif = last ? this.diff(last.data, d) : [];
+      let why = '';
+      if (!d.ident.nome) why = 'Informe o nome do empreendimento.';
+      else if (!d.ident.sigla) why = 'Informe a sigla do empreendimento.';
+      else if (!d.produto.unidade) why = 'Selecione a unidade de negócio.';
+      else if (!(d.autor || '').trim()) why = 'Informe quem elaborou.';
+      else if (last && !dif.length) why = 'Nenhuma alteração em relação à Rev. ' + pad(last.rev) + '.';
+      else if (last && !(d.motivo || '').trim()) why = 'Descreva o motivo da revisão.';
+      v.rv = { diff:dif, noDiff: dif.length === 0,
+        diffTitle: last ? 'Alterações em relação à Rev. ' + pad(last.rev) : 'Primeira emissão',
+        diffSub: last ? dif.length + ' itens alterados' : 'Este documento será a Rev. 00.',
+        noDiffMsg: last ? 'Nenhuma alteração até agora.' : 'Sem revisão anterior para comparar.',
+        autor: d.autor || '', motivo: d.motivo || '',
+        motivoLabel: last ? 'Motivo da revisão *' : 'Descrição (opcional)', motivoPh: last ? 'Ex.: inclusão do quiosque após revisão de produto' : 'Emissão inicial',
+        onAutor: e => { const val = e.target.value; this.setD(x => x.autor = val); },
+        onMotivo: e => { const val = e.target.value; this.setD(x => x.motivo = val); },
+        can: !why, cannot: !!why, why };
+      v.preview = () => this.setState({ view:'doc', docId:null, docBackTo:'edit' });
+      v.generate = () => {
+        const db2 = clone(db); const data = clone(d); const autor = data.autor, motivo = data.motivo || 'Emissão inicial';
+        data.autor = ''; data.motivo = '';
+        const t = { id:uid(), empId:s.empId, rev:nextRev, date:today(), autor, motivo, data };
+        db2.taps.push(t); const em = db2.emps.find(z => z.id === s.empId); em.nome = data.ident.nome; em.sigla = sg;
+        delete db2.drafts[s.empId];
+        if (this.mode === 'server' || this.mode === 'supabase') {
+          this.publishTap(t, sg).then(() => { this.save(db2); this.setState({ view:'doc', docId:t.id, docBackTo:'emp' }); })
+            .catch(err => { alert(err.message); this.loadDb().then(x => this.setState({ db:x, view:'emp' })); });
+          return;
+        }
+        this.save(db2); this.setState({ view:'doc', docId:t.id, docBackTo:'emp' });
+      };
+    }
+    return v;
+  }
+}
+</script>
+</body>
+</html>

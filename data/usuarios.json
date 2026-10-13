@@ -1,0 +1,19 @@
+{
+ "versao": 1,
+ "atualizado": "2026-10-13",
+ "usuarios": [
+  {
+   "login": "admin",
+   "nome": "Administrador provisório",
+   "perfil": "admin",
+   "salt": "PB1a5XYgblCk9X+eAHExlQ==",
+   "iter": 600000,
+   "chave": {
+    "v": 1,
+    "iv": "3+bHnNF8h7O6hCfA",
+    "ct": "DAat48ZOasDkGCnPtn0uG0wUnS0NHxeCQFhe+SAl90YoSP+JagpOgDUVGOoQ5lmv"
+   },
+   "criado": "2026-10-13"
+  }
+ ]
+}
