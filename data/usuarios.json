@@ -14,6 +14,19 @@
     "ct": "6vCc41xjs+SiYZKHi8ZT3R4OQfsHOMksMfsNgmb9xaEHweygOtvBk2vGIRe0q6Ii"
    },
    "criado": "2026-10-13"
+  },
+  {
+   "login": "lucas.lopes",
+   "nome": "Lucas Lopes",
+   "perfil": "leitura",
+   "salt": "XXgD4n5b6jc3dIwvzI2pPg==",
+   "iter": 600000,
+   "chave": {
+    "v": 1,
+    "iv": "yr5/7qLU3F1v14Z0",
+    "ct": "jgJUKBVqcrWneBGu3mJxXRs3tsN0ArluR16kHOT3tNSDtRVvoAlXPKodCcWdzDX2"
+   },
+   "criado": "2026-10-13"
   }
  ]
 }
