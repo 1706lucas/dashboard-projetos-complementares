@@ -100,13 +100,14 @@ function achaCabecalho(rows) {
   }
   return 0;
 }
+const colClasse = H => (H || []).findIndex(h => /^classes?\s+datas?\s+marco/i.test(String(h || "").trim()));
 export function detectKind(wb) {
   const first = wb[Object.keys(wb)[0]] || [];
   const H0 = (first[achaCabecalho(first)] || []).map(String);
   if (H0.indexOf("Classe de Restrição (drop down)") >= 0) return "pendencias";
   const H = (first[0] || []).map(String);
   if (H.indexOf("Lists") >= 0 && H.some(h => /Impacto do Risco|Data final PE/.test(h))) return "indicadores";
-  if (H.indexOf("Classe Datas Marco (drop down)") >= 0 || (H.indexOf("Milestone") >= 0 && H.indexOf("Task Name") >= 0)) return "cronograma";
+  if (colClasse(H) >= 0 || (H.indexOf("Milestone") >= 0 && H.indexOf("Task Name") >= 0)) return "cronograma";
   if (Object.keys(wb).some(k => /contratado/i.test(k)) || Object.keys(wb).some(k => /^NF$/i.test(k))) return "saidas";
   if (Object.keys(wb).some(k => /^geral$/i.test(k)) && Object.keys(wb).some(k => /OR[ÇC]AMENTOS/i.test(k))) return "saidasGadens";
   if (Object.keys(wb).some(k => (wb[k][0] || []).join("|").toUpperCase().indexOf("NOME OBRA") >= 0)) return "siglas";
@@ -188,7 +189,7 @@ const isCompl = t => String(t || "").split(",").some(x => /^\s*(eng\s*-\s*)?comp
 // Fotografia das atividades complementares, para comparar bases entre uploads
 export function snapshotCompl(wb) {
   const t = wb[Object.keys(wb)[0]], H = t[0], i = n => H.indexOf(n);
-  const C = { id: i("Task ID"), name: i("Task Name"), st: i("Status"), sd: i("Start Date"), dd: i("Due Date"), tg: i("tags"), cl: i("Classe Datas Marco (drop down)") };
+  const C = { id: i("Task ID"), name: i("Task Name"), st: i("Status"), sd: i("Start Date"), dd: i("Due Date"), tg: i("tags"), cl: colClasse(H) };
   const nm = r => (r[C.name] || "").replace(/^\s*\ud83d\udccc\s*/, "").trim();
   const MARCO = ["Marco Axial", "Marco Task"];
   const out = {};
@@ -225,20 +226,27 @@ export function comparaAtrasos(prevSnap, curSnap, obras, dataAnterior, dataAtual
 export function mapCronograma(wb, obras, hoje) {
   const t = wb[Object.keys(wb)[0]], H = t[0], i = n => H.indexOf(n);
   const C = { name: i("Task Name"), st: i("Status"), sd: i("Start Date"), dd: i("Due Date"),
-    tg: i("tags"), list: i("Lists"), cl: i("Classe Datas Marco (drop down)") };
+    tg: i("tags"), list: i("Lists"), cl: colClasse(H) };
   if (C.cl < 0) throw new Error("export sem a coluna Classe Datas Marco — refaça pela visão ATUALIZAÇÃO DE DATAS do ClickUp");
   const nm = r => (r[C.name] || "").replace(/^\s*📌\s*/, "").trim();
   const rows = t.slice(1), pre = r => nm(r).slice(0, 3).toUpperCase();
+  const comClasse = rows.filter(r => r[C.cl]).length;
+  const soMarcos = rows.length > 0 && comClasse / rows.length > 0.8;
   return obras.map(o0 => {
     const o = Object.assign({}, o0);
     const mine = rows.filter(r => pre(r) === o.sigla);
-    const compl = mine.filter(r => isCompl(r[C.tg]));
-    o.totalCompl = compl.length;
-    o.doneCompl = compl.filter(r => DONE.indexOf(r[C.st]) >= 0).length;
-    o.pct = o.totalCompl ? Math.round(o.doneCompl / o.totalCompl * 100) : 0;
-    const fase = {}; compl.forEach(r => { const s = r[C.st] || "—"; fase[s] = (fase[s] || 0) + 1; });
-    o.fases = Object.keys(fase).map(s => ({ status: s, n: fase[s], pct: o.totalCompl ? Math.round(fase[s] / o.totalCompl * 100) : 0 }))
-      .sort((a, b) => b.n - a.n);
+    if (!mine.length && o0.temDados) return Object.assign(o, { foraDoExport: true });
+    delete o.foraDoExport;
+    if (!soMarcos || !(o0.totalCompl > 0)) {
+      const compl = mine.filter(r => isCompl(r[C.tg]));
+      o.totalCompl = compl.length;
+      o.doneCompl = compl.filter(r => DONE.indexOf(r[C.st]) >= 0).length;
+      o.pct = o.totalCompl ? Math.round(o.doneCompl / o.totalCompl * 100) : 0;
+      const fase = {}; compl.forEach(r => { const s = r[C.st] || "—"; fase[s] = (fase[s] || 0) + 1; });
+      o.fases = Object.keys(fase).map(s => ({ status: s, n: fase[s], pct: o.totalCompl ? Math.round(fase[s] / o.totalCompl * 100) : 0 }))
+        .sort((a, b) => b.n - a.n);
+    }
+    o.soMarcos = soMarcos;
     o.axial = mine.filter(r => r[C.cl] === "Marco Axial").map(r => ({
       label: clean(nm(r).split("|").slice(1).join(" · ")), status: r[C.st], kind: kindOf(r[C.st]),
       start: ser(r[C.sd]), end: ser(r[C.dd])
@@ -248,7 +256,7 @@ export function mapCronograma(wb, obras, hoje) {
       status: r[C.st], kind: kindOf(r[C.st]), start: ser(r[C.sd]), end: ser(r[C.dd]), tag: r[C.tg] || ""
     })).filter(g => g.start && g.end).sort((a, b) => a.start.localeCompare(b.start));
     o.lista = (mine.map(r => r[C.list]).filter(Boolean)[0]) || o.lista || "";
-    o.temDados = mine.length > 0;
+    o.temDados = mine.length > 0 || (soMarcos && !!o0.temDados);
     const pe = mine.find(r => r[C.cl] === "Marco Axial" && /pré-execu/i.test(nm(r)));
     o.dataPE = pe ? ser(pe[C.dd]) : null;
     // fases (marcos axiais)
