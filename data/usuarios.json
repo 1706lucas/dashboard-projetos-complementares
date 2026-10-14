@@ -1,6 +1,6 @@
 {
  "versao": 1,
- "atualizado": "2026-10-13",
+ "atualizado": "2026-10-14",
  "usuarios": [
   {
    "login": "admin",
@@ -27,6 +27,97 @@
     "ct": "jgJUKBVqcrWneBGu3mJxXRs3tsN0ArluR16kHOT3tNSDtRVvoAlXPKodCcWdzDX2"
    },
    "criado": "2026-10-13"
+  },
+  {
+   "login": "lucas.camargo@makeitconstrutora.com.br",
+   "nome": "Lucas Camargo",
+   "perfil": "leitura",
+   "salt": "AumXlyyxSDTjhWxvfWRsRQ==",
+   "iter": 600000,
+   "chave": {
+    "v": 1,
+    "iv": "LurL6wuU7u9KX6rU",
+    "ct": "y0H5g21oqDpwMga5a5oxdIT06OVuKzJnvZeBEKpfmvtMSKbdItQxUUTADykbtHBO"
+   },
+   "criado": "2026-10-14"
+  },
+  {
+   "login": "mariana.azevedo@makeitconstrutora.com.br",
+   "nome": "Mariana Azevedo",
+   "perfil": "leitura",
+   "salt": "m3bqRoV9Xy/38yrL6WU9/g==",
+   "iter": 600000,
+   "chave": {
+    "v": 1,
+    "iv": "ANRS9l5nsepiTezy",
+    "ct": "4NNC+ZGhtUiK1Q1Z8x8s50iE7cKZuVaTM/xQdYOAM11uZT2xIkXRDD/5lC2hI3d9"
+   },
+   "criado": "2026-10-14"
+  },
+  {
+   "login": "jaira.ataide@makeitconstrutora.com.br",
+   "nome": "Jaira Ataíde",
+   "perfil": "leitura",
+   "salt": "Z8jSFVROrOckYte/Mbf+BA==",
+   "iter": 600000,
+   "chave": {
+    "v": 1,
+    "iv": "oCOB9d1J44d+S/A3",
+    "ct": "1M4EXLRMKIdTGH09RbhCdlXAuiupdKCJbTD7J5dVw+6mVAFJ8MtEdtwBqVYlG57s"
+   },
+   "criado": "2026-10-14"
+  },
+  {
+   "login": "luiz.lemes@gadens.com.br",
+   "nome": "Luiz Lemes",
+   "perfil": "leitura",
+   "salt": "C+wJA83Yw70nRcwqY10QHA==",
+   "iter": 600000,
+   "chave": {
+    "v": 1,
+    "iv": "MbtIU7CeJ8cO91fL",
+    "ct": "TvgbTbTK5QdEnGYmEsVegEINGAMrvwQKbrxSPFLyO1zm32jGuvo5wpxeADF2e+d9"
+   },
+   "criado": "2026-10-14"
+  },
+  {
+   "login": "francyelli.rossot@gadens.com.br",
+   "nome": "Francyelli Rossot",
+   "perfil": "leitura",
+   "salt": "5yC0XnZkZssFt1Bpasm9rg==",
+   "iter": 600000,
+   "chave": {
+    "v": 1,
+    "iv": "DtkvYt7GypsM5lsx",
+    "ct": "y4YUhZ+p2a7hiyx84DHESd6yrstHK5rbMAS/QYyihF7VSLydA7L6OPiydYcMUSpj"
+   },
+   "criado": "2026-10-14"
+  },
+  {
+   "login": "joao.matos@makeitconstrutora.com.br",
+   "nome": "João MAtos",
+   "perfil": "leitura",
+   "salt": "ityQZqW0SHs5EZ6su61jjg==",
+   "iter": 600000,
+   "chave": {
+    "v": 1,
+    "iv": "1i4exPy6OgSIO9Wz",
+    "ct": "1bKdw7yQccE2m/ArMzGyCSvuOCR0Bgbx1UbRfPiXUsEd0l/v6prXAxh/b2xPEzQn"
+   },
+   "criado": "2026-10-14"
+  },
+  {
+   "login": "fernando.okraska@grupogadens.com.br",
+   "nome": "Fernando Okraska",
+   "perfil": "leitura",
+   "salt": "0fyvBbpuObYOHIbb2cVHVg==",
+   "iter": 600000,
+   "chave": {
+    "v": 1,
+    "iv": "ciddcWTJyPD/x38v",
+    "ct": "xdVoMzkFGP6xxGUqpE0HpN7RsMH3B9HPfsTsdpLCztCTNif5yjSuVLCRBr6Lscf2"
+   },
+   "criado": "2026-10-14"
   }
  ]
 }
