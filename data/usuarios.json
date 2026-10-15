@@ -19,14 +19,14 @@
    "login": "lucas.lopes",
    "nome": "Lucas Lopes",
    "perfil": "leitura",
-   "salt": "XXgD4n5b6jc3dIwvzI2pPg==",
+   "salt": "C2StbolJzzAIjGjx5zIFbA==",
    "iter": 600000,
    "chave": {
     "v": 1,
-    "iv": "yr5/7qLU3F1v14Z0",
-    "ct": "jgJUKBVqcrWneBGu3mJxXRs3tsN0ArluR16kHOT3tNSDtRVvoAlXPKodCcWdzDX2"
+    "iv": "bdQzLFtAofBedpyC",
+    "ct": "Pm/Ddowa+kdfznQi3dLdMV/FXp4aQ8+lGso7OSyHNwOmva+XpPiO1snqbtzlRIwj"
    },
-   "criado": "2026-10-13"
+   "criado": "2026-10-15"
   },
   {
    "login": "lucas.camargo@makeitconstrutora.com.br",
