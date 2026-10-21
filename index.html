@@ -1040,6 +1040,17 @@ a:hover{color:var(--blue-700)}
           </div>
 
           <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+              <div style="max-width:70ch">
+                <h3 style="font-size:15px">Atualização automática pelo ClickUp</h3>
+                <p style="margin:4px 0 0;font-size:12px;color:var(--slate-400);line-height:1.5">Todo dia às 7h o GitHub busca cronograma, indicadores e pendências no ClickUp e republica a base. Copie a chave abaixo e salve como segredo DASH_KEY do repositório.</p>
+                <p style="margin:10px 0 0;font-size:12px;color:var(--slate-600);white-space:pre-line">{{ autoStatus }}</p>
+              </div>
+              <button onClick="{{ copiarChave }}" style="cursor:pointer;border:1px solid var(--slate-200);background:var(--card);border-radius:12px;padding:10px 16px;font-family:var(--font-heading);font-weight:700;font-size:13px;color:var(--slate-700);white-space:nowrap">{{ copiarChaveLabel }}</button>
+            </div>
+          </div>
+
+          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
             <h3 style="font-size:15px">Repositório de TAPs (Supabase)</h3>
             <p style="margin:4px 0 14px;font-size:12px;color:var(--slate-400)">Dados do projeto Supabase. Ficam criptografados no pacote, só usuários logados conseguem ler.</p>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">
@@ -1881,7 +1892,7 @@ class Component extends DCLogic {
     this.setState({ pacoteBusy: true, admMsg: "Criptografando os dados…", admErro: false });
     try {
       const C = await this.cofre();
-      const X = await import("./data/export.js");
+      const X = await this.carregaModulo("./data/export.js");
       const d = this.dados();
       if (!d || !this.state.adata || !this.state.fdata) throw new Error("Aguarde o carregamento completo dos dados.");
       const forn = Object.assign({}, this.state.fdata, { seed: this.state.fstate || this.state.fdata.seed });
@@ -1934,6 +1945,17 @@ class Component extends DCLogic {
       setCfgUrl: e => this.setState({ cfg: Object.assign({}, cfg, { url: e.target.value.trim() }) }),
       setCfgAnon: e => this.setState({ cfg: Object.assign({}, cfg, { anon: e.target.value.trim() }) }),
       setCfgChave: e => this.setState({ cfg: Object.assign({}, cfg, { chave: e.target.value.trim() }) }),
+      copiarChaveLabel: st.chaveCopiada ? "Chave copiada ✓" : "Copiar chave DASH_KEY",
+      copiarChave: () => {
+        if (!s || !s.dk) return;
+        const ok = () => { this.setState({ chaveCopiada: true }); setTimeout(() => this.setState({ chaveCopiada: false }), 4000); };
+        if (navigator.clipboard) navigator.clipboard.writeText(s.dk).then(ok, () => window.prompt("Copie a chave:", s.dk));
+        else window.prompt("Copie a chave:", s.dk);
+      },
+      autoStatus: (() => { const a = this.state.data && this.state.data.automatico;
+        if (!a) return "Ainda não houve atualização automática.";
+        const q = new Date(a.quando);
+        return "Última atualização automática: " + q.toLocaleDateString("pt-BR") + " às " + q.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) + "\n" + (a.log || []).join("\n"); })(),
       cfgStatus: cfg.url && cfg.anon && cfg.chave ? "Configurado. O TAP passa a gravar no Supabase depois de publicar o pacote." : "Sem configuração: o TAP funciona em modo local (cada pessoa no próprio navegador)."
     };
   }
@@ -2121,7 +2143,8 @@ class Component extends DCLogic {
             "3. Exportar visualização → Excel → Colunas visíveis → Baixar",
             "4. Envie o arquivo aqui: atualiza Indicadores e Riscos"] },
         { pill: "Restrições", cor: "#EF4444", titulo: "Atualização de pendências de gestão",
-          url: "", img: "", linkLabel: "",
+          url: "https://sharing.clickup.com/9013344143/gr/h/8cktdwf-98893/f6f7e1cf61f7996",
+          img: "data/guia-pendencias.png", linkLabel: "Abrir lista no ClickUp ↗",
           passos: ["1. Espaços → COMPL | Gestão",
             "2. Lista COMPL | ATIVIDADES - Lista Pendências Gestão",
             "3. Exportar visualização → Excel → Colunas visíveis → Baixar (pode manter o agrupamento por obra)",
