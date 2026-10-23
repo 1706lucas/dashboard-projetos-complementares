@@ -221,3 +221,44 @@ export function buildReuniao(ctx) {
 }
 
 export function zipar(files) { const b = zipStore(files); return new Blob([b], { type: "application/zip" }); }
+
+export function buildFollow(ctx) {
+  const tab = (cab, linhas, vazio, linkCol) => !linhas.length ? '<p class="vz">' + esc(vazio) + "</p>" :
+    "<table><thead><tr>" + cab.map(c => "<th>" + esc(c) + "</th>").join("") + "</tr></thead><tbody>" +
+    linhas.map(l => "<tr>" + cab.map((c, i) => { const v = esc(l[i]);
+      return "<td" + (i ? ' class="m"' : "") + ">" + (i === 0 && linkCol != null && l[linkCol] ? '<a href="' + esc(l[linkCol]) + '">' + v + "</a>" : v) + "</td>"; }).join("") + "</tr>").join("") + "</tbody></table>";
+  const cor = { done: "#10B981", prog: "#F59E0B", todo: "#CBD5E1" };
+  const axial = a => !a.axial.length ? '<p class="vz">Sem marcos cadastrados.</p>' : a.axial.map(x =>
+    (a.axial.length > 1 ? '<div class="ao">' + esc(x.obra) + "</div>" : "") + '<div class="ax">' + x.pins.map(p =>
+      '<div class="pn"><i style="background:' + (cor[p[3]] || cor.todo) + '"></i><small>' + esc(p[0]) + "</small><b>" + esc(p[1]) + "</b><span>" + esc(p[2]) + "</span></div>").join("") + "</div>").join("");
+  const matriz = m => { let s = '<div class="mx">';
+    for (let im = 5; im >= 1; im--) for (let p = 1; p <= 5; p++) { const sc = im * p, n = m[im + "-" + p] || "";
+      const c = sc >= 15 ? "#FEE2E2;color:#991B1B" : sc >= 8 ? "#FEF3C7;color:#92400E" : sc >= 4 ? "#DBEAFE;color:#1E40AF" : "#D1FAE5;color:#065F46";
+      s += '<div style="background:' + c + '">' + n + "</div>"; }
+    return s + '</div><p class="vz">Impacto ↑ · Probabilidade →</p>'; };
+  const pg = a => '<section class="pg"><header><div class="k">Apresentação de</div><h1>' + esc(a.nome) + '</h1><div class="ob">' + a.obras.map(esc).join(" · ") + "</div></header>" +
+    '<div class="kp">' + a.kpis.map(k => "<div><b>" + esc(k[0]) + "</b><span>" + esc(k[1]) + "</span></div>").join("") + "</div>" +
+    "<h2>Linha axial · próximas entregas</h2>" + axial(a) +
+    "<h2>Atividades críticas</h2>" + tab(["Atividade", "Obra", "Situação", "Prazo"], a.criticas, "Nenhuma atividade crítica.", 4) +
+    "<h2>Atividades em andamento</h2>" + tab(["Atividade", "Obra", "Status", "Prazo"], a.andamento, "Nenhuma atividade em andamento.", 4) +
+    '<div class="g2"><div><h2>Matriz de risco</h2>' + matriz(a.matriz) + "</div><div><h2>Riscos e status</h2>" + tab(["Risco", "Obra", "Score", "Status"], a.riscos, "Nenhum risco cadastrado.") + "</div></div>" +
+    "<h2>Pedidos de apoio e decisões</h2>" + (a.pedido ? '<div class="pd">' + esc(a.pedido) + "</div>" : '<p class="vz">Sem pedidos registrados.</p>') +
+    "<footer>" + esc(ctx.titulo) + " · " + esc(ctx.geradoEm) + "</footer></section>";
+  return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>' + esc(ctx.titulo) + "</title>" +
+    '<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">' +
+    "<style>*{box-sizing:border-box}body{margin:0;background:#F1F5F9;font-family:Nunito,sans-serif;color:#1E293B;-webkit-print-color-adjust:exact;print-color-adjust:exact}" +
+    ".pg{background:#fff;width:1100px;max-width:100%;margin:24px auto;padding:34px 40px}header{border-bottom:2px solid #E2E8F0;padding-bottom:12px}" +
+    ".k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:#94A3B8}h1{font-size:25px;margin:4px 0 6px;font-weight:900}.ob{font-size:11.5px;color:#64748B}" +
+    ".kp{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.kp div{border:1px solid #E2E8F0;border-left:4px solid #2563EB;padding:9px 12px}.kp b{display:block;font-size:21px;font-weight:900}.kp span{font-size:10.5px;color:#64748B}" +
+    "h2{font-size:13px;margin:18px 0 8px;font-weight:800}.g2{display:grid;grid-template-columns:260px 1fr;gap:24px}" +
+    ".ao{font-size:11.5px;font-weight:800;margin:8px 0 4px}.ax{display:flex;gap:8px;position:relative;margin-bottom:6px}" +
+    ".pn{flex:1;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px}.pn i{width:16px;height:16px;border-radius:99px}.pn small{font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:#64748B}" +
+    ".pn b{font-size:10.5px;line-height:1.25}.pn span{font-family:'DM Mono',monospace;font-size:10px;color:#64748B}" +
+    ".mx{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.mx div{height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px}" +
+    "table{width:100%;border-collapse:collapse;font-size:11px}th{text-align:left;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8;padding:5px 6px;border-bottom:1px solid #E2E8F0}" +
+    "td{padding:5px 6px;border-bottom:1px solid #F1F5F9;vertical-align:top}td.m{white-space:nowrap;font-family:'DM Mono',monospace;font-size:10.5px}a{color:#1D4ED8;text-decoration:none}" +
+    ".vz{font-size:11px;color:#94A3B8;margin:4px 0 0}.pd{white-space:pre-line;font-size:12px;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;line-height:1.5}" +
+    "footer{margin-top:22px;padding-top:10px;border-top:1px solid #E2E8F0;font-size:9.5px;color:#94A3B8}" +
+    "@media print{body{background:#fff}.pg{margin:0;width:auto;padding:10mm;page-break-after:always}}@page{size:A4 landscape;margin:0}</style></head><body>" +
+    ctx.analistas.map(pg).join("") + "<script>setTimeout(function(){window.print()},600)<\/script></body></html>";
+}

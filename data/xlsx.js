@@ -226,7 +226,7 @@ export function comparaAtrasos(prevSnap, curSnap, obras, dataAnterior, dataAtual
 export function mapCronograma(wb, obras, hoje) {
   const t = wb[Object.keys(wb)[0]], H = t[0], i = n => H.indexOf(n);
   const C = { name: i("Task Name"), st: i("Status"), sd: i("Start Date"), dd: i("Due Date"),
-    tg: i("tags"), list: i("Lists"), cl: colClasse(H) };
+    tg: i("tags"), list: i("Lists"), cl: colClasse(H), id: i("Task ID"), par: i("Parent ID"), as: i("Assignee") };
   if (C.cl < 0) throw new Error("export sem a coluna Classe Datas Marco — refaça pela visão ATUALIZAÇÃO DE DATAS do ClickUp");
   const nm = r => (r[C.name] || "").replace(/^\s*📌\s*/, "").trim();
   const rows = t.slice(1), pre = r => nm(r).slice(0, 3).toUpperCase();
@@ -284,6 +284,24 @@ export function mapCronograma(wb, obras, hoje) {
     o.pe = pef ? { start: pef.start, end: pef.end, dias: pef.dias } : null;
     o.pePlus = !!(pef && pef.start && pef.start <= hoje);
     o.inicioObra = mine.some(r => r[C.cl] === "Marco Axial" && norm(nm(r)).indexOf("inicio de obra") >= 0);
+    // follow-up: complementares em aberto (vencidas, iniciando ou vencendo em 30 dias) e processos legais
+    const lim = new Date(Date.parse(hoje) + 30 * 864e5).toISOString().slice(0, 10);
+    const aberta = s => !/CONCLU|COMPLETE|CANCEL/i.test(String(s || ""));
+    const url = id => id ? "https://app.clickup.com/t/" + id : "";
+    const ass = r => String(C.as >= 0 ? r[C.as] || "" : "").split(",").map(s => s.trim()).filter(Boolean);
+    o.complAbertas = mine.filter(r => isCompl(r[C.tg]) && aberta(r[C.st])).map(r => ({
+      n: nm(r).replace(/^[A-Z0-9]{2,4}\s*[-|]\s*/, ""), id: C.id >= 0 ? r[C.id] : null, url: url(C.id >= 0 ? r[C.id] : null),
+      s: ser(r[C.sd]), d: ser(r[C.dd]), status: r[C.st], kind: kindOf(r[C.st]), ass: ass(r)
+    })).filter(t => (t.d && t.d <= lim) || (t.s && t.s <= hoje));
+    const filhos = {};
+    if (C.par >= 0) mine.forEach(r => { const p = r[C.par]; if (p) (filhos[p] = filhos[p] || []).push(r); });
+    o.legais = mine.filter(r => !(C.par >= 0 && r[C.par]) && /\|\s*LEG\s*\|/i.test(nm(r))).map(r => {
+      const id = C.id >= 0 ? r[C.id] : null;
+      const subs = (filhos[id] || []).filter(s => aberta(s[C.st])).sort((a, b) => String(ser(a[C.dd]) || "9").localeCompare(String(ser(b[C.dd]) || "9")));
+      return { processo: clean(nm(r).split("|").slice(2).join(" · ")) || nm(r), status: r[C.st], kind: kindOf(r[C.st]),
+        s: ser(r[C.sd]), d: ser(r[C.dd]), url: url(id), resp: ass(r).join(", "),
+        etapa: subs[0] ? nm(subs[0]).replace(/^[A-Z0-9]{2,4}-[A-Z]{2,4}-\s*/, "") : null, etapaPrazo: subs[0] ? ser(subs[0][C.dd]) : null };
+    }).sort((a, b) => (a.kind === "done") - (b.kind === "done") || String(a.d || "9").localeCompare(String(b.d || "9")));
     return o;
   });
 }
