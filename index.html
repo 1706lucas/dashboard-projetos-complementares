@@ -872,6 +872,234 @@ a:hover{color:var(--blue-700)}
         </section>
       </sc-if>
 
+      <!-- ══════════ REUNIÃO FOLLOW-UP ══════════ -->
+      <sc-if value="{{ isFollow }}" hint-placeholder-val="{{ false }}">
+        <section style="display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap">
+            <div style="display:flex;flex-wrap:wrap;gap:8px;flex:1;min-width:0">
+              <sc-for list="{{ fuAnalistas }}" as="a" hint-placeholder-count="5">
+                <button onClick="{{ a.go }}" style="{{ a.style }}">{{ a.nome }}<span style="{{ a.badgeStyle }}">{{ a.badge }}</span></button>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:8px;flex-shrink:0">
+              <button onClick="{{ fuAbrirPdf }}" style="cursor:pointer;border:1px solid var(--blue-600);background:var(--blue-600);color:#fff;border-radius:11px;padding:8px 16px;font-family:var(--font-heading);font-weight:700;font-size:13px;white-space:nowrap">Gerar PDF</button>
+            </div>
+          </div>
+
+          <sc-if value="{{ fuTem }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:18px">
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:14px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap">
+                  <div>
+                    <div style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Apresentação de</div>
+                    <h2 style="font-size:22px;margin-top:4px">{{ fuNome }}</h2>
+                  </div>
+                  <span style="font-size:12px;color:var(--slate-400)">{{ fuObraLabel }}</span>
+                </div>
+                <sc-if value="{{ fuComDados }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;flex-wrap:wrap;gap:6px">
+                    <sc-for list="{{ fuObraChips }}" as="o" hint-placeholder-count="5">
+                      <button onClick="{{ o.go }}" style="{{ o.style }}"><span class="mono" style="color:var(--blue-600)">{{ o.sigla }}</span>{{ o.nome }}</button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ fuSemDados }}" hint-placeholder-val="{{ false }}">
+                  <p style="margin:0;font-size:12.5px;padding:11px 14px;border-radius:12px;background:var(--slate-50);color:var(--slate-500)">Ainda não há atividades de projetos complementares atribuídas a este analista no ClickUp. Assim que ele for incluído como responsável nas tarefas, os quadros abaixo passam a ser preenchidos.</p>
+                </sc-if>
+              </div>
+
+              <sc-for list="{{ fuResumo }}" as="r" hint-placeholder-count="1">
+                <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:14px">
+                  <span style="{{ r.tituloStyle }}"><span class="mono" style="color:var(--blue-600)">{{ r.sigla }}</span> {{ r.nome }}</span>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px">
+                    <div style="display:flex;flex-direction:column;gap:12px">
+                      <div style="display:flex;align-items:flex-end;gap:12px">
+                        <span style="font-family:var(--font-heading);font-weight:900;font-size:40px;line-height:.9;color:var(--blue-600)">{{ r.pct }}</span>
+                        <span style="font-size:12px;color:var(--slate-500);padding-bottom:3px">concluído em projetos complementares<br>{{ r.pctSub }}</span>
+                      </div>
+                      <div style="height:8px;border-radius:99px;background:var(--slate-100);overflow:hidden"><div style="{{ r.pctBar }}"></div></div>
+                      <div>
+                        <div style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--slate-400);margin-bottom:6px">Duração das fases · {{ r.fasesTotal }}</div>
+                        <div style="display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--slate-100)">
+                          <sc-for list="{{ r.fases }}" as="s" hint-placeholder-count="4"><div style="{{ s.style }}" title="{{ s.title }}"></div></sc-for>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px">
+                          <sc-for list="{{ r.fases }}" as="s" hint-placeholder-count="4">
+                            <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--slate-600);white-space:nowrap"><span style="{{ s.dot }}"></span>{{ s.label }} <b class="mono">{{ s.valor }}</b></span>
+                          </sc-for>
+                        </div>
+                        <sc-if value="{{ r.semFases }}"><p style="margin:0;font-size:11.5px;color:var(--slate-400)">Sem fases cadastradas na linha axial.</p></sc-if>
+                      </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:12px">
+                      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+                        <sc-for list="{{ r.budget }}" as="b" hint-placeholder-count="3">
+                          <div style="{{ b.style }}">
+                            <span style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">{{ b.label }}</span>
+                            <span style="{{ b.valorStyle }}">{{ b.valor }}</span>
+                            <span style="font-size:10.5px;color:var(--slate-400)">{{ b.sub }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                      <div>
+                        <div style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--slate-400);margin-bottom:6px">Composição do budget utilizado por disciplina</div>
+                        <div style="display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--slate-100)">
+                          <sc-for list="{{ r.disc }}" as="s" hint-placeholder-count="4"><div style="{{ s.style }}" title="{{ s.title }}"></div></sc-for>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px">
+                          <sc-for list="{{ r.disc }}" as="s" hint-placeholder-count="4">
+                            <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--slate-600);white-space:nowrap"><span style="{{ s.dot }}"></span>{{ s.label }} <b class="mono">{{ s.valor }}</b></span>
+                          </sc-for>
+                        </div>
+                        <sc-if value="{{ r.semDisc }}"><p style="margin:0;font-size:11.5px;color:var(--slate-400)">Sem contratos lançados na planilha de saídas.</p></sc-if>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
+                <h3 style="font-size:15px">Linha axial · próximas entregas</h3>
+                <p style="margin:3px 0 16px;font-size:12px;color:var(--slate-400)">3 próximas grandes entregas de projetos complementares (Marco Task), seguidas do Lançamento Comercial e do Início de Obra</p>
+                <sc-if value="{{ fuAxialVazio }}"><p style="margin:0;font-size:12.5px;color:var(--slate-400)">Sem marcos cadastrados para as obras deste analista.</p></sc-if>
+                <div style="display:flex;flex-direction:column;gap:22px">
+                  <sc-for list="{{ fuAxial }}" as="ax" hint-placeholder-count="2">
+                    <div style="display:flex;flex-direction:column;gap:10px">
+                      <span style="{{ ax.tituloStyle }}"><span class="mono" style="color:var(--blue-600)">{{ ax.sigla }}</span> {{ ax.nome }}</span>
+                      <div style="overflow-x:auto;padding-bottom:4px">
+                        <div style="{{ ax.trilhoStyle }}">
+                          <div style="{{ ax.linhaStyle }}"></div>
+                          <sc-for list="{{ ax.pins }}" as="p" hint-placeholder-count="5">
+                            <div style="flex:1 0 0;min-width:124px;display:flex;flex-direction:column;align-items:center;gap:7px;position:relative;z-index:1;padding:0 6px">
+                              <div style="{{ p.pinStyle }}">{{ p.pin }}</div>
+                              <span style="{{ p.grupoStyle }}">{{ p.grupo }}</span>
+                              <a href="{{ p.url }}" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;text-align:center;line-height:1.25;color:var(--color-text);text-decoration:none">{{ p.label }}</a>
+                              <span class="mono" style="font-size:11px;color:var(--slate-500)">{{ p.data }}</span>
+                              <span style="{{ p.stStyle }}">{{ p.status }}</span>
+                            </div>
+                          </sc-for>
+                        </div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
+                <h3 style="font-size:15px">Atividades críticas</h3>
+                <div style="display:grid;grid-template-columns:repeat(2,minmax(0,220px));gap:12px;margin:12px 0 14px">
+                  <div style="display:flex;flex-direction:column;gap:4px;padding:12px 16px;border-radius:14px;background:#FEF2F2;border:1px solid #FECACA">
+                    <span style="font-family:var(--font-heading);font-weight:900;font-size:30px;line-height:1;color:#B91C1C">{{ fuNAtrasadas }}</span>
+                    <span style="font-size:12px;font-weight:700;color:#991B1B">atrasadas há mais de 7 dias</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:4px;padding:12px 16px;border-radius:14px;background:#FFF7ED;border:1px solid #FED7AA">
+                    <span style="font-family:var(--font-heading);font-weight:900;font-size:30px;line-height:1;color:#C2410C">{{ fuNSemInicio }}</span>
+                    <span style="font-size:12px;font-weight:700;color:#9A3412">sem início com o prazo correndo</span>
+                  </div>
+                </div>
+                <sc-if value="{{ fuCriticasVazio }}"><p style="margin:0;font-size:12.5px;color:var(--slate-400)">Nenhuma atividade crítica.</p></sc-if>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                    <sc-for list="{{ fuCriticas }}" as="t" hint-placeholder-count="4">
+                      <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:var(--slate-50)">
+                        <span class="mono" style="font-size:11px;font-weight:700;color:var(--blue-600);flex-shrink:0">{{ t.sigla }}</span>
+                        <a href="{{ t.url }}" target="_blank" rel="noopener" style="flex:1;min-width:0;font-size:12.5px;font-weight:700;text-decoration:none;color:var(--color-text)">{{ t.n }}</a>
+                        <span style="{{ t.tagStyle }}">{{ t.tag }}</span>
+                        <span class="mono" style="font-size:10.5px;color:var(--slate-500);white-space:nowrap">{{ t.info }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+              </div>
+
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
+                <h3 style="font-size:15px">Atividades em andamento</h3>
+                <p style="margin:3px 0 12px;font-size:12px;color:var(--slate-400)">{{ fuAndamentoSub }}</p>
+                <sc-if value="{{ fuAndamentoVazio }}"><p style="margin:0;font-size:12.5px;color:var(--slate-400)">Nenhuma atividade em andamento.</p></sc-if>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                    <sc-for list="{{ fuAndamento }}" as="t" hint-placeholder-count="4">
+                      <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:var(--slate-50)">
+                        <span class="mono" style="font-size:11px;font-weight:700;color:var(--blue-600);flex-shrink:0">{{ t.sigla }}</span>
+                        <a href="{{ t.url }}" target="_blank" rel="noopener" style="flex:1;min-width:0;font-size:12.5px;font-weight:700;text-decoration:none;color:var(--color-text)">{{ t.n }}</a>
+                        <span style="{{ t.tagStyle }}">{{ t.tag }}</span>
+                        <span class="mono" style="font-size:10.5px;color:var(--slate-500);white-space:nowrap">{{ t.info }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:minmax(260px,320px) minmax(0,1fr);gap:18px;align-items:start">
+                <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
+                  <h3 style="font-size:15px;margin-bottom:14px">Matriz de risco</h3>
+                  <div style="display:flex;gap:6px">
+                    <div style="display:flex;flex-direction:column;gap:5px">
+                      <sc-for list="{{ fuImp }}" as="l" hint-placeholder-count="5">
+                        <div style="height:38px;width:14px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--slate-400)">{{ l }}</div>
+                      </sc-for>
+                    </div>
+                    <div style="flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:5px">
+                      <sc-for list="{{ fuMatriz }}" as="c" hint-placeholder-count="25">
+                        <div style="{{ c.style }}">{{ c.n }}</div>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:5px 0 0 20px">
+                    <sc-for list="{{ fuProb }}" as="l" hint-placeholder-count="5">
+                      <span style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-400)">{{ l }}</span>
+                    </sc-for>
+                  </div>
+                  <p style="margin:10px 0 0;font-size:10.5px;color:var(--slate-400)">Impacto ↑ · Probabilidade → · {{ fuMatrizNota }}</p>
+                </div>
+                <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
+                  <h3 style="font-size:15px">Riscos e status</h3>
+                  <p style="margin:3px 0 12px;font-size:12px;color:var(--slate-400)">{{ fuRiscosSub }}</p>
+                  <sc-if value="{{ fuRiscosVazio }}"><p style="margin:0;font-size:12.5px;color:var(--slate-400)">Nenhum risco cadastrado nas obras deste analista.</p></sc-if>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <sc-for list="{{ fuRiscos }}" as="r" hint-placeholder-count="5">
+                      <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:var(--slate-50)">
+                        <span style="{{ r.scoreStyle }}">{{ r.score }}</span>
+                        <div style="flex:1;min-width:0">
+                          <div style="font-size:12.5px;font-weight:700;line-height:1.35">{{ r.tarefa }}</div>
+                          <div style="font-size:11px;color:var(--slate-400);margin-top:2px"><span class="mono" style="color:var(--blue-600);font-weight:700">{{ r.sigla }}</span> · {{ r.disciplina }}</div>
+                        </div>
+                        <span style="{{ r.stStyle }}">{{ r.status }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
+                <h3 style="font-size:15px">Pedidos de apoio e decisões para a gestão</h3>
+                <p style="margin:3px 0 10px;font-size:12px;color:var(--slate-400)">Preencha durante a apresentação. Fica salvo neste navegador e entra no PDF.</p>
+                <textarea value="{{ fuPedido }}" onChange="{{ setFuPedido }}" rows="3" placeholder="Ex.: aprovar aditivo do projeto de fundação da Horizon" style="width:100%;border:1px solid var(--slate-200);border-radius:12px;padding:11px 13px;font-size:13px;font-family:var(--font-body);line-height:1.5;resize:vertical;background:var(--card);color:var(--color-text)"></textarea>
+                <p style="margin:6px 0 0;font-size:11px;color:var(--slate-400)">{{ fuPedidoQuando }}</p>
+              </div>
+            </div>
+          </sc-if>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ fuPdfAberto }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ fuFecharPdf }}" style="position:fixed;inset:0;z-index:80;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:24px">
+          <div onClick="{{ stop }}" style="width:100%;max-width:520px;background:var(--card);border-radius:20px;box-shadow:0 20px 60px rgba(15,23,42,.25);padding:24px 26px;display:flex;flex-direction:column;gap:14px">
+            <div>
+              <h3 style="font-size:17px">Gerar PDF do follow-up</h3>
+              <p style="margin:4px 0 0;font-size:12.5px;color:var(--slate-400)">Quais analistas entram no material? Uma página por analista.</p>
+            </div>
+            <div style="display:flex;gap:8px"><button class="btn" onClick="{{ fuPdfTodos }}">Selecionar todos</button><button class="btn" onClick="{{ fuPdfNenhum }}">Limpar</button></div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <sc-for list="{{ fuPdfOpts }}" as="a" hint-placeholder-count="6">
+                <button onClick="{{ a.go }}" style="{{ a.style }}">{{ a.mark }} {{ a.nome }}</button>
+              </sc-for>
+            </div>
+            <p style="{{ fuPdfMsgStyle }}">{{ fuPdfMsg }}</p>
+            <div style="display:flex;justify-content:flex-end;gap:8px">
+              <button class="btn" onClick="{{ fuFecharPdf }}">Cancelar</button>
+              <button onClick="{{ fuGerarPdf }}" style="{{ fuGerarStyle }}">Gerar PDF</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
       <!-- ══════════ REUNIÃO DIRETORIA ══════════ -->
       <sc-if value="{{ isReuniao }}" hint-placeholder-val="{{ false }}">
         <section style="display:flex;flex-direction:column;gap:22px">
@@ -2079,7 +2307,7 @@ class Component extends DCLogic {
       out.obras = u.siglas.dados.map(s => Object.assign({}, byS[s.sigla] || { temDados: false, pct: 0, totalCompl: 0, doneCompl: 0, fases: [], axial: [], gantt: [], fasesLinha: [], vida: {}, econ: {} }, s));
     }
     if (u.cronograma) {
-      const byS = {}; u.cronograma.dados.forEach(o => { byS[o.sigla] = o; });
+      const byS = {}; u.cronograma.dados.forEach(o => { if (!o.foraDoExport) byS[o.sigla] = o; });
       out.obras = out.obras.map(o => byS[o.sigla] ? Object.assign({}, o, byS[o.sigla]) : o);
       if (u.cronograma.atrasos) out.atrasos = u.cronograma.atrasos;
     }
@@ -2128,6 +2356,12 @@ class Component extends DCLogic {
         (this.state.upLoading ? "var(--slate-300)" : "var(--blue-600)") + ";color:#fff;white-space:nowrap",
       upMsg: this.state.upMsg || "",
       guias: [
+        { pill: "Cronograma Gadens", cor: "#F59E0B", titulo: "Atualização de datas · Gadens Inc",
+          url: "https://app.clickup.com/9013344143/v/gr/8cktdwf-104773", img: "", linkLabel: "Abrir visualização da Gadens ↗",
+          passos: ["1. Atualização automática: o robô do GitHub lê esta visualização todo dia às 7h, junto com a da Make It",
+            "2. Para atualizar à mão: abra a visualização → Exportar visualização → Excel → Colunas visíveis → Baixar",
+            "3. Mantenha a coluna Classe Datas Marco visível na visualização",
+            "4. Envie o arquivo aqui: atualiza Prazos, Geral e Follow-up das obras da Gadens"] },
         { pill: "Datas e cronograma", cor: "#8B5CF6", titulo: "Atualização de datas",
           url: "https://app.clickup.com/9013344143/v/gr/8cktdwf-90873", img: "data/guia-datas.png",
           linkLabel: "Abrir visualização COM | DADOS ↗",
@@ -2669,6 +2903,220 @@ class Component extends DCLogic {
       (this.norm(p.obra) === this.norm(o.nome) || String(p.titulo || "").toUpperCase().indexOf(sigla + "-") === 0));
     const out = {}; this.RLISTAS.forEach(l => { out[l[0]] = its.filter(p => p.tipo === l[0]); }); return out;
   }
+  FUKEY = "gadens.followup.v1";
+  FU_ANALISTAS = ["Lucas Vaz de Camargo", "Jaira Ataíde", "Mariana Azevedo", "Francyelli Rossot", "Luiz Lemes"];
+  fuMesmo(a, b) {
+    const t = s => this.norm(s).split(" ").filter(Boolean);
+    const x = t(a), y = t(b);
+    return x.length && y.length && x[0] === y[0] && x[x.length - 1] === y[y.length - 1];
+  }
+  fuStore() {
+    if (!this._fu) { try { this._fu = JSON.parse(localStorage.getItem(this.FUKEY) || "{}"); } catch (e) { this._fu = {}; }
+      this._fu.ocultos = this._fu.ocultos || []; this._fu.pedidos = this._fu.pedidos || {}; }
+    return this._fu;
+  }
+  fuSalvar(patch) {
+    const s = Object.assign(this.fuStore(), patch);
+    try { localStorage.setItem(this.FUKEY, JSON.stringify(s)); } catch (e) { /* sessão apenas */ }
+    this.forceUpdate();
+  }
+  fuHoje() { const t = new Date(Date.now() - 3 * 3600e3); return t.toISOString().slice(0, 10); }
+  fuDados(nome, sigla) {
+    const d = this.dados(), hoje = this.fuHoje();
+    const em15 = new Date(Date.parse(hoje) + 15 * 864e5).toISOString().slice(0, 10);
+    const minhas = []; const obrasSet = {};
+    d.obras.forEach(o => (o.complAbertas || []).forEach(t => {
+      if (!(t.ass || []).some(x => x === nome || this.fuMesmo(x, nome))) return;
+      if (sigla && o.sigla !== sigla) { obrasSet[o.sigla] = o; return; }
+      minhas.push(Object.assign({ sigla: o.sigla, obra: o.nome }, t)); obrasSet[o.sigla] = o;
+    }));
+    const todasObras = Object.keys(obrasSet).map(k => obrasSet[k]).sort((a, b) => a.sigla.localeCompare(b.sigla));
+    const obras = sigla ? todasObras.filter(o => o.sigla === sigla) : todasObras;
+    const siglas = obras.map(o => o.sigla), nomes = obras.map(o => this.norm(o.nome));
+    const entregas = minhas.filter(t => t.d && t.d >= hoje && t.d <= em15).sort((a, b) => a.d.localeCompare(b.d));
+    const h7 = new Date(Date.parse(hoje) - 7 * 864e5).toISOString().slice(0, 10);
+    const naoIniciada = t => /EM ABERTO|TO DO|SEM IN[IÍ]CIO/i.test(t.status);
+    const criticas = minhas.map(t => {
+      if (t.d && t.d < h7) return Object.assign({ tipo: "Atrasada", diasRef: Math.round((Date.parse(hoje) - Date.parse(t.d)) / 864e5) }, t);
+      if (naoIniciada(t) && t.s && t.s <= hoje) return Object.assign({ tipo: "Sem início · prazo correndo", diasRef: Math.round((Date.parse(hoje) - Date.parse(t.s)) / 864e5) }, t);
+      return null;
+    }).filter(Boolean).sort((a, b) => (a.tipo === "Atrasada" ? 0 : 1) - (b.tipo === "Atrasada" ? 0 : 1) || b.diasRef - a.diasRef);
+    const ids = {}; criticas.forEach(t => { ids[t.url] = 1; });
+    const andamento = minhas.filter(t => !ids[t.url] && !naoIniciada(t) && t.kind === "prog").sort((a, b) => String(a.d || "9").localeCompare(String(b.d || "9")));
+    const isC = g => String(g.tag || "").indexOf("eng - complementares") >= 0;
+    const fim = (lista, re) => lista.find(a => re.test(this.norm(a.label)));
+    const axial = obras.map(o => ({ o,
+      prox: (o.gantt || []).filter(g => isC(g) && g.kind !== "done" && g.end).sort((a, b) => a.end.localeCompare(b.end)).slice(0, 3),
+      lanc: fim(o.axial || [], /lancamento comercial/), obra: fim(o.axial || [], /inicio de obra/) }));
+    const A = d.atrasos || { itens: [] };
+    const atrasos = (A.itens || []).filter(x => x.dias > 0 && siglas.indexOf(x.sigla) >= 0).sort((a, b) => b.dias - a.dias);
+    const encerrado = s => /conclu|tratado|cancel/i.test(String(s || ""));
+    const riscos = ((d.indicadores && d.indicadores.riscos) || []).filter(r => nomes.indexOf(this.norm(r.obra)) >= 0)
+      .map(r => Object.assign({ s: this.riscoScore(r), aberto: !encerrado(r.status), sigla: (obras.find(o => this.norm(o.nome) === this.norm(r.obra)) || {}).sigla }, r))
+      .sort((a, b) => (b.aberto - a.aberto) || (b.s || 0) - (a.s || 0));
+    const legais = [];
+    obras.forEach(o => (o.legais || []).forEach(l => { if (l.kind !== "done") legais.push(Object.assign({ sigla: o.sigla }, l)); }));
+    legais.sort((a, b) => String(a.d || "9").localeCompare(String(b.d || "9")));
+    const legAtraso = l => /ATRASO|FORA DO PRAZO/i.test(l.status) || (l.d && l.d < hoje);
+    return { obras, todasObras, entregas, criticas, andamento, axial, atrasos, riscos, legais, legAtraso, hoje, base: A };
+  }
+  fuVals() {
+    const d = this.dados(), st = this.fuStore(), fu = this.state.fu || {};
+    const vazio = { fuAnalistas: [], fuSemAnalista: false, fuTem: false, fuObraChips: [], fuSemDados: false, fuComDados: false, fuObraLabel: "",
+      fuAxial: [], fuResumo: [], fuCriticas: [], fuAndamento: [], fuMatriz: [], fuImp: [], fuProb: [], fuRiscos: [], fuPdfAberto: false, fuPdfOpts: [],
+      fuEditar: () => {}, fuEditarLabel: "Editar lista", fuEditarAvisoStyle: "display:none", fuAbrirPdf: () => {} };
+    if (!d || !d.obras.some(o => o.complAbertas)) return vazio;
+    const cont = {};
+    d.obras.forEach(o => (o.complAbertas || []).forEach(t => (t.ass || []).forEach(a => { cont[a] = (cont[a] || 0) + 1; })));
+    const editar = false;
+    const visiveis = this.FU_ANALISTAS.slice(), lista = visiveis;
+    const sel = visiveis.indexOf(fu.sel) >= 0 ? fu.sel : visiveis[0];
+    const setFu = p => this.setState({ fu: Object.assign({}, this.state.fu, p) });
+    const fuAnalistas = lista.map(a => {
+      const oculto = st.ocultos.indexOf(a) >= 0, on = !editar && a === sel;
+      const crit = this.fuDados(a, "").criticas.length;
+      return { nome: a, badge: editar ? (oculto ? "oculto" : "visível") : String(crit),
+        go: () => { if (editar) { const o = oculto ? st.ocultos.filter(x => x !== a) : st.ocultos.concat([a]); this.fuSalvar({ ocultos: o }); } else setFu({ sel: a }); },
+        style: "display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:12px;cursor:pointer;white-space:nowrap;font-family:var(--font-body);font-size:13px;font-weight:" + (on ? "800" : "600") +
+          ";border:1px solid " + (on ? "var(--blue-600)" : "var(--slate-200)") + ";background:" + (on ? "var(--blue-600)" : "var(--card)") +
+          ";color:" + (on ? "#fff" : "var(--slate-600)") + (editar && oculto ? ";opacity:.45" : ""),
+        badgeStyle: "font-family:var(--font-mono);font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px;background:" +
+          (editar ? "var(--slate-100);color:var(--slate-500)" : crit ? "#FEE2E2;color:#991B1B" : (on ? "rgba(255,255,255,.22);color:#fff" : "var(--slate-100);color:var(--slate-500)")) };
+    });
+    const base = Object.assign({}, vazio, {
+      fuAnalistas, fuSemAnalista: !visiveis.length, fuTem: !!sel,
+      fuEditar: () => setFu({ editar: !editar }), fuEditarLabel: editar ? "Concluir edição" : "Editar lista",
+      fuEditarAvisoStyle: editar ? "margin:-6px 0 0;font-size:12px;color:var(--slate-500)" : "display:none",
+      fuAbrirPdf: () => setFu({ pdf: true, pdfSel: visiveis.slice(), msg: "" }),
+      fuPdfAberto: !!fu.pdf, fuFecharPdf: () => setFu({ pdf: false }),
+      fuPdfTodos: () => setFu({ pdfSel: visiveis.slice() }), fuPdfNenhum: () => setFu({ pdfSel: [] }),
+      fuPdfOpts: visiveis.map(a => { const on = (fu.pdfSel || []).indexOf(a) >= 0;
+        return { nome: a, mark: on ? "✓" : "", go: () => setFu({ pdfSel: on ? fu.pdfSel.filter(x => x !== a) : (fu.pdfSel || []).concat([a]) }),
+          style: "cursor:pointer;padding:8px 13px;border-radius:11px;font-family:var(--font-body);font-size:12.5px;font-weight:700;border:1px solid " +
+            (on ? "var(--blue-500)" : "var(--slate-200)") + ";background:" + (on ? "var(--blue-50)" : "var(--card)") + ";color:" + (on ? "var(--blue-700)" : "var(--slate-500)") }; }),
+      fuPdfMsg: fu.msg || "", fuPdfMsgStyle: fu.msg ? "margin:0;font-size:12px;padding:9px 12px;border-radius:10px;background:#FEF2F2;color:#991B1B" : "display:none",
+      fuGerarPdf: () => this.fuPdf(fu.pdfSel || []),
+      fuGerarStyle: "cursor:pointer;border:1px solid var(--blue-600);background:var(--blue-600);color:#fff;border-radius:11px;padding:9px 18px;font-family:var(--font-heading);font-weight:700;font-size:13px" +
+        ((fu.pdfSel || []).length ? "" : ";opacity:.45;pointer-events:none")
+    });
+    if (!sel) return base;
+    const D0 = this.fuDados(sel, "");
+    const obraSel = D0.todasObras.some(o => o.sigla === fu.obra) ? fu.obra : "";
+    const D = obraSel ? this.fuDados(sel, obraSel) : D0;
+    const chip = on => "display:inline-flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer;padding:6px 12px;border-radius:99px;font-family:var(--font-body);font-size:12px;font-weight:700;border:1px solid " +
+      (on ? "var(--blue-500)" : "var(--slate-200)") + ";background:" + (on ? "var(--blue-50)" : "var(--card)") + ";color:" + (on ? "var(--blue-700)" : "var(--slate-600)");
+    base.fuObraChips = [{ sigla: "", nome: "Todos os empreendimentos", go: () => setFu({ obra: "" }), style: chip(!obraSel) }]
+      .concat(D0.todasObras.map(o => ({ sigla: o.sigla, nome: o.nome, go: () => setFu({ obra: o.sigla }), style: chip(obraSel === o.sigla) })));
+    base.fuSemDados = !D0.todasObras.length;
+    base.fuComDados = !!D0.todasObras.length;
+    const stPill = s => { const c = /ATRASO/i.test(s) && !/CONCLU/i.test(s) ? ["#FEE2E2", "#991B1B"] : /FORA DO PRAZO|PROGRESS|ANDAMENTO|AN[AÁ]LISE/i.test(s) ? ["#FEF3C7", "#92400E"] : /CONCLU|TRATADO/i.test(s) ? ["#D1FAE5", "#065F46"] : ["var(--slate-200)", "var(--slate-600)"];
+      return "font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0;background:" + c[0] + ";color:" + c[1]; };
+    const tagSt = (bg, fg) => "font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0;background:" + bg + ";color:" + fg;
+    const pin = (it, grupo, cor) => {
+      const done = it && it.kind === "done", prog = it && it.kind === "prog";
+      return { label: it ? it.label : "—", grupo, data: it ? this.br(it.end || it.start) : "sem data",
+        status: it ? (it.status || "—") : "não cadastrado",
+        stStyle: (it ? stPill(it.status || "") : tagSt("var(--slate-100)", "var(--slate-400)")).replace("white-space:nowrap;flex-shrink:0;", "white-space:normal;text-align:center;max-width:100%;line-height:1.3;"),
+        pin: done ? "✓" : "", url: null,
+        grupoStyle: "font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:" + cor,
+        pinStyle: "width:36px;height:36px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#fff;border:3px solid " +
+          (done ? "#10B981" : prog ? "#F59E0B" : "var(--slate-300)") + ";background:" + (done ? "#10B981" : prog ? "#F59E0B" : "var(--card)") };
+    };
+    const fuAxial = D.axial.map(x => { const pins = x.prox.map((it, i) => pin(it, "Entrega " + (i + 1), "var(--blue-600)"))
+        .concat([pin(x.lanc, "Lançamento", "#8B5CF6"), pin(x.obra, "Início de obra", "#EF4444")]);
+      const meia = (50 / pins.length).toFixed(2);
+      return { sigla: x.o.sigla, nome: x.o.nome, pins,
+        tituloStyle: D.axial.length > 1 ? "font-size:13px;font-weight:800" : "display:none",
+        trilhoStyle: "position:relative;display:flex;min-width:" + (pins.length * 124) + "px",
+        linhaStyle: "position:absolute;top:17px;left:" + meia + "%;right:" + meia + "%;height:3px;background:var(--slate-200);border-radius:99px" }; });
+    const dd = this.dados();
+    const segs = (lista, total, cores, fmt) => lista.map((x, i) => ({ label: x[0], valor: fmt(x[1]), title: x[0] + " · " + fmt(x[1]),
+      style: "height:100%;background:" + cores[i % cores.length] + ";width:" + (total ? (x[1] / total * 100).toFixed(2) : 0) + "%",
+      dot: "width:9px;height:9px;border-radius:3px;flex-shrink:0;background:" + cores[i % cores.length] }));
+    const CF = { "Estudo Preliminar": ["EP", "#10B981"], "Anteprojeto": ["AP", "#06B6D4"], "Pré-executivo": ["PE", "#8B5CF6"], "Executivo": ["EX", "#2563EB"] };
+    const CD = ["#2563EB", "#8B5CF6", "#06B6D4", "#10B981", "#F59E0B", "#EF4444", "#94A3B8"];
+    const fuResumo = D.obras.map(o => {
+      const fl = (o.fasesLinha || []).filter(f => f.dias > 0);
+      const tf = fl.reduce((a, f) => a + f.dias, 0);
+      const ct = dd.financeiro.contratado.filter(c => { const m = this.matchObra(c.empreendimento); return m && m.sigla === o.sigla; });
+      const usado = ct.reduce((a, c) => a + (c.valor || 0), 0), viab = o.econ && o.econ.budgetDisp;
+      const g = this.group(ct, c => c.projeto || "Outros", c => c.valor || 0);
+      const top = g.slice(0, 6), resto = g.slice(6).reduce((a, x) => a + x[1], 0); if (resto) top.push(["Outras", resto]);
+      const est = viab ? (usado - viab) / viab * 100 : null;
+      const pctF = v => (usado ? Math.round(v / usado * 100) : 0) + "%";
+      const cardB = cor => "display:flex;flex-direction:column;gap:4px;padding:11px 13px;border-radius:12px;background:var(--slate-50);border-left:4px solid " + cor;
+      return { sigla: o.sigla, nome: o.nome, tituloStyle: D.obras.length > 1 ? "font-size:13px;font-weight:800" : "display:none",
+        pct: (o.pct || 0) + "%", pctSub: (o.doneCompl || 0) + " de " + (o.totalCompl || 0) + " tarefas",
+        pctBar: "height:100%;border-radius:99px;background:var(--blue-600);width:" + (o.pct || 0) + "%",
+        fases: segs(fl.map(f => [(CF[f.fase] || [f.fase])[0], f.dias]), tf, fl.map(f => (CF[f.fase] || [0, "#94A3B8"])[1]), v => v + " d"),
+        fasesTotal: tf ? tf + " dias" : "—", semFases: !fl.length,
+        budget: [
+          { label: "Viabilidade", valor: viab ? this.short(viab) : "—", sub: "budget disponível", style: cardB("#2563EB"), valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px" },
+          { label: "Utilizado", valor: this.short(usado), sub: ct.length + " contrato(s)", style: cardB("#8B5CF6"), valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px" },
+          { label: est != null && est > 0 ? "Estouro" : "Saldo", valor: est == null ? "—" : (est > 0 ? "+" : "") + est.toFixed(1).replace(".", ",") + "%",
+            sub: est == null ? "sem viabilidade" : est > 0 ? "acima do budget" : "dentro do budget", style: cardB(est != null && est > 0 ? "#EF4444" : "#10B981"),
+            valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px;color:" + (est != null && est > 0 ? "#B91C1C" : "#047857") }
+        ],
+        disc: segs(top, usado, CD, pctF), semDisc: !top.length };
+    });
+    const linhaT = (t, tag, bg, fg, info) => ({ sigla: t.sigla, n: t.n, url: t.url, tag, tagStyle: tagSt(bg, fg), info });
+    const atrasadas = D.criticas.filter(t => t.tipo === "Atrasada").length;
+    const contM = {}; D.riscos.forEach(r => { if (r.impacto && r.probabilidade) { const k = r.impacto + "-" + r.probabilidade; contM[k] = (contM[k] || 0) + 1; } });
+    const fuMatriz = [];
+    for (let im = 5; im >= 1; im--) for (let p = 1; p <= 5; p++) { const s = im * p, n = contM[im + "-" + p] || 0;
+      const c = s >= 15 ? ["#FEE2E2", "#991B1B"] : s >= 8 ? ["#FEF3C7", "#92400E"] : s >= 4 ? ["#DBEAFE", "#1E40AF"] : ["#D1FAE5", "#065F46"];
+      fuMatriz.push({ n: n ? String(n) : "", style: "height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:900;font-size:14px;background:" + c[0] + ";color:" + c[1] + (n ? ";box-shadow:inset 0 0 0 2px " + c[1] : ";opacity:.55") }); }
+    const posic = D.riscos.filter(r => r.impacto && r.probabilidade).length, abertos = D.riscos.filter(r => r.aberto).length;
+    const ped = st.pedidos[sel] || {};
+    return Object.assign(base, {
+      fuNome: sel,
+      fuObraLabel: obraSel ? "Filtrado por " + (D.obras[0] ? D.obras[0].nome : obraSel) : D0.todasObras.length + " empreendimento(s)",
+      fuAxial, fuAxialVazio: !fuAxial.length, fuResumo,
+      fuNAtrasadas: String(atrasadas), fuNSemInicio: String(D.criticas.length - atrasadas),
+      fuCriticas: D.criticas.map(t => t.tipo === "Atrasada" ? linhaT(t, "Atrasada", "#FEE2E2", "#991B1B", "+" + t.diasRef + " d · prazo " + this.br(t.d))
+        : linhaT(t, "Sem início", "#FFEDD5", "#9A3412", "início " + this.br(t.s) + (t.d ? " · prazo " + this.br(t.d) : ""))),
+      fuCriticasVazio: !D.criticas.length,
+      fuCriticasSub: atrasadas + " atrasada(s) há mais de 7 dias · " + (D.criticas.length - atrasadas) + " sem início com o prazo correndo",
+      fuAndamento: D.andamento.map(t => { const fora = /FORA DO PRAZO|ATRASO/i.test(t.status) || (t.d && t.d < D.hoje);
+        return linhaT(t, fora ? "Fora do prazo" : "No prazo", fora ? "#FEF3C7" : "#D1FAE5", fora ? "#92400E" : "#065F46", t.d ? "prazo " + this.br(t.d) : "sem prazo"); }),
+      fuAndamentoVazio: !D.andamento.length,
+      fuAndamentoSub: D.andamento.length + " atividade(s) de projetos complementares em execução, por prazo",
+      fuMatriz, fuImp: ["5", "4", "3", "2", "1"], fuProb: ["1", "2", "3", "4", "5"],
+      fuMatrizNota: posic + " de " + D.riscos.length + " posicionados",
+      fuRiscos: D.riscos.map(r => ({ tarefa: r.tarefa, sigla: r.sigla || "", disciplina: r.disciplina || "—", status: r.status || "—", stStyle: stPill(r.status || ""),
+        score: r.s == null ? "—" : String(r.s),
+        scoreStyle: "flex-shrink:0;min-width:30px;text-align:center;font-family:var(--font-heading);font-weight:900;font-size:13px;padding:4px 7px;border-radius:8px;" +
+          ((r.s || 0) > 12 ? "background:#FEE2E2;color:#991B1B" : (r.s || 0) >= 8 ? "background:#FEF3C7;color:#92400E" : "background:var(--slate-200);color:var(--slate-600)") })),
+      fuRiscosVazio: !D.riscos.length,
+      fuRiscosSub: D.riscos.length + " risco(s) · " + abertos + " em aberto · " + D.riscos.filter(r => r.aberto && (r.s || 0) > 12).length + " em aberto acima de 12",
+      fuPedido: ped.texto || "",
+      setFuPedido: e => { const p = Object.assign({}, st.pedidos); p[sel] = { texto: e.target.value, quando: new Date().toISOString() }; this.fuSalvar({ pedidos: p }); },
+      fuPedidoQuando: ped.quando ? "Atualizado em " + new Date(ped.quando).toLocaleDateString("pt-BR") + " às " + new Date(ped.quando).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : ""
+    });
+  }
+  async fuPdf(nomes) {
+    const setFu = p => this.setState({ fu: Object.assign({}, this.state.fu, p) });
+    if (!nomes.length) return;
+    let X; try { X = await this.carregaModulo("./data/export.js"); } catch (e) { setFu({ msg: "Não foi possível carregar o exportador: " + e.message }); return; }
+    const st = this.fuStore();
+    const ctx = { titulo: "Reunião Follow-up · Projetos Complementares", geradoEm: new Date().toLocaleDateString("pt-BR"),
+      analistas: nomes.map(n => { const D = this.fuDados(n, (this.state.fu || {}).obra || "");
+        return { nome: n, obras: D.obras.map(o => o.sigla + " · " + o.nome),
+          kpis: [[D.criticas.filter(t => t.tipo === "Atrasada").length, "atrasadas > 7 dias"], [D.criticas.filter(t => t.tipo !== "Atrasada").length, "sem início, prazo correndo"],
+            [D.andamento.length, "em andamento"], [D.riscos.filter(r => r.aberto && (r.s || 0) > 12).length, "riscos em aberto > 12"]],
+          axial: D.axial.map(x => ({ obra: x.o.sigla + " · " + x.o.nome,
+            pins: x.prox.map((it, i) => ["Entrega " + (i + 1), it]).concat([["Lançamento", x.lanc], ["Início de obra", x.obra]])
+              .map(p => [p[0], p[1] ? p[1].label : "—", p[1] ? this.br(p[1].end || p[1].start) : "", p[1] ? p[1].kind : "todo"]) })),
+          criticas: D.criticas.map(t => [t.n, t.sigla, t.tipo === "Atrasada" ? "Atrasada +" + t.diasRef + " d" : "Sem início", this.br(t.d), t.url]),
+          andamento: D.andamento.map(t => [t.n, t.sigla, t.status, this.br(t.d), t.url]),
+          matriz: (() => { const c = {}; D.riscos.forEach(r => { if (r.impacto && r.probabilidade) c[r.impacto + "-" + r.probabilidade] = (c[r.impacto + "-" + r.probabilidade] || 0) + 1; }); return c; })(),
+          riscos: D.riscos.map(r => [r.tarefa, r.sigla || "", r.s == null ? "—" : String(r.s), r.status || "—"]),
+          pedido: (st.pedidos[n] || {}).texto || "" }; }) };
+    const w = window.open("", "_blank");
+    if (!w) { setFu({ msg: "O navegador bloqueou a nova aba. Libere pop-ups para este site e tente de novo." }); return; }
+    w.document.write(X.buildFollow(ctx)); w.document.close();
+    setFu({ pdf: false, msg: "" });
+  }
   rdVals() {
     const d = this.dados();
     const vazio = { rdObras: [], rdVazio: false, rdResumo: "—", rdFonte: "—", rdGerarPdf: () => {} };
@@ -3170,7 +3618,7 @@ class Component extends DCLogic {
     const fnMark = this.state.fstate && this.state.fstate.fornecedores.length ?
       String(this.state.fstate.fornecedores.filter(f => Object.keys(this.state.fstate.vinculos).some(k => this.state.fstate.vinculos[k] === f.id)).length) : "";
     const upMark = Object.keys(this.state.uploads || {}).length ? String(Object.keys(this.state.uploads).length) : "";
-    const pages = [["Geral", ""], ["Prazos", ""], ["Financeiro", ""], ["Indicadores", ""], ["Riscos de Engenharia", ""], ["Reunião Diretoria", ""],
+    const pages = [["Geral", ""], ["Prazos", ""], ["Financeiro", ""], ["Indicadores", ""], ["Riscos de Engenharia", ""], ["Reunião Diretoria", ""], ["Reunião Follow-up", ""],
       ["Gestão de Fornecedores", fnMark], ["Gestão de Analistas", anMark], ["Exportação de dados", ""], ["Base de dados", upMark], ["Termos de Abertura de Projeto (TAP)", "↗"]]
       .concat(this.state.sessao && this.state.sessao.perfil === "admin" ? [["Usuários e publicação", ""]] : []);
     const nav = pages.map(p => ({
@@ -3191,7 +3639,8 @@ class Component extends DCLogic {
       "Base de dados": "Arquivos que alimentam o painel e atualização por upload",
       "Usuários e publicação": "Acessos ao painel e pacote criptografado para o GitHub",
       "Exportação de dados": "Apresentação do setor e planilha de indicadores da empresa",
-      "Reunião Diretoria": "Restrições, linha axial e riscos por obra · pauta da reunião de diretoria"
+      "Reunião Diretoria": "Restrições, linha axial e riscos por obra · pauta da reunião de diretoria",
+      "Reunião Follow-up": "Apresentação de cada analista · linha axial, atividades críticas, em andamento e riscos das obras dele"
     };
     const base = {
       nav, pageTitle: page, pageSub: subs[page],
@@ -3202,9 +3651,9 @@ class Component extends DCLogic {
       isGeral: page === "Geral", isPrazos: page === "Prazos", isIndicadores: page === "Indicadores",
       isRiscos: page === "Riscos de Engenharia", isFinanceiro: page === "Financeiro",
       isAnalistas: page === "Gestão de Analistas", isFornecedores: page === "Gestão de Fornecedores",
-      isBase: page === "Base de dados", isExport: page === "Exportação de dados", isReuniao: page === "Reunião Diretoria",
+      isBase: page === "Base de dados", isExport: page === "Exportação de dados", isReuniao: page === "Reunião Diretoria", isFollow: page === "Reunião Follow-up",
       isAdmin: page === "Usuários e publicação" && !!(this.state.sessao && this.state.sessao.perfil === "admin"),
-      showFilters: page.indexOf("Gestão") !== 0 && page !== "Base de dados" && page !== "Exportação de dados" && page !== "Usuários e publicação",
+      showFilters: page.indexOf("Gestão") !== 0 && page !== "Reunião Follow-up" && page !== "Base de dados" && page !== "Exportação de dados" && page !== "Usuários e publicação",
       ...this.authVals(),
       stop: e => e.stopPropagation(), closeModal: () => this.setState({ modal: null, taskModal: null }),
       modalPill: this.state.taskModal ? "Atividades" : "Indicador",
@@ -3228,7 +3677,7 @@ class Component extends DCLogic {
       ganttVazio: "", ganttVazioStyle: "display:none",
       ganttWrapStyle: "border:1px solid var(--slate-100);border-radius:12px;overflow-x:auto",
       ganttLegendaWrapStyle: "display:flex;gap:18px;margin-top:14px;flex-wrap:wrap;align-items:center"
-    }, this.anVals(), this.fnVals(), this.baseVals(), this.exVals(), this.consVals(null, [], []), this.rdVals());
+    }, this.anVals(), this.fnVals(), this.baseVals(), this.exVals(), this.consVals(null, [], []), this.rdVals(), this.fuVals());
 
     const list = this.obras();
     const o = this.obra();
@@ -3845,7 +4294,7 @@ class Component extends DCLogic {
       ].map(c => ({ title: c.title, sub: c.sub, bars: c.bars, vazio: c.bars.length === 0 })),
       modalEmpty: !!md && md.rows.length === 0 && mk !== "estouro",
       modalCharts: md ? md.charts.map(c => ({ title: c.title, sub: c.sub, bars: c.bars, vazio: c.bars.length === 0 })) : []
-    }, this.anVals(), this.fnVals(), this.baseVals(), this.exVals(), this.consVals(d, list, ganttLegend), this.rdVals());
+    }, this.anVals(), this.fnVals(), this.baseVals(), this.exVals(), this.consVals(d, list, ganttLegend), this.rdVals(), this.fuVals());
   }
 }
 </script>
