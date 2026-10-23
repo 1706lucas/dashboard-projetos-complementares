@@ -5,7 +5,7 @@ import { readFile, writeFile } from "node:fs/promises";
 const TOKEN = process.env.CLICKUP_TOKEN, KEY_B64 = process.env.DASH_KEY;
 if (!TOKEN || !KEY_B64) { console.error("Faltam os segredos CLICKUP_TOKEN e/ou DASH_KEY."); process.exit(1); }
 
-const VIEWS = { cronograma: "8cktdwf-90873", indicadores: "8cktdwf-91333", pendencias: "8cktdwf-98893" };
+const VIEWS = { cronograma: ["8cktdwf-90873", "8cktdwf-104773"], indicadores: "8cktdwf-91333", pendencias: "8cktdwf-98893" };
 const X = await import("data:text/javascript;base64," + (await readFile("data/xlsx.js")).toString("base64"));
 
 const subtle = globalThis.crypto.subtle;
@@ -75,7 +75,15 @@ const d = await abrir("data/dashboard.json.enc");
 const log = []; let ok = 0;
 
 try {
-  const wb = paraPlanilha(await tarefasDaView(VIEWS.cronograma));
+  const vistas = [], partes = [];
+  for (const v of VIEWS.cronograma) {
+    try { const t = await tarefasDaView(v); vistas.push(t); partes.push(v + ": " + t.length); }
+    catch (e) { partes.push(v + ": falhou (" + e.message.slice(0, 80) + ")"); }
+  }
+  if (!vistas.length) throw new Error("nenhuma visualização de cronograma respondeu · " + partes.join(" · "));
+  const vistos = {}, todas = [];
+  vistas.forEach(l => l.forEach(t => { if (!vistos[t.id]) { vistos[t.id] = 1; todas.push(t); } }));
+  const wb = paraPlanilha(todas);
   if (X.detectKind(wb) !== "cronograma") throw new Error("a visualização não traz a coluna Classe Datas Marco");
   d.obras = X.mapCronograma(wb, d.obras, hoje);
   let hist = []; try { hist = await abrir("data/historico.json.enc"); } catch (e) { hist = []; }
@@ -85,7 +93,7 @@ try {
   if (ref) d.atrasos = X.comparaAtrasos(ref.snap, snap, d.obras, ref.quando, hoje);
   hist.push({ quando: hoje, snap });
   await fechar("data/historico.json.enc", hist.filter(h => h.quando >= dias(hoje, -14)));
-  log.push("cronograma: " + (wb.Tasks.length - 1) + " tarefas"); ok++;
+  log.push("cronograma: " + (wb.Tasks.length - 1) + " tarefas (Make It + Gadens · " + partes.join(" · ") + ")"); ok++;
 } catch (e) { log.push("cronograma NÃO atualizado: " + e.message); }
 
 try {
