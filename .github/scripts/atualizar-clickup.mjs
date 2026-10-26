@@ -5,7 +5,13 @@ import { readFile, writeFile } from "node:fs/promises";
 const TOKEN = process.env.CLICKUP_TOKEN, KEY_B64 = process.env.DASH_KEY;
 if (!TOKEN || !KEY_B64) { console.error("Faltam os segredos CLICKUP_TOKEN e/ou DASH_KEY."); process.exit(1); }
 
-const VIEWS = { cronograma: ["8cktdwf-90873", "8cktdwf-104773"], indicadores: "8cktdwf-91333", pendencias: "8cktdwf-98893" };
+// Fontes padrão. O mapa salvo no dashboard (Base de dados → Mapa das fontes) tem prioridade.
+const PADRAO = [
+  { tipo: "cronograma", nome: "Cronograma Make It", view: "8cktdwf-90873" },
+  { tipo: "cronograma", nome: "Cronograma Gadens", view: "8cktdwf-104773" },
+  { tipo: "indicadores", nome: "Indicadores de engenharia", view: "8cktdwf-91333" },
+  { tipo: "pendencias", nome: "Pendências de gestão", view: "8cktdwf-98893" }
+];
 const X = await import("data:text/javascript;base64," + (await readFile("data/xlsx.js")).toString("base64"));
 
 const subtle = globalThis.crypto.subtle;
@@ -73,17 +79,25 @@ const hoje = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10); // ho
 const dias = (s, n) => new Date(Date.parse(s) + n * 864e5).toISOString().slice(0, 10);
 const d = await abrir("data/dashboard.json.enc");
 const log = []; let ok = 0;
+let FONTES = PADRAO;
+try { const cfg = await abrir("data/config.json.enc"); if (cfg && Array.isArray(cfg.fontes) && cfg.fontes.some(f => f.view)) FONTES = cfg.fontes.filter(f => f.view && f.ativo !== false); }
+catch (e) { /* sem config: usa o padrão */ }
+const leitura = []; // status por fonte, exibido no Mapa das fontes
+async function ler(f) {
+  try { const t = await tarefasDaView(f.view); leitura.push({ view: f.view, nome: f.nome, tipo: f.tipo, n: t.length, erro: null }); return t; }
+  catch (e) { leitura.push({ view: f.view, nome: f.nome, tipo: f.tipo, n: 0, erro: e.message.slice(0, 160) }); throw e; }
+}
+const VIEWS = { cronograma: FONTES.filter(f => f.tipo === "cronograma"),
+  indicadores: FONTES.filter(f => f.tipo === "indicadores"), pendencias: FONTES.filter(f => f.tipo === "pendencias") };
+async function lerTodas(lista) {
+  const vistos = {}, todas = [];
+  for (const f of lista) { try { (await ler(f)).forEach(t => { if (!vistos[t.id]) { vistos[t.id] = 1; todas.push(t); } }); } catch (e) {} }
+  if (!todas.length) throw new Error("nenhuma visualização respondeu");
+  return todas;
+}
 
 try {
-  const vistas = [], partes = [];
-  for (const v of VIEWS.cronograma) {
-    try { const t = await tarefasDaView(v); vistas.push(t); partes.push(v + ": " + t.length); }
-    catch (e) { partes.push(v + ": falhou (" + e.message.slice(0, 80) + ")"); }
-  }
-  if (!vistas.length) throw new Error("nenhuma visualização de cronograma respondeu · " + partes.join(" · "));
-  const vistos = {}, todas = [];
-  vistas.forEach(l => l.forEach(t => { if (!vistos[t.id]) { vistos[t.id] = 1; todas.push(t); } }));
-  const wb = paraPlanilha(todas);
+  const wb = paraPlanilha(await lerTodas(VIEWS.cronograma));
   if (X.detectKind(wb) !== "cronograma") throw new Error("a visualização não traz a coluna Classe Datas Marco");
   d.obras = X.mapCronograma(wb, d.obras, hoje);
   let hist = []; try { hist = await abrir("data/historico.json.enc"); } catch (e) { hist = []; }
@@ -93,18 +107,18 @@ try {
   if (ref) d.atrasos = X.comparaAtrasos(ref.snap, snap, d.obras, ref.quando, hoje);
   hist.push({ quando: hoje, snap });
   await fechar("data/historico.json.enc", hist.filter(h => h.quando >= dias(hoje, -14)));
-  log.push("cronograma: " + (wb.Tasks.length - 1) + " tarefas (Make It + Gadens · " + partes.join(" · ") + ")"); ok++;
+  log.push("cronograma: " + (wb.Tasks.length - 1) + " tarefas"); ok++;
 } catch (e) { log.push("cronograma NÃO atualizado: " + e.message); }
 
 try {
-  const I = X.mapIndicadores(paraPlanilha(await tarefasDaView(VIEWS.indicadores)));
+  const I = X.mapIndicadores(paraPlanilha(await lerTodas(VIEWS.indicadores)));
   if (!I.riscos.length && !I.qualidade.length && !I.linhaBase.length) throw new Error("nenhum registro reconhecido");
   d.indicadores = Object.assign({}, d.indicadores, I);
   log.push("indicadores: " + I.riscos.length + " riscos, " + I.qualidade.length + " avaliações"); ok++;
 } catch (e) { log.push("indicadores NÃO atualizados: " + e.message); }
 
 try {
-  const its = X.mapPendencias(paraPlanilha(await tarefasDaView(VIEWS.pendencias)));
+  const its = X.mapPendencias(paraPlanilha(await lerTodas(VIEWS.pendencias)));
   if (!its.length) throw new Error("nenhuma pendência reconhecida");
   d.pendencias = { arquivo: "ClickUp (automático)", quando: hoje, itens: its };
   log.push("pendências: " + its.length); ok++;
@@ -113,5 +127,7 @@ try {
 console.log(log.join("\n"));
 if (!ok) process.exit(1);
 d.geradoEm = hoje;
-d.automatico = { quando: new Date().toISOString(), log };
+d.fontesUltima = Object.assign({}, d.fontesUltima);
+leitura.forEach(l => { if (!l.erro && l.n) d.fontesUltima[l.view] = hoje; });
+d.automatico = { quando: new Date().toISOString(), log, leitura };
 await fechar("data/dashboard.json.enc", d);
