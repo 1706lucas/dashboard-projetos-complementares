@@ -1296,6 +1296,52 @@ a:hover{color:var(--blue-700)}
         <section style="display:flex;flex-direction:column;gap:18px">
           <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+              <div style="max-width:72ch">
+                <h3 style="font-size:15px">Mapa das fontes</h3>
+                <p style="margin:4px 0 0;font-size:12px;color:var(--slate-400);line-height:1.5">De onde vem cada parte do dashboard e o que o robô das 7h leu na última execução. {{ mfDica }}</p>
+              </div>
+              <span style="font-size:11.5px;color:var(--slate-500);white-space:nowrap">{{ mfQuando }}</span>
+            </div>
+            <div style="overflow-x:auto;margin-top:14px">
+              <table class="table" style="min-width:820px;table-layout:fixed">
+                <thead><tr><th style="width:190px">Fonte</th><th style="width:220px">Link no ClickUp</th><th>Alimenta</th><th style="width:130px">Última atualização</th><th style="width:170px">Última leitura</th><th style="width:40px"></th></tr></thead>
+                <tbody>
+                  <sc-for list="{{ mfLinhas }}" as="f" hint-placeholder-count="5">
+                    <tr>
+                      <td>
+                        <div style="display:flex;align-items:center;gap:8px">
+                          <span style="{{ f.dot }}"></span>
+                          <div>
+                            <div style="font-size:12.5px;font-weight:800">{{ f.nome }}</div>
+                            <div style="font-size:10.5px;color:var(--slate-400)">{{ f.modo }}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <sc-if value="{{ f.editavel }}"><input value="{{ f.link }}" onChange="{{ f.setLink }}" placeholder="Cole o link da visualização" style="height:34px;border:1px solid var(--slate-200);border-radius:10px;padding:0 10px;font-size:12px;font-family:var(--font-mono);width:100%;min-width:0;background:var(--card);color:var(--color-text)"></sc-if>
+                        <sc-if value="{{ f.fixo }}"><a href="{{ f.link }}" target="_blank" rel="noopener" style="display:block;font-size:12px;color:var(--slate-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.linkTxt }}</a></sc-if>
+                        <div style="{{ f.viewStyle }}">{{ f.viewTxt }}</div>
+                      </td>
+                      <td style="font-size:12px;color:var(--slate-600);line-height:1.45">{{ f.alimenta }}</td>
+                      <td><div class="mono" style="font-size:12.5px;font-weight:800;white-space:nowrap">{{ f.atual }}</div><div style="font-size:10.5px;color:var(--slate-400);margin-top:2px">{{ f.atualSub }}</div></td>
+                      <td><span style="{{ f.stStyle }}">{{ f.st }}</span><div style="font-size:10.5px;color:var(--slate-400);margin-top:3px;line-height:1.35">{{ f.stSub }}</div></td>
+                      <td><button onClick="{{ f.remover }}" style="{{ f.remStyle }}">×</button></td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+            <sc-if value="{{ mfAdmin }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center">
+                <button class="btn" onClick="{{ mfAddCrono }}">+ Cronograma</button>
+                <button class="btn" onClick="{{ mfAddInd }}">+ Indicadores</button>
+                <button class="btn" onClick="{{ mfAddPend }}">+ Pendências</button>
+                <span style="font-size:11.5px;color:var(--slate-400)">Alterações valem para o robô depois de Usuários e publicação → Gerar pacote para publicar.</span>
+              </div>
+            </sc-if>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
               <div>
                 <h3 style="font-size:15px">Atualizar dados</h3>
                 <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400);max-width:72ch">Selecione um ou mais arquivos .xlsx exportados do ClickUp ou a planilha SAÍDAS. O painel identifica cada arquivo pelas colunas e recalcula os indicadores na hora. A leitura acontece no seu navegador e fica salva nesta máquina.</p>
@@ -2063,7 +2109,7 @@ class Component extends DCLogic {
     const ss = this.state.sessao;
     if (C && ss && ss.perfil === "admin") {
       C.listaUsuarios().then(u => this.setState({ usuarios: u }));
-      C.carregar("data/config.json").then(c => this.setState({ cfg: Object.assign({ url: "", anon: "", chave: "" }, c) })).catch(() => {});
+      C.carregar("data/config.json").then(c => this.setState({ cfg: Object.assign({ url: "", anon: "", chave: "", fontes: null }, c) })).catch(() => {});
     }
   }
   async entrar(e) {
@@ -2303,7 +2349,8 @@ class Component extends DCLogic {
     if (!Object.keys(u).length) return d;
     const out = Object.assign({}, d);
     if (u.siglas) {
-      const byS = {}; (u.cronograma ? u.cronograma.dados : d.obras).forEach(o => { byS[o.sigla] = o; });
+      const byS = {}; d.obras.forEach(o => { byS[o.sigla] = o; });
+      if (u.cronograma) u.cronograma.dados.forEach(o => { if (!o.foraDoExport) byS[o.sigla] = o; });
       out.obras = u.siglas.dados.map(s => Object.assign({}, byS[s.sigla] || { temDados: false, pct: 0, totalCompl: 0, doneCompl: 0, fases: [], axial: [], gantt: [], fasesLinha: [], vida: {}, econ: {} }, s));
     }
     if (u.cronograma) {
@@ -2326,6 +2373,67 @@ class Component extends DCLogic {
       out.benchmark = bench;
     }
     return out;
+  }
+  MF_PADRAO = [
+    { tipo: "cronograma", nome: "Cronograma Make It", link: "https://app.clickup.com/9013344143/v/gr/8cktdwf-90873" },
+    { tipo: "cronograma", nome: "Cronograma Gadens", link: "https://app.clickup.com/9013344143/v/gr/8cktdwf-104773" },
+    { tipo: "indicadores", nome: "Indicadores de engenharia", link: "https://app.clickup.com/9013344143/v/gr/8cktdwf-91333" },
+    { tipo: "pendencias", nome: "Pendências de gestão", link: "https://sharing.clickup.com/9013344143/gr/h/8cktdwf-98893/f6f7e1cf61f7996" }
+  ];
+  MF_TIPOS = {
+    cronograma: ["#8B5CF6", "Geral, Prazos, Reunião Diretoria (linha axial), Follow-up, Gestão de Analistas"],
+    indicadores: ["#2563EB", "Indicadores, Riscos de Engenharia, Desvio de LB de PE, Follow-up (riscos)"],
+    pendencias: ["#EF4444", "Reunião Diretoria (restrições)"]
+  };
+  mfView(link) { const m = String(link || "").match(/(8[a-z0-9]{5,}-\d{3,})/i); return m ? m[1] : ""; }
+  mfLista() {
+    const c = this.state.cfg || {};
+    return Array.isArray(c.fontes) && c.fontes.length ? c.fontes : this.MF_PADRAO.map(f => Object.assign({}, f, { view: this.mfView(f.link) }));
+  }
+  mfSalvar(lista) {
+    this.setState({ cfg: Object.assign({}, this.state.cfg, { fontes: lista.map(f => Object.assign({}, f, { view: this.mfView(f.link) })) }) });
+  }
+  mfVals() {
+    const d = this.dados(), a = d && d.automatico, adm = !!(this.state.sessao && this.state.sessao.perfil === "admin");
+    const lidas = (a && a.leitura) || [];
+    const lista = this.mfLista();
+    const pill = (bg, fg) => "display:inline-block;font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:99px;white-space:nowrap;background:" + bg + ";color:" + fg;
+    const linhas = lista.map((f, i) => {
+      const v = this.mfView(f.link), l = lidas.find(x => x.view === v), t = this.MF_TIPOS[f.tipo] || ["#94A3B8", ""];
+      const upT = (this.state.uploads || {})[f.tipo];
+      const cand = [[d && d.fontesUltima && d.fontesUltima[v], "robô"], [l && !l.erro && l.n && a ? String(a.quando).slice(0, 10) : null, "robô"],
+        [f.tipo === "pendencias" && d && d.pendencias ? d.pendencias.quando : null, "base publicada"], [upT ? upT.quando : null, "upload neste navegador"],
+        [d ? d.geradoEm : null, "data da base publicada"]].find(c => c[0]) || [null, ""];
+      const ult = cand[0], origem = cand[1];
+      const dias = ult ? Math.round((Date.now() - Date.parse(ult)) / 864e5) : null;
+      const st = !v ? ["Link inválido", pill("#FEE2E2", "#991B1B"), "não achei o ID da visualização no link"]
+        : !l ? ["Ainda não lida", pill("var(--slate-100)", "var(--slate-500)"), a ? "publique o pacote e rode o robô" : "o robô ainda não rodou"]
+        : l.erro ? ["Falhou", pill("#FEE2E2", "#991B1B"), l.erro]
+        : !l.n ? ["0 tarefas", pill("#FEF3C7", "#92400E"), "a visualização está vazia ou o token não tem acesso"]
+        : [l.n + " tarefas", pill("#D1FAE5", "#065F46"), "lida em " + new Date(a.quando).toLocaleDateString("pt-BR")];
+      return { nome: f.nome, modo: "Automático · ClickUp", link: f.link, linkTxt: f.link, editavel: adm, fixo: !adm,
+        dot: "width:10px;height:10px;border-radius:3px;flex-shrink:0;background:" + t[0], alimenta: t[1],
+        viewTxt: v ? "ID da visualização: " + v : "",
+        viewStyle: v ? "font-size:10.5px;color:var(--slate-400);margin-top:4px;font-family:var(--font-mono)" : "display:none",
+        st: st[0], stStyle: st[1], stSub: st[2],
+        atual: ult ? this.br(ult) : "—", atualSub: ult ? (dias <= 0 ? "hoje" : dias === 1 ? "ontem" : "há " + dias + " dias") + " · " + origem : "nunca atualizada",
+        setLink: e => { const n = lista.slice(); n[i] = Object.assign({}, f, { link: e.target.value.trim() }); this.mfSalvar(n); },
+        remover: () => { if (window.confirm("Remover a fonte " + f.nome + " do robô?")) this.mfSalvar(lista.filter((x, j) => j !== i)); },
+        remStyle: adm ? "cursor:pointer;border:0;background:transparent;color:var(--slate-400);font-size:18px;line-height:1" : "display:none" };
+    });
+    const up = this.state.uploads || {};
+    [["Financeiro · SAÍDAS", "#10B981", "Financeiro, Geral (budget), Follow-up (viabilidade e composição)", "saidas"],
+     ["Planilha de siglas", "#F59E0B", "Liga cada tarefa à obra pela sigla · todas as abas", "siglas"]].forEach(m => linhas.push({
+      atual: up[m[3]] ? this.br(up[m[3]].quando) : d && d.geradoEm ? this.br(d.geradoEm) : "—", atualSub: up[m[3]] ? "upload neste navegador" : "base publicada",
+      nome: m[0], modo: "Manual · upload nesta aba", link: "", linkTxt: "Envie o .xlsx em Atualizar dados, abaixo", editavel: false, fixo: true,
+      dot: "width:10px;height:10px;border-radius:3px;flex-shrink:0;background:" + m[1], alimenta: m[2], viewTxt: "", viewStyle: "display:none",
+      st: "Manual", stStyle: pill("var(--slate-100)", "var(--slate-600)"), stSub: "o robô não lê esta fonte",
+      setLink: () => {}, remover: () => {}, remStyle: "display:none" }));
+    const add = (tipo, nome) => () => this.mfSalvar(lista.concat([{ tipo, nome: nome + " " + (lista.filter(x => x.tipo === tipo).length + 1), link: "" }]));
+    return { mfLinhas: linhas, mfAdmin: adm,
+      mfQuando: a ? "Robô: " + new Date(a.quando).toLocaleDateString("pt-BR") + " às " + new Date(a.quando).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "Robô ainda não rodou",
+      mfDica: adm ? "Cole aqui o link de cada visualização: é exatamente o que o robô vai ler." : "",
+      mfAddCrono: add("cronograma", "Cronograma"), mfAddInd: add("indicadores", "Indicadores"), mfAddPend: add("pendencias", "Pendências") };
   }
   baseVals() {
     const u = this.state.uploads || {}, d = this.dados();
@@ -3677,7 +3785,7 @@ class Component extends DCLogic {
       ganttVazio: "", ganttVazioStyle: "display:none",
       ganttWrapStyle: "border:1px solid var(--slate-100);border-radius:12px;overflow-x:auto",
       ganttLegendaWrapStyle: "display:flex;gap:18px;margin-top:14px;flex-wrap:wrap;align-items:center"
-    }, this.anVals(), this.fnVals(), this.baseVals(), this.exVals(), this.consVals(null, [], []), this.rdVals(), this.fuVals());
+    }, this.anVals(), this.fnVals(), this.baseVals(), this.mfVals(), this.exVals(), this.consVals(null, [], []), this.rdVals(), this.fuVals());
 
     const list = this.obras();
     const o = this.obra();
@@ -4294,7 +4402,7 @@ class Component extends DCLogic {
       ].map(c => ({ title: c.title, sub: c.sub, bars: c.bars, vazio: c.bars.length === 0 })),
       modalEmpty: !!md && md.rows.length === 0 && mk !== "estouro",
       modalCharts: md ? md.charts.map(c => ({ title: c.title, sub: c.sub, bars: c.bars, vazio: c.bars.length === 0 })) : []
-    }, this.anVals(), this.fnVals(), this.baseVals(), this.exVals(), this.consVals(d, list, ganttLegend), this.rdVals(), this.fuVals());
+    }, this.anVals(), this.fnVals(), this.baseVals(), this.mfVals(), this.exVals(), this.consVals(d, list, ganttLegend), this.rdVals(), this.fuVals());
   }
 }
 </script>
