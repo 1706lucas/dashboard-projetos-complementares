@@ -581,6 +581,14 @@ a{color:var(--color-accent)}a:hover{color:var(--blue-700)}
                       <span style="font-weight:800;font-size:15px">{{ g.disc }}</span>
                       <span style="font-size:12px;color:var(--slate-400)">{{ g.resumo }}</span>
                     </div>
+                    <sc-if value="{{ g.hasPrem }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-direction:column;gap:6px;padding:12px 18px;border-bottom:1px solid var(--slate-100)">
+                        <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">Diretrizes automáticas das premissas</span>
+                        <sc-for list="{{ g.prem }}" as="p">
+                          <div style="display:flex;gap:10px;font-size:13px;line-height:1.45"><span style="font-weight:700;flex-shrink:0;min-width:34px">{{ p.a }}</span><span>{{ p.t }}</span></div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
                     <div style="display:grid;grid-template-columns:200px minmax(0,1.6fr) minmax(0,1fr);gap:14px;padding:10px 18px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400);border-bottom:1px solid var(--slate-100)">
                       <span>Zona de construção</span><span>Solução pretendida</span><span>Diretriz de projeto (link)</span>
                     </div>
@@ -777,6 +785,14 @@ const PREM_ELE = [
  ["gas","Terá alimentação de gás para cooktop?","","Cooktop a gás previsto"],
  ["gasEsp","Deverá prever circuito elétrico como espera para o cooktop?","gas","Circuito de espera para cooktop previsto"]
 ];
+const PREM_DIR = {
+ aq:["Hidrossanitário","Previsão de circuito elétrico para alimentação de chuveiro","Previsão de tubulação seca e espera de circuito no quadro de distribuição. Considerar demanda no projeto."],
+ res:["Elétrico","Considerar circuito reservas","Não considerar circuitos reservas"],
+ ac:["Elétrico","Prever infra seca e espaço para disjuntor para ar-condicionado. Considerar na demanda","Não prever circuito e alimentação para ar-condicionado"],
+ acAlim:["Elétrico","Prever infra seca e espaço para disjuntor para ar-condicionado. Considerar na demanda","Não prever circuito e alimentação para ar-condicionado"],
+ gas:["Elétrico","Prever infra seca e espaço no disjuntor para previsão de cooktop. Contemplar demanda no quadro de distribuição.",""],
+ gasEsp:["Elétrico","Previsão de circuito elétrico como espera para o cooktop",""]
+};
 const PROJ_Q = [
  ["cas","Terá castelo d'água?",["Castelo d'água","Est. Castelo d'água"]],
  ["cont","Terá contenções de solo e/ou pavimentação?",["Ensaios de Solos"]],
@@ -1172,6 +1188,15 @@ class Component extends DCLogic {
     });
     return out;
   }
+  premDir(d) {
+    const pe = (d.prem && d.prem.ele) || {}, out = {}, seen = {};
+    PREM_ELE.forEach(q => { const a = pe[q[0]], m = PREM_DIR[q[0]]; if (!a || !m || (q[2] && pe[q[2]] !== 'Sim')) return;
+      let t = a === 'Sim' ? m[1] : a === 'Não' ? m[2] : ''; if (!t) return;
+      if (a === 'Sim' && q[4] && pe[q[4]]) t += ' (' + pe[q[4]] + ' circuito(s))';
+      const k = m[0] + '|' + t; if (seen[k]) return; seen[k] = 1;
+      (out[m[0]] = out[m[0]] || []).push({ q:q[1], a, t }); });
+    return out;
+  }
   docSections(d) {
     const S = []; let n = 0;
     const tbl = (t, cols, rows, note) => ({ t, note: note || '', isTable:true, cols, rows, empty: rows.length === 0 });
@@ -1184,17 +1209,24 @@ class Component extends DCLogic {
     S.push({ t:(++n) + '. Zonas de construção', isPlan:true, note:'', hasImg: !!d.planta, imgEl: d.planta ? React.createElement('img', { src:d.planta, alt:'Implantação', style:{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'fill' } }) : null, ar: d.plantaAR || 1.6,
       zs: d.zonas.map(z => { const p = this.getPts(z); return { code:z.code, pts:this.ptsStr(p), l:Math.min(...p.map(q => q[0])) + '%', tp:Math.min(...p.map(q => q[1])) + '%', c:this.zc(z), fill:this.zc(z) + '22' }; }) });
     S.push(tbl('', ['Código','Zona','Tipo','Áreas','Disciplinas'], d.zonas.map(z => [this.sig(d) + '-' + z.code, z.nome || '—', this.zt(z.t).n, z.ar.join(', ') || '—', z.di.join(', ') || '—'])));
-    S.push(tbl((++n) + '. Equipamentos', ['Equipamento','Descrição','Qtd','Zona','Especificação','Status'], d.equip.map(e => [e.cat || '—', e.desc || '—', e.qtd || '—', e.zona || '—', e.spec || '—', e.status])));
-    { const pe = (d.prem && d.prem.ele) || {};
-      const lin = PREM_ELE.filter(q => pe[q[0]] && (!q[2] || pe[q[2]] === 'Sim')).map(q => [q[1], pe[q[0]] + (q[4] && pe[q[4]] && pe[q[0]] === 'Sim' ? ' · ' + pe[q[4]] + ' circuito(s)' : '')]);
-      if (lin.length) S.push(tbl((++n) + '. Premissas de projeto · Elétrico', ['Premissa','Resposta'], lin)); }
+    { const en6 = ++n, gz = {}; d.equip.forEach(e => { const k = e.zona || ''; (gz[k] = gz[k] || []).push(e); });
+      const ks = d.zonas.map(z => z.code).filter(c => gz[c]).concat(Object.keys(gz).filter(k => !d.zonas.some(z => z.code === k)));
+      S.push({ t:en6 + '. Equipamentos', note: ks.length ? '' : 'Nenhum equipamento cadastrado.' });
+      ks.forEach((k, i) => { const z = d.zonas.find(x => x.code === k);
+        S.push(tbl(en6 + '.' + (i + 1) + ' ' + (z ? this.sig(d) + '-' + z.code + (z.nome ? ' · ' + z.nome : '') : k ? 'Zona ' + k : 'Sem zona definida'),
+          ['Equipamento','Descrição','Qtd','Especificação','Status'], gz[k].map(e => [e.cat || '—', e.desc || '—', e.qtd || '—', e.spec || '—', e.status]))); }); }
     S.push(tbl((++n) + '. Projetistas', ['Disciplina','Projetista','Zonas','Contratação'], this.projDiscs(d).map(x => { const p = d.proj[x] || {}; return [x, p.v ? this.desName(p.v) : 'A definir', this.zOf(d, x).join(', '), p.st || 'A contratar']; })));
     const en = ++n;
-    this.escZ(d).forEach((z, i) => {
-      const lnk = u => /^https?:\/\//i.test(u || '') ? React.createElement('a', { href:u, target:'_blank', rel:'noopener',
-          style:{ color:'#1D4ED8', fontWeight:700, textDecoration:'underline', wordBreak:'normal' } }, 'Acesse a Diretriz da Solução aqui') : '—';
-      const rows = z.rows.map(r => { const pj = d.proj[r.disc]; return [r.disc, pj && pj.v ? this.desName(pj.v) : '—', r.sol || this.ESC_PAD, lnk(r.link)]; });
-      S.push(tbl(en + '.' + (i + 1) + ' Definição de Soluções e Diretrizes de Projeto · ' + z.code + ' ' + z.nome, ['Disciplina','Projetista','Solução pretendida','Diretriz de projeto'], rows));
+    S.push({ t:en + '. Definição de Soluções e Diretrizes de Projeto', note:'' });
+    const lnk = u => /^https?:\/\//i.test(u || '') ? React.createElement('a', { href:u, target:'_blank', rel:'noopener',
+        style:{ color:'#1D4ED8', fontWeight:700, textDecoration:'underline', wordBreak:'normal' } }, 'Acesse a Diretriz da Solução aqui') : '—';
+    const pd = this.premDir(d), gd = {};
+    this.escZ(d).forEach(z => z.rows.forEach(r => { (gd[r.disc] = gd[r.disc] || []).push([z.code === 'GERAL' ? 'Geral' : this.sig(d) + '-' + z.code + (z.nome ? ' · ' + z.nome : ''), r.sol || this.ESC_PAD, lnk(r.link)]); }));
+    Object.keys(pd).forEach(k => { if (!gd[k]) gd[k] = []; });
+    Object.keys(gd).sort((a, b) => this.dOrd(a, b)).forEach((k, i) => { const pj = d.proj[k];
+      const tt = en + '.' + (i + 1) + ' ' + k + ' · Projetista: ' + (pj && pj.v ? this.desName(pj.v) : 'A definir');
+      if (pd[k]) S.push(tbl(tt, ['Premissa','Resposta','Diretriz'], pd[k].map(p => [p.q, p.a, p.t])));
+      if (gd[k].length) S.push(tbl(pd[k] ? '' : tt, ['Zona','Solução pretendida','Diretriz de projeto'], gd[k]));
     });
     return S;
   }
@@ -1517,7 +1549,8 @@ class Component extends DCLogic {
           sol: r.sol, link: r.link, temLink: /^https?:\/\//i.test(r.link),
           onSol: ev => upd(z.code, r.disc, 'sol', ev.target.value), onLink: ev => upd(z.code, r.disc, 'link', ev.target.value.trim()) }; };
       const gd = {}; zs.forEach(z => z.rows.forEach(r => { (gd[r.disc] = gd[r.disc] || []).push(mk(z, r)); }));
-      v.escDiscs = Object.keys(gd).sort((a, b) => this.dOrd(a, b)).map(k => ({ disc:k, rows:gd[k],
+      const pdUI = this.premDir(d);
+      v.escDiscs = Object.keys(gd).sort((a, b) => this.dOrd(a, b)).map(k => ({ disc:k, rows:gd[k], prem: pdUI[k] || [], hasPrem: !!pdUI[k],
         resumo: gd[k].length + (gd[k].length === 1 ? ' zona' : ' zonas') + ' · ' + gd[k].filter(r => r.sol).length + ' com solução definida' }));
       v.escZonas = zs.map(z => { const pre = z.rows.filter(r => r.sol).length;
         return { code: z.code === 'GERAL' ? '—' : this.sig(d) + '-' + z.code, nome: z.nome, resumo: z.rows.length + ' disciplina(s) · ' + pre + ' com solução definida',
