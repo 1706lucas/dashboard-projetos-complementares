@@ -552,54 +552,59 @@ a{color:var(--color-accent)}a:hover{color:var(--blue-700)}
         </sc-if>
 
         <sc-if value="{{ isEscopo }}" hint-placeholder-val="{{ false }}">
-          <div style="display:flex;flex-direction:column;gap:20px">
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px">
-              <sc-for list="{{ phases }}" as="p" hint-placeholder-count="4">
-                <div>
-                  <sc-if value="{{ p.active }}"><div style="padding:14px 16px;border-radius:14px;border:1px solid var(--slate-100);background:var(--blue-600);color:#fff;display:flex;flex-direction:column;gap:2px;height:100%"><span style="font-weight:800;font-size:18px">{{ p.k }}</span><span style="font-size:12px;color:#fff;opacity:.85">{{ p.n }}</span><span style="font-size:11px;color:#fff;opacity:.7">{{ p.count }}</span></div></sc-if>
-                  <sc-if value="{{ p.idle }}"><div onClick="{{ p.go }}" style="padding:14px 16px;border-radius:14px;border:1px solid var(--slate-100);background:var(--card);display:flex;flex-direction:column;gap:2px;cursor:pointer;height:100%" style-hover="background:var(--slate-50)"><span style="font-weight:800;font-size:18px">{{ p.k }}</span><span style="font-size:12px;color:var(--slate-600)">{{ p.n }}</span><span style="font-size:11px;color:var(--slate-400)">{{ p.count }}</span></div></sc-if>
-                </div>
-              </sc-for>
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <p style="margin:0;font-size:13px;color:var(--slate-500);max-width:820px;text-wrap:pretty">Para cada zona, descreva a solução pretendida em cada disciplina e vincule a diretriz de projeto vigente. Campos sem solução saem no TAP como <strong>A dimensionar pelo projetista</strong>.</p>
+            <div style="display:flex;gap:4px;background:var(--slate-100);border-radius:12px;padding:4px;align-self:flex-start">
+              <sc-for list="{{ escModos }}" as="m" hint-placeholder-count="2"><button onClick="{{ m.go }}" style="{{ m.style }}">{{ m.label }}</button></sc-for>
             </div>
-            <p style="margin:0;font-size:14px;color:var(--slate-600);max-width:820px;text-wrap:pretty"><strong>Objetivo da fase:</strong> {{ ph.obj }}</p>
-            <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden">
-              <div style="display:grid;grid-template-columns:36px 170px minmax(0,1fr) minmax(0,1.6fr) 150px;gap:14px;padding:12px 16px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400);border-bottom:1px solid var(--slate-200)">
-                <span></span><span>Disciplina</span><span>Entrada (PO)</span><span>Entregáveis</span><span>Prazo</span>
+            <sc-if value="{{ escPorDisc }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <sc-for list="{{ escDiscs }}" as="g" hint-placeholder-count="3">
+                  <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden">
+                    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--slate-200);background:var(--slate-50)">
+                      <span style="font-weight:800;font-size:15px">{{ g.disc }}</span>
+                      <span style="font-size:12px;color:var(--slate-400)">{{ g.resumo }}</span>
+                    </div>
+                    <div style="display:grid;grid-template-columns:200px minmax(0,1.6fr) minmax(0,1fr);gap:14px;padding:10px 18px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400);border-bottom:1px solid var(--slate-100)">
+                      <span>Zona de construção</span><span>Solução pretendida</span><span>Diretriz de projeto (link)</span>
+                    </div>
+                    <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="3">
+                      <div style="display:grid;grid-template-columns:200px minmax(0,1.6fr) minmax(0,1fr);gap:14px;padding:12px 18px;border-bottom:1px solid var(--slate-100);align-items:start">
+                        <div style="display:flex;flex-direction:column;gap:3px"><span style="font-family:var(--font-mono);font-weight:800;font-size:12px;color:var(--blue-700)">{{ r.code }}</span><span style="font-size:13px;font-weight:700">{{ r.nome }}</span></div>
+                        <textarea value="{{ r.sol }}" onChange="{{ r.onSol }}" rows="2" placeholder="A dimensionar pelo projetista" style="border-radius:10px;width:100%;padding:8px 10px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:13px;line-height:1.45;outline:none;color:var(--color-text);resize:vertical"></textarea>
+                        <div style="display:flex;flex-direction:column;gap:5px">
+                          <input type="url" value="{{ r.link }}" onChange="{{ r.onLink }}" placeholder="Cole o link da diretriz" style="border-radius:10px;width:100%;padding:8px 10px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:13px;line-height:1.45;outline:none;color:var(--color-text)">
+                          <sc-if value="{{ r.temLink }}"><a href="{{ r.link }}" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;color:var(--blue-600);text-decoration:none">Abrir última revisão da diretriz ↗</a></sc-if>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-for>
               </div>
-              <sc-for list="{{ ph.rows }}" as="r" hint-placeholder-count="8">
-                <div style="display:grid;grid-template-columns:36px 170px minmax(0,1fr) minmax(0,1.6fr) 150px;gap:14px;padding:12px 16px;border-bottom:1px solid var(--slate-100);align-items:start">
-                  <input type="checkbox" checked="{{ r.on }}" onChange="{{ r.toggle }}" style="border-radius:10px;width:18px;height:18px;margin-top:4px;accent-color:var(--blue-600)">
-                  <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:14px;font-weight:600">{{ r.disc }}</span><span style="font-size:12px;color:var(--slate-400)">{{ r.proj }}</span><span style="font-family:var(--font-mono);font-size:10.5px;color:var(--blue-700)">{{ r.zonasL }}</span></div>
-                  <span style="font-size:13px;color:var(--slate-500);line-height:1.45">{{ r.inp }}</span>
-                  <textarea value="{{ r.ent }}" onChange="{{ r.onEnt }}" rows="2" disabled="{{ r.off }}" style="border-radius:10px;width:100%;padding:8px 10px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:13px;line-height:1.45;outline:none;resize:vertical"></textarea>
-                  <input type="date" value="{{ r.prazo }}" onChange="{{ r.onPrazo }}" disabled="{{ r.off }}" style="border-radius:10px;width:100%;padding:8px 8px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:13px;outline:none">
-                </div>
-              </sc-for>
-              <div style="display:flex;gap:8px;padding:12px 16px;align-items:center">
-                <input list="discSug" value="{{ newDisc }}" onChange="{{ onNewDisc }}" placeholder="Adicionar disciplina ou entregável neste marco" style="border-radius:10px;flex:1;max-width:380px;padding:8px 10px;border:1px dashed var(--slate-300);font-size:13px;outline:none">
-                <datalist id="discSug"><sc-for list="{{ discSug }}" as="o"><option value="{{ o }}"></option></sc-for></datalist>
-                <button onClick="{{ addDisc }}" style="border-radius:10px;padding:8px 14px;background:transparent;border:1px solid var(--slate-200);font-size:13px;font-weight:700;cursor:pointer" style-hover="background:var(--slate-50)">+ Adicionar</button>
-              </div>
-            </div>
-            <sc-if value="{{ ph.hasFreeze }}">
-            <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);padding:20px 24px;display:flex;flex-direction:column;gap:12px">
-              <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
-                <h3 style="margin:0;font-size:16px;font-weight:800">Congelamentos ao final do {{ ph.k }}</h3>
-                <span style="font-size:13px;color:var(--slate-500)">Nível de risco de alteração · PO.CM.PJC.001</span>
-              </div>
-              <sc-for list="{{ ph.freeze }}" as="f" hint-placeholder-count="6">
-                <div style="display:grid;grid-template-columns:minmax(0,1.2fr) 110px minmax(0,1.6fr);gap:14px;padding:8px 0;border-top:1px solid var(--slate-100);font-size:13px;align-items:center">
-                  <span style="font-weight:600">{{ f.item }}</span>
-                  <span>
-                    <sc-if value="{{ f.hi }}"><span style="padding:3px 10px;border-radius:99px;background:var(--red-50);color:#DC2626;font-weight:600;font-size:12px">{{ f.risk }}</span></sc-if>
-                    <sc-if value="{{ f.mid }}"><span style="padding:3px 10px;border-radius:99px;background:var(--amber-50);color:#D97706;font-weight:600;font-size:12px">{{ f.risk }}</span></sc-if>
-                    <sc-if value="{{ f.lo }}"><span style="padding:3px 10px;border-radius:99px;background:var(--green-50);color:#059669;font-weight:600;font-size:12px">{{ f.risk }}</span></sc-if>
-                  </span>
-                  <span style="color:var(--slate-500)">{{ f.disc }}</span>
-                </div>
-              </sc-for>
-            </div>
             </sc-if>
+            <sc-if value="{{ escVazio }}"><div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden;padding:20px 24px;font-size:13px;color:var(--slate-500)">Nenhuma zona cadastrada. Volte em <strong>Zonas de construção</strong> e demarque as zonas com suas disciplinas.</div></sc-if>
+            <sc-for list="{{ escZonasVis }}" as="z" hint-placeholder-count="2">
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden">
+                <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--slate-200);background:var(--slate-50)">
+                  <span style="font-family:var(--font-mono);font-weight:800;font-size:13px;color:var(--blue-700)">{{ z.code }}</span>
+                  <span style="font-weight:800;font-size:15px">{{ z.nome }}</span>
+                  <span style="font-size:12px;color:var(--slate-400)">{{ z.resumo }}</span>
+                </div>
+                <div style="display:grid;grid-template-columns:200px minmax(0,1.6fr) minmax(0,1fr);gap:14px;padding:10px 18px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400);border-bottom:1px solid var(--slate-100)">
+                  <span>Disciplina</span><span>Solução pretendida</span><span>Diretriz de projeto (link)</span>
+                </div>
+                <sc-for list="{{ z.rows }}" as="r" hint-placeholder-count="5">
+                  <div style="display:grid;grid-template-columns:200px minmax(0,1.6fr) minmax(0,1fr);gap:14px;padding:12px 18px;border-bottom:1px solid var(--slate-100);align-items:start">
+                    <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:14px;font-weight:700">{{ r.disc }}</span><span style="font-size:12px;color:var(--slate-400)">{{ r.proj }}</span></div>
+                    <textarea value="{{ r.sol }}" onChange="{{ r.onSol }}" rows="2" placeholder="A dimensionar pelo projetista" style="border-radius:10px;width:100%;padding:8px 10px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:13px;line-height:1.45;outline:none;color:var(--color-text);resize:vertical"></textarea>
+                    <div style="display:flex;flex-direction:column;gap:5px">
+                      <input type="url" value="{{ r.link }}" onChange="{{ r.onLink }}" placeholder="Cole o link da diretriz" style="border-radius:10px;width:100%;padding:8px 10px;border:1px solid var(--slate-200);background:var(--card);font-family:inherit;font-size:13px;line-height:1.45;outline:none;color:var(--color-text)">
+                      <sc-if value="{{ r.temLink }}"><a href="{{ r.link }}" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;color:var(--blue-600);text-decoration:none">Abrir última revisão da diretriz ↗</a></sc-if>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
           </div>
         </sc-if>
 
@@ -873,11 +878,11 @@ const FG = [
 const STEPS = [
  { t:"Identificação", d:FG[0].d }, { t:"Produto", d:FG[1].d },
  { t:"Objetivo e restrições", d:"O objetivo é montado automaticamente a partir do Produto. Informe as restrições legais e de engenharia." },
- { t:"Marcos", d:"Entregas de projeto e datas-alvo. Cada marco vira uma fase no Escopo por entrega." },
+ { t:"Marcos", d:"Entregas de projeto e datas-alvo." },
  { t:"Zonas de construção", d:"Envie a implantação e demarque as zonas. Para cada zona são propostos código, áreas e disciplinas, todos editáveis." },
  { t:"Premissas de Projetos", d:"Premissas por disciplina e equipamentos por zona. Responda às perguntas para registrar as premissas e lançar as previsões automaticamente." },
  { t:"Projetistas", d:"Disciplinas padrão do empreendimento, as definidas nas zonas e as adicionadas pelas perguntas abaixo. Defina o escritório e o status de contratação." },
- { t:"Escopo por entrega", d:"Entregáveis por marco e disciplina, pré-preenchidos conforme o PO.CM.PJC.001 e as zonas. Tudo editável." },
+ { t:"Definição de Soluções e Diretrizes de Projeto", d:"Solução pretendida por disciplina em cada zona, com o link da diretriz de projeto vigente." },
  { t:"Revisar e emitir", d:"Confira o resumo e as alterações em relação à revisão vigente antes de emitir." }
 ];
 function blank() {
@@ -1062,6 +1067,15 @@ class Component extends DCLogic {
   zDiscs(d) { const o = []; d.zonas.forEach(z => z.di.forEach(x => { if (!o.includes(x)) o.push(x); })); return o.sort((a, b) => this.dOrd(a, b)); }
   projDiscs(d) { const o = PROJ_BASE.slice(); this.zDiscs(d).concat(d.projExtra || []).forEach(x => { if (!o.includes(x)) o.push(x); }); return o.sort((a, b) => this.dOrd(a, b)); }
   zOf(d, disc) { return d.zonas.filter(z => z.di.includes(disc)).map(z => z.code); }
+  ESC_PAD = 'A dimensionar pelo projetista';
+  escZ(d) {
+    const ez = d.escZona || {}, zs = (d.zonas || []).map(z => ({ code: z.code, nome: z.nome || z.name || z.code, discs: (z.di || []).slice() }));
+    const usadas = {}; zs.forEach(z => z.discs.forEach(x => { usadas[x] = 1; }));
+    const resto = this.projDiscs(d).filter(x => !usadas[x]);
+    if (resto.length) zs.push({ code: 'GERAL', nome: 'Disciplinas gerais do empreendimento', discs: resto });
+    return zs.map(z => ({ code: z.code, nome: z.nome, rows: z.discs.map(disc => { const e = (ez[z.code] || {})[disc] || {};
+      return { disc, sol: e.sol || '', link: e.link || '' }; }) })).filter(z => z.rows.length);
+  }
   escRows(d, m) {
     const st = d.escopo[m.id] || {}; const P = PHASES.find(p => p.k === m.k);
     const discs = this.projDiscs(d); Object.keys(st).forEach(k => { if (!discs.includes(k)) discs.push(k); });
@@ -1081,7 +1095,8 @@ class Component extends DCLogic {
     PROJ_Q.forEach(q => { if (d.pq && d.pq[q[0]]) put('pq.' + q[0], 'Projetistas › ' + q[1], d.pq[q[0]]); });
     PREM_ELE.forEach(q => { const pe = (d.prem && d.prem.ele) || {}; if (pe[q[0]]) put('pe.' + q[0], 'Premissas Elétrico › ' + q[1], pe[q[0]] + (q[4] && pe[q[4]] ? ' (' + pe[q[4]] + ')' : '')); });
     this.projDiscs(d).forEach(x => { const p = d.proj[x]; put('p.' + x, 'Projetista › ' + x, p && p.v ? this.desName(p.v) + ' (' + p.st + ')' : ''); });
-    d.marcos.forEach(m => this.escRows(d, m).forEach(r => put('s.' + m.id + r.disc, 'Escopo ' + m.n + ' › ' + r.disc, r.on ? r.ent + (r.prazo ? ' | prazo ' + fmtD(r.prazo) : '') : 'Não incluso')));
+    this.escZ(d).forEach(z => z.rows.forEach(r => { put('ez.' + z.code + r.disc, 'Escopo ' + z.code + ' › ' + r.disc, r.sol || this.ESC_PAD);
+      put('el.' + z.code + r.disc, 'Diretriz ' + z.code + ' › ' + r.disc, r.link); }));
     return o;
   }
   diff(a, b) {
@@ -1110,11 +1125,11 @@ class Component extends DCLogic {
       if (lin.length) S.push(tbl((++n) + '. Premissas de projeto · Elétrico', ['Premissa','Resposta'], lin)); }
     S.push(tbl((++n) + '. Projetistas', ['Disciplina','Projetista','Zonas','Contratação'], this.projDiscs(d).map(x => { const p = d.proj[x] || {}; return [x, p.v ? this.desName(p.v) : 'A definir', this.zOf(d, x).join(', '), p.st || 'A contratar']; })));
     const en = ++n;
-    d.marcos.forEach((m, i) => {
-      const P = PHASES.find(p => p.k === m.k);
-      const rows = this.escRows(d, m).filter(r => r.on).map(r => { const pj = d.proj[r.disc]; return [r.disc, pj && pj.v ? this.desName(pj.v) : '—', r.ent || '—', fmtD(r.prazo) || '—']; });
-      S.push(tbl(en + '.' + (i + 1) + ' Escopo · ' + m.n, ['Disciplina','Projetista','Entregáveis','Prazo'], rows, P ? P.obj : ''));
-      if (P) S.push(tbl('Congelamentos · ' + m.n, ['Item','Risco de alteração','Disciplinas impactadas'], P.freeze.map(f => [f[0], f[1], f[2]])));
+    this.escZ(d).forEach((z, i) => {
+      const lnk = u => /^https?:\/\//i.test(u || '') ? React.createElement('a', { href:u, target:'_blank', rel:'noopener',
+          style:{ color:'#1D4ED8', fontWeight:700, textDecoration:'underline', wordBreak:'normal' } }, 'Acesse a Diretriz da Solução aqui') : '—';
+      const rows = z.rows.map(r => { const pj = d.proj[r.disc]; return [r.disc, pj && pj.v ? this.desName(pj.v) : '—', r.sol || this.ESC_PAD, lnk(r.link)]; });
+      S.push(tbl(en + '.' + (i + 1) + ' Definição de Soluções e Diretrizes de Projeto · ' + z.code + ' ' + z.nome, ['Disciplina','Projetista','Solução pretendida','Diretriz de projeto'], rows));
     });
     return S;
   }
@@ -1417,25 +1432,29 @@ class Component extends DCLogic {
       });
     }
     if (step === 7) {
-      const mi = Math.min(s.phase, d.marcos.length - 1); const M = d.marcos[mi];
-      v.phases = d.marcos.map((m, i) => ({ k:m.k || pad(i + 1), n:m.n, active:i === mi, idle:i !== mi, count: this.escRows(d, m).filter(r => r.on).length + ' entregas · ' + (fmtD(m.d) || 'sem data'), go: () => this.setState({ phase:i }) }));
-      v.noMarcos = !M;
-      if (M) {
-        const P = PHASES.find(p => p.k === M.k);
-        const upd = (disc, fn) => this.setD(x => { const mm = x.marcos.find(q => q.id === M.id); const r = this.escRows(x, mm).find(q => q.disc === disc) || { on:true, ent:'', prazo:'' };
-          x.escopo[M.id] = x.escopo[M.id] || {}; const cur = x.escopo[M.id][disc] || { on:r.on, ent:r.ent, prazo:r.prazo }; fn(cur); x.escopo[M.id][disc] = cur; });
-        v.ph = { k:M.n, obj: P ? P.obj : 'Marco personalizado: defina os entregáveis de cada disciplina.', hasFreeze: !!P,
-          rows: this.escRows(d, M).map(r => { const pj = d.proj[r.disc];
-            return { ...r, off:!r.on, inp: r.inp || 'Sem referência no PO', proj: pj && pj.v ? this.desName(pj.v) : 'Projetista não definido', zonasL: r.zonas ? 'Zonas: ' + r.zonas : 'Adicionada manualmente',
-              toggle: () => upd(r.disc, c => c.on = !c.on),
-              onEnt: ev => { const val = ev.target.value; upd(r.disc, c => c.ent = val); },
-              onPrazo: ev => { const val = ev.target.value; upd(r.disc, c => c.prazo = val); } }; }),
-          freeze: P ? P.freeze.map(f => ({ item:f[0], risk:f[1], disc:f[2], hi:f[1] === 'Alto', mid:f[1].startsWith('Médio'), lo:f[1] === 'Baixo' })) : [] };
-        v.newDisc = s.newDisc || '';
-        v.onNewDisc = e => this.setState({ newDisc:e.target.value });
-        v.addDisc = () => { const val = (s.newDisc || '').trim(); if (!val) return; this.setD(x => { x.escopo[M.id] = x.escopo[M.id] || {}; if (!x.escopo[M.id][val]) x.escopo[M.id][val] = { on:true, ent:'', prazo:M.d || '' }; }); this.setState({ newDisc:'' }); };
-        v.discSug = this.allDisc().filter(x => !this.projDiscs(d).includes(x));
-      }
+      const zs = this.escZ(d);
+      const upd = (code, disc, k, val) => this.setD(x => { x.escZona = x.escZona || {}; x.escZona[code] = x.escZona[code] || {};
+        const c = x.escZona[code][disc] = x.escZona[code][disc] || {}; c[k] = val; });
+      v.escVazio = !zs.length;
+      const porDisc = s.escModo === 'disc';
+      v.escPorDisc = porDisc;
+      v.escModos = [['zona','Por zona de construção'],['disc','Por disciplina']].map(m => ({ label:m[1], go: () => this.setState({ escModo:m[0] }),
+        style:'padding:7px 14px;border:0;border-radius:9px;cursor:pointer;white-space:nowrap;font-family:var(--font-body);font-weight:700;font-size:12.5px;background:' + ((porDisc ? 'disc' : 'zona') === m[0] ? 'var(--card);color:var(--slate-700);box-shadow:0 1px 2px rgba(15,23,42,.08)' : 'transparent;color:var(--slate-500)') }));
+      const mk = (z, r) => { const pj = d.proj[r.disc];
+        return { disc: r.disc, code: z.code === 'GERAL' ? 'Geral' : this.sig(d) + '-' + z.code, nome: z.nome, proj: pj && pj.v ? this.desName(pj.v) : 'Projetista não definido',
+          sol: r.sol, link: r.link, temLink: /^https?:\/\//i.test(r.link),
+          onSol: ev => upd(z.code, r.disc, 'sol', ev.target.value), onLink: ev => upd(z.code, r.disc, 'link', ev.target.value.trim()) }; };
+      const gd = {}; zs.forEach(z => z.rows.forEach(r => { (gd[r.disc] = gd[r.disc] || []).push(mk(z, r)); }));
+      v.escDiscs = Object.keys(gd).sort((a, b) => this.dOrd(a, b)).map(k => ({ disc:k, rows:gd[k],
+        resumo: gd[k].length + (gd[k].length === 1 ? ' zona' : ' zonas') + ' · ' + gd[k].filter(r => r.sol).length + ' com solução definida' }));
+      v.escZonas = zs.map(z => { const pre = z.rows.filter(r => r.sol).length;
+        return { code: z.code === 'GERAL' ? '—' : this.sig(d) + '-' + z.code, nome: z.nome, resumo: z.rows.length + ' disciplina(s) · ' + pre + ' com solução definida',
+          rows: z.rows.map(r => { const pj = d.proj[r.disc];
+            return { disc: r.disc, proj: pj && pj.v ? this.desName(pj.v) : 'Projetista não definido', sol: r.sol, link: r.link,
+              temLink: /^https?:\/\//i.test(r.link),
+              onSol: ev => upd(z.code, r.disc, 'sol', ev.target.value),
+              onLink: ev => upd(z.code, r.disc, 'link', ev.target.value.trim()) }; }) }; });
+      v.escZonasVis = porDisc ? [] : v.escZonas;
     }
     if (step === LAST) {
       const identFill = FG[0].f.filter(f => d.ident[f[0]]).length;
