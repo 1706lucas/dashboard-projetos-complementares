@@ -1,4 +1,4 @@
-/ Busca cronograma, indicadores e pendências no ClickUp, recalcula e recriptografa a base.
+// Busca cronograma, indicadores e pendências no ClickUp, recalcula e recriptografa a base.
 // Segredos do repositório: CLICKUP_TOKEN (token pessoal do ClickUp) e DASH_KEY (chave dos dados).
 import { readFile, writeFile } from "node:fs/promises";
 
