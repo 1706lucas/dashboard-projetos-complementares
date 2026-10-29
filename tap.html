@@ -142,6 +142,7 @@ a{color:var(--color-accent)}a:hover{color:var(--blue-700)}
                 <sc-if value="{{ r.hasDiff }}" hint-placeholder-val="{{ false }}">
                   <button onClick="{{ r.toggle }}" style="border-radius:10px;padding:7px 12px;background:var(--color-surface);border:0;font-family:inherit;font-size:13px;cursor:pointer" style-hover="background:var(--slate-100)">{{ r.diffLabel }}</button>
                 </sc-if>
+                <sc-if value="{{ r.adm }}"><button onClick="{{ r.alterar }}" style="border-radius:10px;padding:7px 12px;background:transparent;border:1px solid var(--slate-200);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--blue-700)">Alterar</button><button onClick="{{ r.excluir }}" style="border-radius:10px;padding:7px 12px;background:transparent;border:1px solid var(--slate-200);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:#DC2626;border-color:#FECACA">Excluir</button></sc-if>
                 <button onClick="{{ r.view }}" style="border-radius:10px;padding:7px 12px;background:transparent;border:1px solid var(--slate-200);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:var(--slate-50)">Documento</button>
               </div>
             </div>
@@ -167,6 +168,12 @@ a{color:var(--color-accent)}a:hover{color:var(--blue-700)}
   </sc-if>
 
   <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ false }}">
+    <sc-if value="{{ editandoRev }}" hint-placeholder-val="{{ false }}">
+      <div style="margin:16px 28px 0;padding:11px 16px;border-radius:12px;background:#FEF3C7;color:#92400E;font-size:13px;font-weight:700;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <span style="flex:1;min-width:240px">{{ editandoTxt }}</span>
+        <button onClick="{{ cancelarAlteracao }}" style="border-radius:9px;padding:6px 12px;border:1px solid #F59E0B;background:transparent;color:#92400E;font-family:inherit;font-weight:700;font-size:12px;cursor:pointer">Cancelar alteração</button>
+      </div>
+    </sc-if>
     <div>
 
       <div style="padding:26px 28px 96px;display:flex;flex-direction:column;gap:22px;max-width:1280px;width:100%">
@@ -649,10 +656,10 @@ a{color:var(--color-accent)}a:hover{color:var(--blue-700)}
             <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
               <button onClick="{{ preview }}" style="border-radius:10px;padding:12px 20px;background:transparent;border:1px solid var(--slate-200);font-family:inherit;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:var(--slate-50)">Pré-visualizar documento</button>
               <sc-if value="{{ rv.can }}" hint-placeholder-val="{{ false }}">
-                <button onClick="{{ generate }}" style="border-radius:10px;padding:12px 24px;background:var(--blue-600);color:#fff;border:0;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:var(--blue-700)">Emitir {{ ed.nextRev }}</button>
+                <button onClick="{{ generate }}" style="border-radius:10px;padding:12px 24px;background:var(--blue-600);color:#fff;border:0;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:var(--blue-700)">{{ rv.btnLabel }}</button>
               </sc-if>
               <sc-if value="{{ rv.cannot }}" hint-placeholder-val="{{ true }}">
-                <button style="border-radius:10px;padding:12px 24px;background:var(--slate-200);color:var(--slate-400);border:0;font-family:inherit;font-weight:600;font-size:14px;cursor:not-allowed">Emitir {{ ed.nextRev }}</button>
+                <button style="border-radius:10px;padding:12px 24px;background:var(--slate-200);color:var(--slate-400);border:0;font-family:inherit;font-weight:600;font-size:14px;cursor:not-allowed">{{ rv.btnLabel }}</button>
                 <span style="font-size:13px;color:var(--blue-700)">{{ rv.why }}</span>
               </sc-if>
             </div>
@@ -1033,6 +1040,33 @@ class Component extends DCLogic {
   setTema(x) { try { localStorage.setItem(TEMA_KEY, x); } catch (e) {} document.documentElement.setAttribute('data-tema', x); this.setState({ tema:x }); }
   save(db) { this.setState({ db }); if (this.mode === 'server' || this.mode === 'supabase') { this.pending = db; this.pushBase(db); return; } try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} }
   setD(fn) { const db = clone(this.state.db); fn(db.drafts[this.state.empId], db); this.save(db); }
+  isAdm() { const C = window.Cofre, s = C && C.sessao && C.sessao(); return !!(s && s.perfil === 'admin'); }
+  async gravarTapAdm(acao, t, sigla) {
+    if (this.mode === 'supabase') {
+      const q = 'taps?sigla=eq.' + encodeURIComponent(sigla) + '&rev=eq.' + t.rev;
+      const r = acao === 'excluir' ? await this.sb(q, { method:'DELETE' })
+        : await this.sb(q, { method:'PATCH', headers:{ Prefer:'return=minimal' }, body: JSON.stringify({ tap: t, html: null }) });
+      if (!r.ok) throw new Error((acao === 'excluir' ? 'Falha ao excluir' : 'Falha ao alterar') + ' (' + r.status + '). ' +
+        (r.status === 401 || r.status === 403 || r.status === 404 ? 'Rode no Supabase o SQL de permissão de administrador.' : ''));
+      return;
+    }
+    if (this.mode === 'server') throw new Error('No servidor da empresa a alteração e a exclusão de revisões não estão disponíveis.');
+  }
+  excluirRev(t) {
+    const emp = this.state.db.emps.find(e => e.id === t.empId) || {};
+    const ultima = this.last(t.empId) === t;
+    if (!window.confirm('Excluir a Rev. ' + pad(t.rev) + ' do TAP.' + (emp.sigla || '') + '.001?' + (ultima ? '' : '\n\nAtenção: não é a revisão mais recente. As revisões seguintes continuam numeradas como estão.') + '\n\nEssa ação não pode ser desfeita.')) return;
+    this.gravarTapAdm('excluir', t, emp.sigla || '').then(() => {
+      const db2 = clone(this.state.db); db2.taps = db2.taps.filter(x => x.id !== t.id); this.save(db2);
+      if (this.state.docId === t.id) this.setState({ view:'emp', docId:null });
+    }).catch(e => alert(e.message));
+  }
+  alterarRev(t) {
+    if (this.state.db.drafts[t.empId] && !window.confirm('Existe um rascunho em aberto deste empreendimento. Ele será substituído pelo conteúdo da Rev. ' + pad(t.rev) + '. Continuar?')) return;
+    const db2 = clone(this.state.db); const nd = clone(t.data); nd.autor = t.autor || ''; nd.motivo = t.motivo || '';
+    db2.drafts[t.empId] = nd; this.save(db2);
+    this.setState({ view:'edit', step:0, editTapId:t.id });
+  }
   taps(empId) { return this.state.db.taps.filter(t => t.empId === empId).sort((a, b) => a.rev - b.rev); }
   last(empId) { const t = this.taps(empId); return t[t.length - 1] || null; }
   desName(id) { const d = this.state.db.designers.find(x => x.id === id); return d ? d.n : ''; }
@@ -1282,7 +1316,7 @@ class Component extends DCLogic {
   }
   rv0() {
     const s = this.state, db = s.db;
-    const base = { isHome:false, isEmp:false, isEdit:false, isDoc:false, crumb:'' };
+    const base = { isHome:false, isEmp:false, isEdit:false, isDoc:false, crumb:'', editandoRev:false, editandoTxt:'', cancelarAlteracao:() => {} };
     const goHome = () => this.setState({ view:'home', empId:null });
     if (!db) return { ...base, isHome:true, goHome, emps:[], noEmps:false };
     base.goHome = goHome;
@@ -1308,7 +1342,8 @@ class Component extends DCLogic {
         const dif = prev && open ? this.diff(prev.data, t.data) : [];
         return { revL:'Rev. ' + pad(t.rev), date:fmtD(t.date), autor:t.autor, motivo:t.motivo, isLast:t === last, hasDiff:!!prev, open, diff:dif,
           diffLabel: open ? 'Ocultar alterações' : 'Ver alterações', toggle: () => this.setState({ openDiff: open ? null : t.id }),
-          view: () => this.setState({ view:'doc', docId:t.id, docBackTo:'emp' }) };
+          view: () => this.setState({ view:'doc', docId:t.id, docBackTo:'emp' }),
+          adm: this.isAdm(), alterar: () => this.alterarRev(t), excluir: () => this.excluirRev(t) };
       });
       const dd = last ? last.data : db.drafts[s.empId];
       return { ...base, isEmp:true, crumb:emp.nome, empV: {
@@ -1336,13 +1371,17 @@ class Component extends DCLogic {
 
     // edit
     if (!d) return { ...base, isEmp:false, isHome:true, emps:[], noEmps:true };
+    const tEdit = s.editTapId ? db.taps.find(x => x.id === s.editTapId) : null;
     const step = s.step, LAST = STEPS.length - 1;
     const nextRev = last ? last.rev + 1 : 0;
+    const extraEdit = { editandoRev: !!tEdit,
+      editandoTxt: tEdit ? 'Modo administrador: você está alterando a Rev. ' + pad(tEdit.rev) + ' já emitida. Ao salvar, o conteúdo dela é substituído, sem criar revisão nova.' : '',
+      cancelarAlteracao: () => { const db2 = clone(db); delete db2.drafts[s.empId]; this.save(db2); this.setState({ view:'emp', editTapId:null }); } };
     const sg = this.sig(d);
     const zd = this.zDiscs(d);
     const counts = [null, null, null, d.marcos.filter(m => m.d).length + '/' + d.marcos.length, d.zonas.length || '', d.equip.length || '', this.projDiscs(d).length, null, null];
     const steps = STEPS.map((x, i) => ({ n:pad(i + 1), t:x.t, active:i === step, idle:i !== step, count:counts[i] == null ? '' : String(counts[i]), go: () => this.setState({ step:i }) }));
-    const v = { ...base, isEdit:true, crumb: emp.nome, steps, cur:{ n:pad(step + 1), tot:pad(STEPS.length), t:STEPS[step].t, d:STEPS[step].d },
+    const v = { ...base, ...extraEdit, isEdit:true, crumb: emp.nome, steps, cur:{ n:pad(step + 1), tot:pad(STEPS.length), t:STEPS[step].t, d:STEPS[step].d },
       ed:{ title: d.ident.nome || 'Novo empreendimento', revLabel: 'Rascunho da Rev. ' + pad(nextRev) + (last ? ' · base Rev. ' + pad(last.rev) : ''), nextRev:'Rev. ' + pad(nextRev) },
       prev: () => this.setState({ step: Math.max(0, step - 1) }), next: () => this.setState({ step: Math.min(LAST, step + 1) }),
       hasNext: step < LAST, nextT: STEPS[Math.min(LAST, step + 1)].t,
@@ -1478,9 +1517,10 @@ class Component extends DCLogic {
       else if (!d.ident.sigla) why = 'Informe a sigla do empreendimento.';
       else if (!d.produto.unidade) why = 'Selecione a unidade de negócio.';
       else if (!(d.autor || '').trim()) why = 'Informe quem elaborou.';
-      else if (last && !dif.length) why = 'Nenhuma alteração em relação à Rev. ' + pad(last.rev) + '.';
+      else if (!tEdit && last && !dif.length) why = 'Nenhuma alteração em relação à Rev. ' + pad(last.rev) + '.';
       else if (last && !(d.motivo || '').trim()) why = 'Descreva o motivo da revisão.';
-      v.rv = { diff:dif, noDiff: dif.length === 0,
+      v.rv = { btnLabel: tEdit ? 'Salvar alterações na Rev. ' + pad(tEdit.rev) : 'Emitir Rev. ' + pad(nextRev),
+        diff:dif, noDiff: dif.length === 0,
         diffTitle: last ? 'Alterações em relação à Rev. ' + pad(last.rev) : 'Primeira emissão',
         diffSub: last ? dif.length + ' itens alterados' : 'Este documento será a Rev. 00.',
         noDiffMsg: last ? 'Nenhuma alteração até agora.' : 'Sem revisão anterior para comparar.',
@@ -1493,6 +1533,15 @@ class Component extends DCLogic {
       v.generate = () => {
         const db2 = clone(db); const data = clone(d); const autor = data.autor, motivo = data.motivo || 'Emissão inicial';
         data.autor = ''; data.motivo = '';
+        if (tEdit && this.isAdm()) {
+          const t2 = Object.assign({}, tEdit, { data, autor, motivo, alterado: today() });
+          const em2 = db2.emps.find(z => z.id === s.empId); em2.nome = data.ident.nome; em2.sigla = sg;
+          this.gravarTapAdm('alterar', t2, sg).then(() => {
+            db2.taps = db2.taps.map(x => x.id === t2.id ? t2 : x); delete db2.drafts[s.empId];
+            this.save(db2); this.setState({ view:'doc', docId:t2.id, docBackTo:'emp', editTapId:null });
+          }).catch(err => alert(err.message));
+          return;
+        }
         const t = { id:uid(), empId:s.empId, rev:nextRev, date:today(), autor, motivo, data };
         db2.taps.push(t); const em = db2.emps.find(z => z.id === s.empId); em.nome = data.ident.nome; em.sigla = sg;
         delete db2.drafts[s.empId];
