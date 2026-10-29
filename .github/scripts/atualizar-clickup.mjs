@@ -65,7 +65,7 @@ function paraPlanilha(tasks) {
       "Start Date": serial(t.start_date), "Due Date": serial(t.due_date),
       "Priority": t.priority && t.priority.priority, "tags": (t.tags || []).map(g => g.name).join(", "), "Task URL": t.url };
     (t.custom_fields || []).forEach(f => {
-      const n = f.name + " (" + (SUF[f.type] || f.type) + ")";
+      const n = f.id === "b9709a86-fd65-4ab9-a874-f686b019aeb3" ? "Classe Datas Marco (drop down)" : f.name + " (" + (SUF[f.type] || f.type) + ")";
       if (fixas.indexOf(n) < 0 && extras.indexOf(n) < 0) extras.push(n);
       r[n] = valorCampo(f);
     });
@@ -80,7 +80,8 @@ const dias = (s, n) => new Date(Date.parse(s) + n * 864e5).toISOString().slice(0
 const d = await abrir("data/dashboard.json.enc");
 const log = []; let ok = 0;
 let FONTES = PADRAO;
-try { const cfg = await abrir("data/config.json.enc"); if (cfg && Array.isArray(cfg.fontes) && cfg.fontes.some(f => f.view)) FONTES = cfg.fontes.filter(f => f.view && f.ativo !== false); }
+let CFG = null;
+try { CFG = await abrir("data/config.json.enc"); if (CFG && Array.isArray(CFG.fontes) && CFG.fontes.some(f => f.view)) FONTES = CFG.fontes.filter(f => f.view && f.ativo !== false); }
 catch (e) { /* sem config: usa o padrão */ }
 const leitura = []; // status por fonte, exibido no Mapa das fontes
 async function ler(f) {
@@ -124,6 +125,14 @@ try {
   log.push("pendências: " + its.length); ok++;
 } catch (e) { log.push("pendências NÃO atualizadas: " + e.message); }
 
+// Mantém o Supabase ativo: o plano gratuito pausa o projeto após 7 dias sem uso.
+if (CFG && CFG.url && CFG.anon) {
+  try {
+    const r = await fetch(CFG.url.replace(/\/$/, "") + "/rest/v1/tap_base?select=id&limit=1",
+      { headers: { apikey: CFG.anon, Authorization: "Bearer " + CFG.anon, "x-tap-chave": CFG.chave || "" } });
+    log.push("supabase: " + (r.ok ? "ativo" : "respondeu " + r.status + (r.status === 540 || r.status >= 500 ? " (projeto pausado? use Resume project)" : "")));
+  } catch (e) { log.push("supabase: sem resposta (" + e.message.slice(0, 80) + ")"); }
+}
 console.log(log.join("\n"));
 if (!ok) process.exit(1);
 d.geradoEm = hoje;
