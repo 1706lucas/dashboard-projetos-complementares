@@ -85,11 +85,11 @@ a{color:var(--color-accent)}a:hover{color:var(--blue-700)}
         <button onClick="{{ newEmp }}" style="border-radius:10px;padding:11px 20px;background:var(--blue-600);color:#fff;border:0;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:var(--blue-700)">+ Novo TAP</button>
       </div>
       <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);overflow-x:auto">
-        <div style="display:grid;grid-template-columns:72px minmax(160px,2fr) minmax(110px,1fr) 70px 90px minmax(120px,1fr) 80px;min-width:760px;gap:16px;padding:12px 20px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400);border-bottom:1px solid var(--slate-200)">
-          <span>Sigla</span><span>Empreendimento</span><span>Cidade</span><span>Revisão</span><span>Emitida em</span><span>Elaborado por</span><span></span>
+        <div style="display:grid;grid-template-columns:72px minmax(160px,2fr) minmax(110px,1fr) 70px 90px minmax(120px,1fr) 80px 34px;min-width:760px;gap:16px;padding:12px 20px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--slate-400);border-bottom:1px solid var(--slate-200)">
+          <span>Sigla</span><span>Empreendimento</span><span>Cidade</span><span>Revisão</span><span>Emitida em</span><span>Elaborado por</span><span></span><span></span>
         </div>
         <sc-for list="{{ emps }}" as="e" hint-placeholder-count="3">
-          <div onClick="{{ e.open }}" style="display:grid;grid-template-columns:72px minmax(160px,2fr) minmax(110px,1fr) 70px 90px minmax(120px,1fr) 80px;min-width:760px;gap:16px;padding:16px 20px;font-size:14px;border-bottom:1px solid var(--slate-100);cursor:pointer;align-items:center" style-hover="background:var(--slate-50)">
+          <div onClick="{{ e.open }}" style="display:grid;grid-template-columns:72px minmax(160px,2fr) minmax(110px,1fr) 70px 90px minmax(120px,1fr) 80px 34px;min-width:760px;gap:16px;padding:16px 20px;font-size:14px;border-bottom:1px solid var(--slate-100);cursor:pointer;align-items:center" style-hover="background:var(--slate-50)">
             <span style="font-family:var(--font-mono);font-weight:500;color:var(--blue-700)">{{ e.sigla }}</span>
             <span style="font-weight:600">{{ e.nome }}</span>
             <span style="color:var(--slate-500)">{{ e.cidade }}</span>
@@ -98,6 +98,9 @@ a{color:var(--color-accent)}a:hover{color:var(--blue-700)}
             <span style="color:var(--slate-500)">{{ e.autor }}</span>
             <span style="display:flex;justify-content:flex-end">
               <sc-if value="{{ e.hasDraft }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;background:var(--blue-50);color:var(--blue-700);font-weight:600">Rascunho</span></sc-if>
+            </span>
+            <span style="display:flex;justify-content:flex-end">
+              <sc-if value="{{ e.adm }}" hint-placeholder-val="{{ false }}"><button onClick="{{ e.excluir }}" title="Excluir empreendimento" style="width:30px;height:30px;border-radius:9px;border:1px solid #FECACA;background:transparent;color:#DC2626;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center" style-hover="background:#FEF2F2">×</button></sc-if>
             </span>
           </div>
         </sc-for>
@@ -1353,7 +1356,8 @@ class Component extends DCLogic {
       const q = s.q.toLowerCase();
       const emps = db.emps.map(e => {
         const l = this.last(e.id); const dd = l ? l.data : db.drafts[e.id];
-        return { id:e.id, sigla:e.sigla || '—', nome:e.nome, cidade: dd ? [dd.ident.cidade, dd.ident.uf].filter(Boolean).join(' / ') : '', rev: l ? 'Rev. ' + pad(l.rev) : '—', date: l ? fmtD(l.date) : '', autor: l ? l.autor : '', hasDraft: !!db.drafts[e.id], open: () => this.setState({ view:'emp', empId:e.id, openDiff:null }) };
+        return { id:e.id, sigla:e.sigla || '—', nome:e.nome, cidade: dd ? [dd.ident.cidade, dd.ident.uf].filter(Boolean).join(' / ') : '', rev: l ? 'Rev. ' + pad(l.rev) : '—', date: l ? fmtD(l.date) : '', autor: l ? l.autor : '', hasDraft: !!db.drafts[e.id], open: () => this.setState({ view:'emp', empId:e.id, openDiff:null }),
+          adm: this.isAdm(), excluir: ev => { ev.stopPropagation(); this.excluirEmp(e); } };
       }).filter(e => !q || (e.nome + e.sigla + e.cidade).toLowerCase().includes(q));
       return { ...base, isHome:true, crumb: db.emps.length + ' empreendimentos · ' + db.taps.length + ' revisões emitidas', q:s.q, onQ: e => this.setState({ q:e.target.value }), emps, noEmps: emps.length === 0,
         newEmp: () => { const db2 = clone(db); const id = uid(); db2.emps.push({ id, nome:'Novo empreendimento', sigla:'' }); db2.drafts[id] = blank(); this.save(db2); this.setState({ view:'edit', empId:id, step:0 }); } };
