@@ -121,6 +121,7 @@ a{color:var(--color-accent)}a:hover{color:var(--blue-700)}
             <button onClick="{{ empV.viewLast }}" style="border-radius:10px;padding:11px 18px;background:transparent;color:var(--color-text);border:1px solid var(--slate-200);font-family:inherit;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:var(--slate-50)">Documento vigente ({{ empV.lastRev }})</button>
           </sc-if>
           <button onClick="{{ empV.edit }}" style="border-radius:10px;padding:11px 20px;background:var(--blue-600);color:#fff;border:0;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:var(--blue-700)">{{ empV.editLabel }}</button>
+          <sc-if value="{{ empV.adm }}" hint-placeholder-val="{{ false }}"><button onClick="{{ empV.excluirEmp }}" style="border-radius:10px;padding:11px 16px;background:transparent;color:#DC2626;border:1px solid #FECACA;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap" style-hover="background:#FEF2F2">Excluir empreendimento</button></sc-if>
         </div>
       </div>
       <section style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden">
@@ -130,20 +131,25 @@ a{color:var(--color-accent)}a:hover{color:var(--blue-700)}
         </div>
         <sc-for list="{{ empV.revs }}" as="r" hint-placeholder-count="2">
           <div style="border-bottom:1px solid var(--slate-100)">
-            <div style="display:grid;grid-template-columns:90px 110px minmax(0,1fr) minmax(0,2fr) auto;gap:16px;padding:16px 20px;align-items:center;font-size:14px">
+            <div style="display:grid;grid-template-columns:90px 110px minmax(0,1fr) minmax(0,2fr);gap:10px 16px;padding:16px 20px;align-items:center;font-size:14px">
               <div style="display:flex;flex-direction:column;gap:4px">
                 <span style="font-weight:800;font-size:16px">{{ r.revL }}</span>
                 <sc-if value="{{ r.isLast }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--blue-600);padding:2px 6px;align-self:flex-start">Vigente</span></sc-if>
               </div>
               <span style="color:var(--slate-500)">{{ r.date }}</span>
-              <span>{{ r.autor }}</span>
-              <span style="color:var(--slate-600);text-wrap:pretty">{{ r.motivo }}</span>
-              <div style="display:flex;gap:8px;justify-content:flex-end">
+              <span style="min-width:0;overflow-wrap:anywhere">{{ r.autor }}</span>
+              <span style="min-width:0;overflow-wrap:anywhere;color:var(--slate-600);text-wrap:pretty">{{ r.motivo }}</span>
+              <div style="grid-column:1 / -1;display:flex;gap:8px 14px;align-items:center;justify-content:flex-end;flex-wrap:wrap">
+               <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
                 <sc-if value="{{ r.hasDiff }}" hint-placeholder-val="{{ false }}">
-                  <button onClick="{{ r.toggle }}" style="border-radius:10px;padding:7px 12px;background:var(--color-surface);border:0;font-family:inherit;font-size:13px;cursor:pointer" style-hover="background:var(--slate-100)">{{ r.diffLabel }}</button>
+                  <button onClick="{{ r.toggle }}" style="border-radius:10px;padding:7px 12px;font-family:inherit;font-size:13px;cursor:pointer;white-space:nowrap;background:var(--color-surface);border:0" style-hover="background:var(--slate-100)">{{ r.diffLabel }}</button>
                 </sc-if>
-                <sc-if value="{{ r.adm }}"><button onClick="{{ r.alterar }}" style="border-radius:10px;padding:7px 12px;background:transparent;border:1px solid var(--slate-200);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--blue-700)">Alterar</button><button onClick="{{ r.excluir }}" style="border-radius:10px;padding:7px 12px;background:transparent;border:1px solid var(--slate-200);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:#DC2626;border-color:#FECACA">Excluir</button></sc-if>
-                <button onClick="{{ r.view }}" style="border-radius:10px;padding:7px 12px;background:transparent;border:1px solid var(--slate-200);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:var(--slate-50)">Documento</button>
+                <button onClick="{{ r.view }}" style="border-radius:10px;padding:7px 12px;font-family:inherit;font-size:13px;cursor:pointer;white-space:nowrap;background:transparent;border:1px solid var(--slate-200);font-weight:600" style-hover="background:var(--slate-50)">Documento</button>
+               </div>
+               <sc-if value="{{ r.adm }}"><div style="display:flex;gap:12px;justify-content:flex-end">
+                <button onClick="{{ r.alterar }}" style="padding:0;border:0;background:transparent;font-family:inherit;font-size:12px;font-weight:700;color:var(--blue-700);cursor:pointer;white-space:nowrap;text-decoration:underline">Alterar revisão</button>
+                <button onClick="{{ r.excluir }}" style="padding:0;border:0;background:transparent;font-family:inherit;font-size:12px;font-weight:700;color:#DC2626;cursor:pointer;white-space:nowrap;text-decoration:underline">Excluir</button>
+               </div></sc-if>
               </div>
             </div>
             <sc-if value="{{ r.open }}" hint-placeholder-val="{{ false }}">
@@ -151,9 +157,9 @@ a{color:var(--color-accent)}a:hover{color:var(--blue-700)}
                 <sc-for list="{{ r.diff }}" as="c" hint-placeholder-count="3">
                   <div style="display:grid;grid-template-columns:84px minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);gap:12px;padding:8px 12px;background:var(--slate-50);font-size:13px">
                     <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--blue-700)">{{ c.kind }}</span>
-                    <span style="font-weight:600">{{ c.l }}</span>
-                    <span style="color:var(--slate-400);text-decoration:line-through">{{ c.a }}</span>
-                    <span>{{ c.b }}</span>
+                    <span style="font-weight:600;min-width:0;overflow-wrap:anywhere">{{ c.l }}</span>
+                    <span style="color:var(--slate-400);text-decoration:line-through;min-width:0;overflow-wrap:anywhere">{{ c.a }}</span>
+                    <span style="min-width:0;overflow-wrap:anywhere">{{ c.b }}</span>
                   </div>
                 </sc-for>
               </div>
@@ -635,9 +641,9 @@ a{color:var(--color-accent)}a:hover{color:var(--blue-700)}
                 <sc-for list="{{ rv.diff }}" as="c" hint-placeholder-count="3">
                   <div style="display:grid;grid-template-columns:84px minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);gap:12px;padding:8px 12px;background:var(--slate-50);font-size:13px">
                     <span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--blue-700)">{{ c.kind }}</span>
-                    <span style="font-weight:600">{{ c.l }}</span>
-                    <span style="color:var(--slate-400);text-decoration:line-through">{{ c.a }}</span>
-                    <span>{{ c.b }}</span>
+                    <span style="font-weight:600;min-width:0;overflow-wrap:anywhere">{{ c.l }}</span>
+                    <span style="color:var(--slate-400);text-decoration:line-through;min-width:0;overflow-wrap:anywhere">{{ c.a }}</span>
+                    <span style="min-width:0;overflow-wrap:anywhere">{{ c.b }}</span>
                   </div>
                 </sc-for>
                 <sc-if value="{{ rv.noDiff }}"><div style="padding:12px 0;font-size:14px;color:var(--slate-500)">{{ rv.noDiffMsg }}</div></sc-if>
@@ -1052,6 +1058,28 @@ class Component extends DCLogic {
     }
     if (this.mode === 'server') throw new Error('No servidor da empresa a alteração e a exclusão de revisões não estão disponíveis.');
   }
+  async excluirEmp(emp) {
+    const ts = this.taps(emp.id);
+    const cod = 'TAP.' + (emp.sigla || 'XXX') + '.001';
+    const msg = 'Excluir o empreendimento "' + emp.nome + '" (' + cod + ')?\n\n' +
+      (ts.length ? 'Isso apaga também as ' + ts.length + ' revisão(ões) emitida(s) e o rascunho.' : 'Isso apaga também o rascunho.') + '\n\nEssa ação não pode ser desfeita.';
+    if (!window.confirm(msg)) return;
+    const conf = window.prompt('Para confirmar, digite a sigla do empreendimento (' + (emp.sigla || 'XXX') + '):', '');
+    if (conf == null) return;
+    if (String(conf).trim().toUpperCase() !== String(emp.sigla || 'XXX').toUpperCase()) { alert('Sigla não confere. Nada foi excluído.'); return; }
+    try {
+      if (this.mode === 'supabase' && ts.length) {
+        const r = await this.sb('taps?sigla=eq.' + encodeURIComponent(emp.sigla || ''), { method:'DELETE' });
+        if (!r.ok) throw new Error('Falha ao excluir as revisões (' + r.status + '). Rode no Supabase o SQL de permissão de administrador.');
+      } else if (this.mode === 'server') throw new Error('No servidor da empresa a exclusão de empreendimentos não está disponível.');
+      const db2 = clone(this.state.db);
+      db2.taps = db2.taps.filter(t => t.empId !== emp.id);
+      db2.emps = db2.emps.filter(e => e.id !== emp.id);
+      delete db2.drafts[emp.id];
+      this.save(db2);
+      this.setState({ view:'home', empId:null, editTapId:null });
+    } catch (e) { alert(e.message); }
+  }
   excluirRev(t) {
     const emp = this.state.db.emps.find(e => e.id === t.empId) || {};
     const ultima = this.last(t.empId) === t;
@@ -1130,7 +1158,7 @@ class Component extends DCLogic {
     PREM_ELE.forEach(q => { const pe = (d.prem && d.prem.ele) || {}; if (pe[q[0]]) put('pe.' + q[0], 'Premissas Elétrico › ' + q[1], pe[q[0]] + (q[4] && pe[q[4]] ? ' (' + pe[q[4]] + ')' : '')); });
     this.projDiscs(d).forEach(x => { const p = d.proj[x]; put('p.' + x, 'Projetista › ' + x, p && p.v ? this.desName(p.v) + ' (' + p.st + ')' : ''); });
     this.escZ(d).forEach(z => z.rows.forEach(r => { put('ez.' + z.code + r.disc, 'Escopo ' + z.code + ' › ' + r.disc, r.sol || this.ESC_PAD);
-      put('el.' + z.code + r.disc, 'Diretriz ' + z.code + ' › ' + r.disc, r.link); }));
+      put('el.' + z.code + r.disc, 'Diretriz ' + z.code + ' › ' + r.disc, r.link ? 'Link da diretriz definido (ref. ' + (Array.from(r.link).reduce((x, ch) => (x * 31 + ch.charCodeAt(0)) >>> 0, 7) % 46656).toString(36).toUpperCase().padStart(3, '0') + ')' : ''); }));
     return o;
   }
   diff(a, b) {
@@ -1350,7 +1378,8 @@ class Component extends DCLogic {
         codigo: 'TAP.' + (emp.sigla || 'XXX') + '.001', nome:emp.nome,
         meta: dd ? [dd.produto.unidade, [dd.ident.cidade, dd.ident.uf].filter(Boolean).join(' / '), dd.produto.unid && dd.produto.unid + ' unidades'].filter(Boolean).join(' · ') : '',
         hasLast:!!last, lastRev: last ? 'Rev. ' + pad(last.rev) : '', viewLast: () => last && this.setState({ view:'doc', docId:last.id, docBackTo:'emp' }),
-        editLabel: db.drafts[s.empId] ? 'Continuar rascunho' : 'Nova revisão', edit: openEditor, revs, noRevs: revs.length === 0 } };
+        editLabel: db.drafts[s.empId] ? 'Continuar rascunho' : 'Nova revisão', edit: openEditor, revs, noRevs: revs.length === 0,
+        adm: this.isAdm(), excluirEmp: () => this.excluirEmp(emp) } };
     }
 
     const d = db.drafts[s.empId];
