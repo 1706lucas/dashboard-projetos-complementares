@@ -378,6 +378,39 @@ a:hover{color:var(--blue-700)}
         <section style="display:flex;flex-direction:column;gap:22px">
           <sc-if value="{{ prazosCons }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:22px">
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+                  <div>
+                    <h3 style="font-size:15px">Datas alteradas nos últimos 7 dias</h3>
+                    <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Atividades com tag complementares que tiveram início ou término alterado · maior variação primeiro</p>
+                  </div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <sc-for list="{{ alt7Kpis }}" as="k" hint-placeholder-count="3">
+                      <span style="{{ k.style }}">{{ k.label }}</span>
+                    </sc-for>
+                  </div>
+                </div>
+                <sc-if value="{{ alt7Tem }}" hint-placeholder-val="{{ false }}">
+                  <div style="overflow-x:auto;margin-top:14px;max-height:520px;overflow-y:auto">
+                    <table class="table" style="table-layout:fixed;min-width:860px">
+                      <thead><tr><th style="width:34%">Atividade</th><th style="width:16%">Obra</th><th style="width:18%">Início (antes → agora)</th><th style="width:18%">Término (antes → agora)</th><th style="text-align:right;width:80px">Variação</th><th style="text-align:right;width:90px">Alterado em</th></tr></thead>
+                      <tbody>
+                        <sc-for list="{{ alt7 }}" as="a" hint-placeholder-count="8">
+                          <tr>
+                            <td style="min-width:0;padding:9px 8px">{{ a.link }}</td>
+                            <td style="padding:9px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span class="mono" style="font-size:10.5px;font-weight:700;color:var(--blue-600)">{{ a.sigla }}</span> {{ a.obra }}</td>
+                            <td class="mono" style="padding:9px 8px;font-size:11.5px;white-space:nowrap"><span style="color:var(--slate-400)">{{ a.sAnt }}</span> → <b style="{{ a.sStyle }}">{{ a.s }}</b></td>
+                            <td class="mono" style="padding:9px 8px;font-size:11.5px;white-space:nowrap"><span style="color:var(--slate-400)">{{ a.dAnt }}</span> → <b style="{{ a.dStyle }}">{{ a.d }}</b></td>
+                            <td style="text-align:right;padding:9px 8px"><span style="{{ a.varStyle }}">{{ a.var }}</span></td>
+                            <td class="mono" style="text-align:right;padding:9px 8px;font-size:11.5px;color:var(--slate-500)">{{ a.quando }}</td>
+                          </tr>
+                        </sc-for>
+                      </tbody>
+                    </table>
+                  </div>
+                </sc-if>
+                <p style="margin:12px 0 0;font-size:11.5px;color:var(--slate-400)">{{ alt7Nota }}</p>
+              </div>
               <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
                 <div style="flex:2 1 600px;min-width:0;background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
                   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
@@ -904,7 +937,7 @@ a:hover{color:var(--blue-700)}
                   </div>
                 </sc-if>
                 <sc-if value="{{ fuSemDados }}" hint-placeholder-val="{{ false }}">
-                  <p style="margin:0;font-size:12.5px;padding:11px 14px;border-radius:12px;background:var(--slate-50);color:var(--slate-500)">Ainda não há atividades de projetos complementares atribuídas a este analista no ClickUp. Assim que ele for incluído como responsável nas tarefas, os quadros abaixo passam a ser preenchidos.</p>
+                  <p style="margin:0;font-size:12.5px;padding:11px 14px;border-radius:12px;background:var(--slate-50);color:var(--slate-500)">Ainda não há atividades de projetos complementares em aberto atribuídas a este analista na base publicada. Responsáveis encontrados na base: {{ fuRespBase }}</p>
                 </sc-if>
               </div>
 
@@ -1311,14 +1344,28 @@ a:hover{color:var(--blue-700)}
                       <td>
                         <div style="display:flex;align-items:center;gap:8px">
                           <span style="{{ f.dot }}"></span>
-                          <div>
-                            <div style="font-size:12.5px;font-weight:800">{{ f.nome }}</div>
-                            <div style="font-size:10.5px;color:var(--slate-400)">{{ f.modo }}</div>
-                          </div>
+                          <sc-if value="{{ f.nomeFixo }}" hint-placeholder-val="{{ true }}">
+                            <div>
+                              <div style="font-size:12.5px;font-weight:800">{{ f.nome }}</div>
+                              <div style="font-size:10.5px;color:var(--slate-400)">{{ f.modo }}</div>
+                            </div>
+                          </sc-if>
+                          <sc-if value="{{ f.obraEdit }}" hint-placeholder-val="{{ false }}">
+                            <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
+                              <input value="{{ f.nome }}" onChange="{{ f.setNome }}" placeholder="Nome da obra" style="height:30px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12px;font-weight:800;width:100%;min-width:0;background:var(--card);color:var(--color-text);font-family:var(--font-body)">
+                              <div style="display:flex;gap:5px">
+                                <input value="{{ f.sigla }}" onChange="{{ f.setSigla }}" placeholder="SIG" maxlength="3" style="height:28px;width:56px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:11.5px;font-family:var(--font-mono);text-transform:uppercase;background:var(--card);color:var(--color-text)">
+                                <select value="{{ f.bu }}" onChange="{{ f.setBu }}" style="height:28px;flex:1;min-width:0;border:1px solid var(--slate-200);border-radius:8px;padding:0 6px;font-size:11.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body)">
+                                  <option value="Make It">Make It</option>
+                                  <option value="Gadens Inc">Gadens Inc</option>
+                                </select>
+                              </div>
+                            </div>
+                          </sc-if>
                         </div>
                       </td>
                       <td>
-                        <sc-if value="{{ f.editavel }}"><input value="{{ f.link }}" onChange="{{ f.setLink }}" placeholder="Cole o link da visualização" style="height:34px;border:1px solid var(--slate-200);border-radius:10px;padding:0 10px;font-size:12px;font-family:var(--font-mono);width:100%;min-width:0;background:var(--card);color:var(--color-text)"></sc-if>
+                        <sc-if value="{{ f.editavel }}"><input value="{{ f.link }}" onChange="{{ f.setLink }}" placeholder="Cole o link da lista ou visualização" style="height:34px;border:1px solid var(--slate-200);border-radius:10px;padding:0 10px;font-size:12px;font-family:var(--font-mono);width:100%;min-width:0;background:var(--card);color:var(--color-text)"></sc-if>
                         <sc-if value="{{ f.fixo }}"><a href="{{ f.link }}" target="_blank" rel="noopener" style="display:block;font-size:12px;color:var(--slate-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.linkTxt }}</a></sc-if>
                         <div style="{{ f.viewStyle }}">{{ f.viewTxt }}</div>
                       </td>
@@ -1333,6 +1380,7 @@ a:hover{color:var(--blue-700)}
             </div>
             <sc-if value="{{ mfAdmin }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center">
+                <button class="btn" onClick="{{ mfAddObra }}">+ Obra</button>
                 <button class="btn" onClick="{{ mfAddCrono }}">+ Cronograma</button>
                 <button class="btn" onClick="{{ mfAddInd }}">+ Indicadores</button>
                 <button class="btn" onClick="{{ mfAddPend }}">+ Pendências</button>
@@ -1427,6 +1475,84 @@ a:hover{color:var(--blue-700)}
         </section>
       </sc-if>
 
+      <!-- ══════════ ORGANOGRAMA DO SETOR (estático) ══════════ -->
+      <sc-if value="{{ isOrg }}" hint-placeholder-val="{{ false }}">
+        <section style="display:flex;flex-direction:column;align-items:center">
+          <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #8B5CF6;display:flex;align-items:center;gap:14px;padding:16px 26px">
+            <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#8B5CF6;background:#EFE9FE">{{ orgCoordIni }}</div>
+            <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">Coordenador de Projetos</div><h2 style="margin:2px 0 0;font-size:22px;font-weight:900">{{ orgCoord }}</h2></div>
+          </div>
+          <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;width:100%">
+            <sc-for list="{{ orgKpis }}" as="k" hint-placeholder-count="4">
+              <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid {{ k.cor }};display:flex;gap:14px;align-items:flex-start;padding:18px 20px">
+                <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:{{ k.cor }};background:{{ k.bg }}">{{ k.ico }}</div>
+                <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">{{ k.l }}</div><div class="mono" style="font-size:22px;font-weight:900;margin:2px 0 1px;line-height:1.2">{{ k.v }}</div><div class="mono" style="font-size:12px;color:var(--slate-400)">{{ k.s }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
+          <div style="height:2px;background:var(--slate-200);width:calc(100% - 16.6%)"></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;width:100%">
+            <sc-for list="{{ orgAn }}" as="a" hint-placeholder-count="6">
+              <div style="display:flex;flex-direction:column;min-width:0">
+                <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
+                <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #8B5CF6;padding:14px">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                    <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#8B5CF6;background:#EFE9FE">{{ a.ini }}</div>
+                    <div><h3 style="margin:0;font-size:15px;font-weight:800;line-height:1.2">{{ a.n }}</h3><div style="font-size:11px;color:var(--slate-400);font-weight:600">Analista de Projetos</div></div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:baseline">
+                    <div class="mono" style="grid-row:span 2;font-size:28px;font-weight:900;line-height:1;padding-right:10px;border-right:1px solid var(--slate-200)">{{ a.qtd }}<small style="display:block;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--slate-400);margin-top:4px;font-family:var(--font-body)">obras</small></div>
+                    <div style="display:flex;justify-content:space-between;gap:6px;font-size:12px;color:var(--slate-500)"><span>{{ a.uhL }}</span><b class="mono" style="color:var(--color-text)">{{ a.uh }} <span style="color:var(--slate-400);font-weight:600">{{ a.pct }}</span></b></div>
+                    <div style="display:flex;justify-content:space-between;gap:6px;font-size:12px;color:var(--slate-500)"><span>{{ a.m2L }}</span><b class="mono" style="color:var(--color-text)">{{ a.m2 }}</b></div>
+                  </div>
+                  <div title="{{ a.mixT }}" style="display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:12px;background:var(--slate-100)">
+                    <i style="display:block;height:100%;background:#2563EB;width:{{ a.wg }}"></i><i style="display:block;height:100%;background:#F59E0B;width:{{ a.wm }}"></i><i style="display:block;height:100%;background:#94A0B4;width:{{ a.wx }}"></i>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;margin:10px 0 0 14px;padding-left:12px;border-left:2px solid var(--slate-200)">
+                  <sc-for list="{{ a.obras }}" as="o" hint-placeholder-count="4">
+                    <div style="background:var(--card);border-radius:10px;box-shadow:var(--card-shadow);border-left:4px solid {{ o.cor }};padding:9px 11px;position:relative">
+                      <span style="position:absolute;left:-18px;top:50%;width:14px;height:2px;background:var(--slate-200)"></span>
+                      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:800;font-size:13px"><span>{{ o.n }}</span><span style="font-size:9.5px;font-weight:900;letter-spacing:.04em;padding:2px 6px;border-radius:6px;flex:none;color:{{ o.cor }};background:{{ o.bg }}">{{ o.chip }}</span></div>
+                      <div style="display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11.5px;color:var(--slate-400);margin-top:3px">
+                        <span><b class="mono" style="color:var(--slate-500)">{{ o.uh }}</b> UH</span><span><b class="mono" style="color:var(--slate-500)">{{ o.m2 }}</b> m²</span>
+                        <sc-if value="{{ o.est }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px;font-weight:800;color:#B45309;background:#FEF3E2;border:1px dashed #F59E0B;border-radius:6px;padding:0 5px">estimativo</span></sc-if>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="width:100%;margin-top:28px;padding:16px 18px;background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border:1px dashed var(--slate-200);border-left:4px dashed #94A0B4">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+              <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#94A0B4;background:#EEF1F5">PD</div>
+              <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">Pré-due · sem analista definido</div><h3 style="margin:2px 0 0;font-size:16px;font-weight:900">{{ orgPreTit }} <span style="font-size:12.5px;font-weight:700;color:var(--slate-400)">{{ orgPreSub }}</span></h3></div>
+              <span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--slate-400);background:var(--slate-100);padding:3px 8px;border-radius:6px">Fora dos totais do organograma</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+              <sc-for list="{{ orgPre }}" as="o" hint-placeholder-count="7">
+                <div style="background:var(--card);border-radius:10px;box-shadow:var(--card-shadow);border-left:4px dashed {{ o.cor }};padding:9px 11px">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:800;font-size:13px"><span>{{ o.n }}</span><span style="font-size:9.5px;font-weight:900;letter-spacing:.04em;padding:2px 6px;border-radius:6px;flex:none;color:{{ o.cor }};background:{{ o.bg }}">{{ o.chip }}</span></div>
+                  <div style="font-size:11.5px;color:var(--slate-400);margin-top:3px">{{ o.dados }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="margin-top:26px;width:100%;max-width:980px;display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--slate-500)">
+            <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+              <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:4px;height:16px;border-radius:2px;background:#2563EB"></i>Gadens (GD)</span>
+              <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:4px;height:16px;border-radius:2px;background:#F59E0B"></i>Make It (MK)</span>
+              <span style="display:inline-flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:800;color:#B45309;background:#FEF3E2;border:1px dashed #F59E0B;border-radius:6px;padding:0 5px">estimativo</span>valor estimado</span>
+            </div>
+            <div><strong style="color:var(--color-text)">* Totais incluem estimativas:</strong> Rafitec (384 UH / 18.578,94 m²) e Container (336 UH / 14.207,20 m²). Sem eles: 5.864 UH / 284.201,68 m². Obras em pré-due não entram nos totais. Quadratto = Leilão (GDS 16); Aura = Alta Tensão (GDS 22). Quadratto, Fundação, Zago, Rafitec, Container, Martim Afonso e Guadalupe informados pelo coordenador em 03/11/2026.</div>
+            <div>Fonte: SA_DAS – MAKE IT R01 (aba CNPJ MAKE IT) e SA_DAS – GADENS (aba ORÇAMENTOS). Atualizado em 03/11/2026.</div>
+          </div>
+        </section>
+      </sc-if>
+
       <!-- ══════════ GESTÃO DE ANALISTAS ══════════ -->
       <sc-if value="{{ isAnalistas }}" hint-placeholder-val="{{ false }}">
         <section style="display:flex;flex-direction:column;gap:18px">
@@ -1438,7 +1564,7 @@ a:hover{color:var(--blue-700)}
 
           <sc-if value="{{ anEmpty }}" hint-placeholder-val="{{ false }}">
             <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:48px;box-shadow:var(--card-shadow);text-align:center">
-              <h3 style="font-size:17px">Nenhum cronograma postado em "Gadens Inc" ainda</h3>
+              <h3 style="font-size:17px">Nenhum analista com atividades de projetos complementares nesta unidade</h3>
               <p style="margin:8px auto 0;font-size:13px;color:var(--slate-400);max-width:64ch">Assim que um cronograma da Gadens Inc for adicionado, este espaço será preenchido no mesmo formato: analistas → obras → atividades → Gantts.</p>
             </div>
           </sc-if>
@@ -2375,22 +2501,56 @@ class Component extends DCLogic {
     return out;
   }
   MF_PADRAO = [
-    { tipo: "cronograma", nome: "Cronograma Make It", link: "https://app.clickup.com/9013344143/v/gr/8cktdwf-90873" },
-    { tipo: "cronograma", nome: "Cronograma Gadens", link: "https://app.clickup.com/9013344143/v/gr/8cktdwf-104773" },
-    { tipo: "indicadores", nome: "Indicadores de engenharia", link: "https://app.clickup.com/9013344143/v/gr/8cktdwf-91333" },
-    { tipo: "pendencias", nome: "Pendências de gestão", link: "https://sharing.clickup.com/9013344143/gr/h/8cktdwf-98893/f6f7e1cf61f7996" }
+    { tipo: "indicadores", nome: "Indicadores de engenharia (Linha de Base)", link: "https://app.clickup.com/9013344143/v/gr/8cktdwf-91333" },
+    { tipo: "indicadores", nome: "Riscos por empreendimento", link: "https://app.clickup.com/9013344143/v/li/901327399298" },
+    { tipo: "indicadores", nome: "Desvio de LB de PE", link: "https://app.clickup.com/9013344143/v/li/901329055549" },
+    { tipo: "indicadores", nome: "Alterações de Projeto", link: "https://app.clickup.com/9013344143/v/li/901327896268" },
+    { tipo: "indicadores", nome: "Estouro de obra por conta de projetos", link: "https://app.clickup.com/9013344143/v/li/901327896274" },
+    { tipo: "indicadores", nome: "Economia de orçamento por conta de projetos", link: "https://app.clickup.com/9013344143/v/li/901327896284" },
+    { tipo: "indicadores", nome: "Qualidade de entrega", link: "https://app.clickup.com/9013344143/v/li/901319437903" },
+    { tipo: "pendencias", nome: "Pendências de gestão", link: "https://sharing.clickup.com/9013344143/gr/h/8cktdwf-98893/f6f7e1cf61f7996" },
+    { tipo: "cronograma", nome: "Lume", sigla: "LUM", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901305541456" },
+    { tipo: "cronograma", nome: "Essence", sigla: "ESS", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901305651702" },
+    { tipo: "cronograma", nome: "Now", sigla: "NOW", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901305540246" },
+    { tipo: "cronograma", nome: "Edge", sigla: "EDG", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901305589843" },
+    { tipo: "cronograma", nome: "Horizon", sigla: "HOR", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901308225891" },
+    { tipo: "cronograma", nome: "Quadratto", sigla: "QUA", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901327828147" },
+    { tipo: "cronograma", nome: "Flow", sigla: "FLO", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901305618860" },
+    { tipo: "cronograma", nome: "Aura", sigla: "AUR", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901325334354" },
+    { tipo: "cronograma", nome: "Alba", sigla: "ALB", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901305538823" },
+    { tipo: "cronograma", nome: "Arena", sigla: "ARE", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901327999906" },
+    { tipo: "cronograma", nome: "Fundação", sigla: "FUN", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901327965854" },
+    { tipo: "cronograma", nome: "Zago", sigla: "ZAG", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901328072536" },
+    { tipo: "cronograma", nome: "Al Nasser I", sigla: "AL1", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901326874097" },
+    { tipo: "cronograma", nome: "Rafitec", sigla: "RAF", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/1400450000002217" },
+    { tipo: "cronograma", nome: "Vert", sigla: "VER", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901322097447" },
+    { tipo: "cronograma", nome: "Al Nasser II", sigla: "AL2", bu: "Make It", link: "https://app.clickup.com/9013344143/v/li/901327104307" },
+    { tipo: "cronograma", nome: "Martim Afonso", sigla: "MAR", bu: "Gadens Inc", link: "https://app.clickup.com/9013344143/v/li/901327721107" },
+    { tipo: "cronograma", nome: "Core Evo (João Negrão)", sigla: "EVO", bu: "Gadens Inc", link: "https://app.clickup.com/9013344143/v/li/901328360960" },
+    { tipo: "cronograma", nome: "Guadalupe", sigla: "GUA", bu: "Gadens Inc", link: "https://app.clickup.com/9013344143/v/li/1400450000008729" },
+    { tipo: "cronograma", nome: "General Carneiro", sigla: "GEN", bu: "Gadens Inc", link: "https://app.clickup.com/9013344143/v/f/901310141418" },
+    { tipo: "cronograma", nome: "Pe Agostinho", sigla: "PAG", bu: "Gadens Inc", link: "https://app.clickup.com/9013344143/v/f/901310219261" }
   ];
   MF_TIPOS = {
     cronograma: ["#8B5CF6", "Geral, Prazos, Reunião Diretoria (linha axial), Follow-up, Gestão de Analistas"],
     indicadores: ["#2563EB", "Indicadores, Riscos de Engenharia, Desvio de LB de PE, Follow-up (riscos)"],
     pendencias: ["#EF4444", "Reunião Diretoria (restrições)"]
   };
-  mfView(link) { const m = String(link || "").match(/(8[a-z0-9]{5,}-\d{3,})/i); return m ? m[1] : ""; }
+  mfView(link) {
+    const s = String(link || ""), li = s.match(/\/v\/li\/(\d+)/), fo = s.match(/\/v\/f\/(\d+)/), m = s.match(/(8[a-z0-9]{5,}-\d{3,})/i);
+    return li ? "li:" + li[1] : fo ? "f:" + fo[1] : m ? m[1] : "";
+  }
   mfLista() {
-    const c = this.state.cfg || {};
-    return Array.isArray(c.fontes) && c.fontes.length ? c.fontes : this.MF_PADRAO.map(f => Object.assign({}, f, { view: this.mfView(f.link) }));
+    let c = this.state.cfg || {}; const pad = this.MF_PADRAO.map(f => Object.assign({}, f, { view: this.mfView(f.link) }));
+    if (!(Array.isArray(c.fontes) && c.fontes.length)) return pad;
+    const GERAIS = ["8cktdwf-90873", "8cktdwf-104773"];
+    c = Object.assign({}, c, { fontes: c.fontes.filter(f => GERAIS.indexOf(this.mfView(f.link) || f.view) < 0) });
+    let out = c.fontes.some(f => f.sigla) ? c.fontes : c.fontes.concat(pad.filter(p => p.sigla && !c.fontes.some(f => this.mfView(f.link) === p.view)));
+    if (!out.some(f => f.tipo === "indicadores" && /^li:/.test(this.mfView(f.link)))) out = out.concat(pad.filter(p => p.tipo === "indicadores" && /^li:/.test(p.view) && !out.some(f => this.mfView(f.link) === p.view)));
+    return out;
   }
   mfSalvar(lista) {
+    lista = lista.filter(f => ["8cktdwf-90873", "8cktdwf-104773"].indexOf(this.mfView(f.link)) < 0);
     this.setState({ cfg: Object.assign({}, this.state.cfg, { fontes: lista.map(f => Object.assign({}, f, { view: this.mfView(f.link) })) }) });
   }
   mfVals() {
@@ -2406,14 +2566,19 @@ class Component extends DCLogic {
         [d ? d.geradoEm : null, "data da base publicada"]].find(c => c[0]) || [null, ""];
       const ult = cand[0], origem = cand[1];
       const dias = ult ? Math.round((Date.now() - Date.parse(ult)) / 864e5) : null;
-      const st = !v ? ["Link inválido", pill("#FEE2E2", "#991B1B"), "não achei o ID da visualização no link"]
+      const st = !v ? ["Link inválido", pill("#FEE2E2", "#991B1B"), f.link ? "use o link da lista, pasta ou visualização (app.clickup.com)" : "cole o link da lista da obra"]
+        : f.sigla != null && !/^[A-Z0-9]{3}$/.test(f.sigla || "") ? ["Falta a sigla", pill("#FEF3C7", "#92400E"), "informe a sigla de 3 letras da obra"]
         : !l ? ["Ainda não lida", pill("var(--slate-100)", "var(--slate-500)"), a ? "publique o pacote e rode o robô" : "o robô ainda não rodou"]
         : l.erro ? ["Falhou", pill("#FEE2E2", "#991B1B"), l.erro]
         : !l.n ? ["0 tarefas", pill("#FEF3C7", "#92400E"), "a visualização está vazia ou o token não tem acesso"]
         : [l.n + " tarefas", pill("#D1FAE5", "#065F46"), "lida em " + new Date(a.quando).toLocaleDateString("pt-BR")];
-      return { nome: f.nome, modo: "Automático · ClickUp", link: f.link, linkTxt: f.link, editavel: adm, fixo: !adm,
-        dot: "width:10px;height:10px;border-radius:3px;flex-shrink:0;background:" + t[0], alimenta: t[1],
-        viewTxt: v ? "ID da visualização: " + v : "",
+      const ehObra = f.sigla != null, upd = k => e => { const n = lista.slice(); n[i] = Object.assign({}, f, { [k]: k === "sigla" ? e.target.value.toUpperCase().slice(0, 3) : e.target.value }); this.mfSalvar(n); };
+      return { nome: f.nome || (ehObra ? "Obra nova" : ""), modo: ehObra ? (f.sigla || "???") + " · " + (f.bu || "Make It") + " · Automático" : "Automático · ClickUp", link: f.link, linkTxt: f.link, editavel: adm, fixo: !adm,
+        obraEdit: adm && ehObra, nomeFixo: !(adm && ehObra), sigla: f.sigla || "", bu: f.bu || "Make It",
+        setNome: upd("nome"), setSigla: upd("sigla"), setBu: upd("bu"),
+        dot: "width:10px;height:10px;border-radius:3px;flex-shrink:0;background:" + t[0],
+        alimenta: ehObra ? "Datas e marcos da obra " + (f.sigla || "") + ": Geral, Prazos, Reunião Diretoria, Follow-up" : t[1],
+        viewTxt: v ? (v.startsWith("li:") ? "Lista: " + v.slice(3) : v.startsWith("f:") ? "Pasta: " + v.slice(2) : "ID da visualização: " + v) : "",
         viewStyle: v ? "font-size:10.5px;color:var(--slate-400);margin-top:4px;font-family:var(--font-mono)" : "display:none",
         st: st[0], stStyle: st[1], stSub: st[2],
         atual: ult ? this.br(ult) : "—", atualSub: ult ? (dias <= 0 ? "hoje" : dias === 1 ? "ontem" : "há " + dias + " dias") + " · " + origem : "nunca atualizada",
@@ -2428,11 +2593,13 @@ class Component extends DCLogic {
       nome: m[0], modo: "Manual · upload nesta aba", link: "", linkTxt: "Envie o .xlsx em Atualizar dados, abaixo", editavel: false, fixo: true,
       dot: "width:10px;height:10px;border-radius:3px;flex-shrink:0;background:" + m[1], alimenta: m[2], viewTxt: "", viewStyle: "display:none",
       st: "Manual", stStyle: pill("var(--slate-100)", "var(--slate-600)"), stSub: "o robô não lê esta fonte",
+      obraEdit: false, nomeFixo: true, sigla: "", bu: "", setNome: () => {}, setSigla: () => {}, setBu: () => {},
       setLink: () => {}, remover: () => {}, remStyle: "display:none" }));
     const add = (tipo, nome) => () => this.mfSalvar(lista.concat([{ tipo, nome: nome + " " + (lista.filter(x => x.tipo === tipo).length + 1), link: "" }]));
     return { mfLinhas: linhas, mfAdmin: adm,
       mfQuando: a ? "Robô: " + new Date(a.quando).toLocaleDateString("pt-BR") + " às " + new Date(a.quando).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "Robô ainda não rodou",
-      mfDica: adm ? "Cole aqui o link de cada visualização: é exatamente o que o robô vai ler." : "",
+      mfDica: adm ? "Cole o link de cada lista, pasta ou visualização do ClickUp (app.clickup.com): é exatamente o que o robô vai ler. Para uma obra nova, use + Obra e informe nome, sigla e unidade de negócio." : "",
+      mfAddObra: () => this.mfSalvar(lista.concat([{ tipo: "cronograma", nome: "", sigla: "", bu: "Make It", link: "" }])),
       mfAddCrono: add("cronograma", "Cronograma"), mfAddInd: add("indicadores", "Indicadores"), mfAddPend: add("pendencias", "Pendências") };
   }
   baseVals() {
@@ -2620,6 +2787,25 @@ class Component extends DCLogic {
       nota: "Base anterior " + this.br(A.baseAnterior) + " · base atual " + this.br(A.baseAtual) +
         (A.comAtraso > itens.length ? " · exibindo os " + itens.length + " maiores atrasos" : "") +
         (A.novas ? " · " + A.novas + " marcos novos não entram na comparação" : "") };
+  }
+  alt7Vals(d) {
+    const A = d && d.alteracoes7, its = A && A.itens ? A.itens.filter(x => this.inFilter(x.obra)) : [];
+    const pill = (bg, fg) => "display:inline-block;font-size:11px;font-weight:800;padding:4px 10px;border-radius:99px;white-space:nowrap;background:" + bg + ";color:" + fg;
+    const adi = its.filter(x => (x.dDue || 0) > 0).length, ant = its.filter(x => (x.dDue || 0) < 0).length;
+    const sgn = v => v == null || v === 0 ? "" : (v > 0 ? "+" : "") + v + " d";
+    const cor = v => !v ? "font-weight:600;color:var(--slate-500)" : v > 0 ? "color:#B91C1C" : "color:#047857";
+    return { alt7Tem: its.length > 0,
+      alt7Kpis: [[its.length + " alteradas", pill("var(--slate-100)", "var(--slate-600)")], [adi + " adiadas", pill("#FEF2F2", "#991B1B")], [ant + " antecipadas", pill("#ECFDF5", "#065F46")]].map(k => ({ label: k[0], style: k[1] })),
+      alt7Nota: !A ? "Painel gerado pelo robô das 7h a partir das fotografias diárias do cronograma. Aparece depois de 2 execuções." :
+        !A.baseAnterior ? "Ainda não há fotografia anterior para comparar. O painel se completa nos próximos dias." :
+        "Comparação entre " + this.br(A.baseAnterior) + " e " + this.br(A.baseAtual) + (its.length ? "" : " · nenhuma data alterada no período") + ". Atividades criadas no período não entram.",
+      alt7: its.map(x => ({ sigla: x.sigla, obra: x.obra, sAnt: this.br(x.startAnt), s: this.br(x.start), dAnt: this.br(x.dueAnt), d: this.br(x.due),
+        sStyle: cor(x.dStart), dStyle: cor(x.dDue), quando: this.br(x.quando),
+        var: sgn(x.dDue != null && x.dDue !== 0 ? x.dDue : x.dStart) || "—",
+        varStyle: "display:inline-block;font-family:var(--font-mono);font-size:11.5px;font-weight:800;padding:3px 8px;border-radius:8px;white-space:nowrap;background:" +
+          ((x.dDue || x.dStart || 0) > 0 ? "#FEF2F2;color:#991B1B" : (x.dDue || x.dStart || 0) < 0 ? "#ECFDF5;color:#065F46" : "var(--slate-100);color:var(--slate-600)"),
+        link: React.createElement("a", { href: x.url, target: "_blank", rel: "noopener", title: x.nome,
+          style: { fontWeight: 600, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, x.nome) })) };
   }
   consVals(d, list, ganttLegend) {
     const R = React;
@@ -3016,7 +3202,9 @@ class Component extends DCLogic {
   fuMesmo(a, b) {
     const t = s => this.norm(s).split(" ").filter(Boolean);
     const x = t(a), y = t(b);
-    return x.length && y.length && x[0] === y[0] && x[x.length - 1] === y[y.length - 1];
+    if (!x.length || !y.length || x[0] !== y[0]) return false;
+    if (x.length === 1 || y.length === 1) return true;
+    return x[x.length - 1] === y[y.length - 1] || x.indexOf(y[y.length - 1]) >= 0 || y.indexOf(x[x.length - 1]) >= 0;
   }
   fuStore() {
     if (!this._fu) { try { this._fu = JSON.parse(localStorage.getItem(this.FUKEY) || "{}"); } catch (e) { this._fu = {}; }
@@ -3051,11 +3239,11 @@ class Component extends DCLogic {
     }).filter(Boolean).sort((a, b) => (a.tipo === "Atrasada" ? 0 : 1) - (b.tipo === "Atrasada" ? 0 : 1) || b.diasRef - a.diasRef);
     const ids = {}; criticas.forEach(t => { ids[t.url] = 1; });
     const andamento = minhas.filter(t => !ids[t.url] && !naoIniciada(t) && t.kind === "prog").sort((a, b) => String(a.d || "9").localeCompare(String(b.d || "9")));
-    const isC = g => String(g.tag || "").indexOf("eng - complementares") >= 0;
+    const isC = g => String(g.tag || "").split(",").some(x => /^\s*(eng\s*-\s*)?complementares\s*$/i.test(x));
     const fim = (lista, re) => lista.find(a => re.test(this.norm(a.label)));
     const axial = obras.map(o => ({ o,
       prox: (o.gantt || []).filter(g => isC(g) && g.kind !== "done" && g.end).sort((a, b) => a.end.localeCompare(b.end)).slice(0, 3),
-      lanc: fim(o.axial || [], /lancamento comercial/), obra: fim(o.axial || [], /inicio de obra/) }));
+      lanc: fim(o.axial || [], /lancamento/), obra: fim(o.axial || [], /inicio d[ae] obra/) }));
     const A = d.atrasos || { itens: [] };
     const atrasos = (A.itens || []).filter(x => x.dias > 0 && siglas.indexOf(x.sigla) >= 0).sort((a, b) => b.dias - a.dias);
     const encerrado = s => /conclu|tratado|cancel/i.test(String(s || ""));
@@ -3071,7 +3259,7 @@ class Component extends DCLogic {
   fuVals() {
     const d = this.dados(), st = this.fuStore(), fu = this.state.fu || {};
     const vazio = { fuAnalistas: [], fuSemAnalista: false, fuTem: false, fuObraChips: [], fuSemDados: false, fuComDados: false, fuObraLabel: "",
-      fuAxial: [], fuResumo: [], fuCriticas: [], fuAndamento: [], fuMatriz: [], fuImp: [], fuProb: [], fuRiscos: [], fuPdfAberto: false, fuPdfOpts: [],
+      fuAxial: [], fuResumo: [], fuCriticas: [], fuRespBase: "", fuAndamento: [], fuMatriz: [], fuImp: [], fuProb: [], fuRiscos: [], fuPdfAberto: false, fuPdfOpts: [],
       fuEditar: () => {}, fuEditarLabel: "Editar lista", fuEditarAvisoStyle: "display:none", fuAbrirPdf: () => {} };
     if (!d || !d.obras.some(o => o.complAbertas)) return vazio;
     const cont = {};
@@ -3116,13 +3304,15 @@ class Component extends DCLogic {
     base.fuObraChips = [{ sigla: "", nome: "Todos os empreendimentos", go: () => setFu({ obra: "" }), style: chip(!obraSel) }]
       .concat(D0.todasObras.map(o => ({ sigla: o.sigla, nome: o.nome, go: () => setFu({ obra: o.sigla }), style: chip(obraSel === o.sigla) })));
     base.fuSemDados = !D0.todasObras.length;
+    const rb = {}; d.obras.forEach(o => (o.complAbertas || []).forEach(t => (t.ass || []).forEach(a => { rb[a] = 1; })));
+    base.fuRespBase = Object.keys(rb).sort().join(", ") || "nenhum (a base não tem atividades em aberto com responsável)";
     base.fuComDados = !!D0.todasObras.length;
     const stPill = s => { const c = /ATRASO/i.test(s) && !/CONCLU/i.test(s) ? ["#FEE2E2", "#991B1B"] : /FORA DO PRAZO|PROGRESS|ANDAMENTO|AN[AÁ]LISE/i.test(s) ? ["#FEF3C7", "#92400E"] : /CONCLU|TRATADO/i.test(s) ? ["#D1FAE5", "#065F46"] : ["var(--slate-200)", "var(--slate-600)"];
       return "font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0;background:" + c[0] + ";color:" + c[1]; };
     const tagSt = (bg, fg) => "font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0;background:" + bg + ";color:" + fg;
     const pin = (it, grupo, cor) => {
       const done = it && it.kind === "done", prog = it && it.kind === "prog";
-      return { label: it ? it.label : "—", grupo, data: it ? this.br(it.end || it.start) : "sem data",
+      return { label: it ? (it.label || "Sem nome") : "—", grupo, data: it ? this.br(it.end || it.start) : "sem data",
         status: it ? (it.status || "—") : "não cadastrado",
         stStyle: (it ? stPill(it.status || "") : tagSt("var(--slate-100)", "var(--slate-400)")).replace("white-space:nowrap;flex-shrink:0;", "white-space:normal;text-align:center;max-width:100%;line-height:1.3;"),
         pin: done ? "✓" : "", url: null,
@@ -3501,8 +3691,68 @@ class Component extends DCLogic {
       ref: this.scrollRef(hojeP >= 0 && hojeP <= 100 ? hojeP : null, labelW || 250, key || "") };
   }
 
+  anBase(bu) {
+    const d = this.dados(); if (!d || !d.obras.some(o => o.tarefasCompl)) return null;
+    const hoje = this.fuHoje();
+    const cat = t => { const s = String(t.status || "").toUpperCase();
+      if (/CANCEL/.test(s)) return "cancelado";
+      if (/CONCLU.*ATRASO/.test(s)) return "concluido_atraso";
+      if (/CONCLU|COMPLETE/.test(s)) return "concluido";
+      if (/EM ATRASO/.test(s) || (t.d && t.d < hoje && !/ABERTO|TO DO/.test(s))) return "atrasada";
+      if (/FORA DO PRAZO/.test(s)) return "andamento_atraso";
+      if (/PROGRESS|ANDAMENTO|VALIDA|PAUSADO/.test(s)) return "andamento";
+      return t.s && t.s <= hoje ? "sem_inicio_vencido" : "sem_inicio"; };
+    const por = {};
+    d.obras.filter(o => o.bu === bu).forEach(o => (o.tarefasCompl || []).forEach(t => (t.ass || []).forEach(nome => {
+      const a = por[nome] = por[nome] || { name: nome, obras: {}, all: [] };
+      const tk = { n: t.n.replace(/^[A-Z0-9]{2,4}\s*[-|]\s*/, ""), sigla: o.sigla, obra: o.nome, cat: cat(t), status: t.status, s: t.s, d: t.d, pri: t.pri, url: t.url, mae: t.mae, cl: t.cl };
+      (a.obras[o.sigla] = a.obras[o.sigla] || { obra: o.nome, sigla: o.sigla, tasks: [] }).tasks.push(tk); a.all.push(tk);
+    })));
+    const c = (l, k) => l.filter(t => t.cat === k).length;
+    const analistas = Object.keys(por).map(k => { const a = por[k], ab = a.all.filter(t => t.cat !== "concluido" && t.cat !== "cancelado");
+      return { name: a.name, total: a.all.length, atrasada: c(a.all, "atrasada"), andamento: c(a.all, "andamento") + c(a.all, "andamento_atraso"),
+        andamentoForaPrazo: c(a.all, "andamento_atraso"), semInicioVencido: c(a.all, "sem_inicio_vencido"), semInicio: c(a.all, "sem_inicio"),
+        concluidoAtraso: c(a.all, "concluido_atraso"), cancelado: c(a.all, "cancelado"),
+        obras: Object.keys(a.obras).sort().map(s => { const o = a.obras[s];
+          return Object.assign(o, { total: o.tasks.length, atrasada: c(o.tasks, "atrasada"), andamento: c(o.tasks, "andamento"), semInicioVencido: c(o.tasks, "sem_inicio_vencido") }); }),
+        macro: ab.filter(t => t.cl === "Marco Axial" || t.cl === "Marco Task").filter(t => t.s && t.d),
+        vi: ab.filter(t => /verifica[cç][aã]o interna|\bVI\b/i.test(t.n)).filter(t => t.s && t.d) };
+    }).filter(a => a.total >= 3).sort((a, b) => b.total - a.total);
+    return { hoje, analistas };
+  }
+  // Organograma estático · edite aqui: [obra, marca (g = Gadens, m = Make It, x = sem marca), UH, m², estimativo]
+  ORG = { coord: "Lucas Lopes", an: [
+    { n: "Lucas Camargo", o: [["Horizon","m",144,7703.31],["Edge","m",432,26828.44],["Alba","m",224,11556],["Al Nasser I","m",256,17131.8],["Al Nasser II","m",230,15742.2]] },
+    { n: "Mariana", o: [["Vert","m",256,12575.29],["Aura","m",120,5933.04],["Arena","m",178,10238.31],["Fundação","m",239,9036]] },
+    { n: "Jaira", o: [["Flow","m",256,13445.78],["Quadratto","m",256,14804.83],["Zago","m",208,11791.75],["Rafitec","m",384,18578.94,1],["Container","m",336,14207.20,1]] },
+    { n: "João", o: [["Lume","m",380,22408.21],["Essence","m",256,15485.01],["Arbo","m",80,3944.46],["Now","m",192,10114.74]] },
+    { n: "Luiz Lemes", o: [["Core Palácio","g",429,12432.52],["General Carneiro","g",174,7324.53],["João Negrão","g",351,15226.59]] },
+    { n: "Francyelli Rossot", o: [["Core Faivre","g",238,8675.85],["Core Silva Jardim","g",241,8945.77],["Martim Afonso","g",116,4892.28],["Guadalupe","g",430,9602.60],["Pe. Agostinho","g",178,8362.37]] }
+  ],
+  // pré-due: sem analista, fora dos totais · [obra, marca, UH, m²]
+  pre: [["Galinha Pintadinha","m",null,null],["Cassol","m",null,null],["Yokohama","m",null,null],["Atubão","m",null,null],["Goleadores","m",null,null],["Koffee","g",null,null],["Sete Bar do Didi","g",null,null]] };
+  orgVals() {
+    const T = this.ORG, fmt = (n, d = 0) => n.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+    const all = T.an.flatMap(a => a.o), sum = (arr, i) => arr.reduce((s, o) => s + (o[i] || 0), 0), by = b => all.filter(o => o[1] === b);
+    const ini = n => { const w = n.split(" ").filter(x => x.length > 2); return (w.length > 1 ? w[0][0] + w[1][0] : n.slice(0, 2)).toUpperCase(); };
+    const C = { g: ["#2563EB", "#E8EFFD", "GD"], m: ["#F59E0B", "#FEF3E2", "MK"], x: ["#94A0B4", "#EEF1F5", "?"] };
+    const tot = sum(all, 2);
+    return { orgCoord: T.coord, orgCoordIni: ini(T.coord),
+      orgKpis: [["#8B5CF6","#EFE9FE","#","Empreendimentos",fmt(all.length),T.an.length + " analistas · " + fmt(all.length / T.an.length, 1) + " obras/analista"],
+        ["#10B981","#E3F7F0","UH","Unidades habitacionais*",fmt(tot),fmt(sum(all, 3), 2) + " m² construído*"],
+        ["#2563EB","#E8EFFD","GD","Gadens",by("g").length + " obras",fmt(sum(by("g"), 2)) + " UH · " + fmt(sum(by("g"), 3)) + " m²"],
+        ["#F59E0B","#FEF3E2","MK","Make It",by("m").length + " obras",fmt(sum(by("m"), 2)) + " UH · " + fmt(sum(by("m"), 3)) + " m²"]].map(k => ({ cor:k[0], bg:k[1], ico:k[2], l:k[3], v:k[4], s:k[5] })),
+      orgAn: T.an.map(a => { const uh = sum(a.o, 2), est = a.o.some(o => o[4]), q = a.o.length, g = a.o.filter(o => o[1] === "g").length, m = a.o.filter(o => o[1] === "m").length, x = q - g - m;
+        return { n: a.n, ini: ini(a.n), qtd: q, uhL: "UH" + (est ? "*" : ""), m2L: "m²" + (est ? "*" : ""), uh: fmt(uh), pct: "(" + fmt(uh / tot * 100, 1) + "%)", m2: fmt(sum(a.o, 3), 2),
+          wg: g / q * 100 + "%", wm: m / q * 100 + "%", wx: x / q * 100 + "%", mixT: "Gadens " + g + " · Make It " + m + (x ? " · sem marca " + x : ""),
+          obras: a.o.map(o => ({ n: o[0], cor: C[o[1]][0], bg: C[o[1]][1], chip: C[o[1]][2], uh: fmt(o[2]), m2: fmt(o[3], 2), est: !!o[4] })) }; }),
+      orgPreTit: T.pre.length + " obra" + (T.pre.length > 1 ? "s" : "") + " em avaliação",
+      orgPreSub: "· " + T.pre.filter(o => o[1] === "m").length + " MK · " + T.pre.filter(o => o[1] === "g").length + " GD",
+      orgPre: T.pre.map(o => ({ n: o[0], cor: C[o[1]][0], bg: C[o[1]][1], chip: C[o[1]][2], dados: o[2] != null ? fmt(o[2]) + " UH · " + fmt(o[3], 2) + " m²" : "Sem dados estimativos ainda" })) };
+  }
   anVals() {
-    const A = this.state.adata, an = this.state.an;
+    const an = this.state.an;
+    const A = this.anBase(an.tab === "gadens" ? "Gadens Inc" : "Make It") || (an.tab === "gadens" ? { hoje: this.fuHoje(), analistas: [] } : this.state.adata);
     const catLegend = [["Concluído", "#10B981"], ["Em andamento", "#F59E0B"], ["Em atraso", "#EF4444"], ["Sem início", "#CBD5E1"]].map(c => ({
       label: c[0], dotStyle: "width:18px;height:8px;border-radius:99px;display:inline-block;background:" + c[1]
     }));
@@ -3510,15 +3760,15 @@ class Component extends DCLogic {
       anMacro: { rows: [], ticks: [], minStyle: "", vazio: false, ref: () => {} }, anVi: { rows: [], ticks: [], minStyle: "", vazio: false, ref: () => {} },
       anEmpty: false, anShow: false, anNome: "", anQ: "", anSemResultado: false, setAnQ: () => {} };
 
-    const totMakeIt = A.analistas.reduce((s, a) => s + a.total, 0);
-    const anTabs = [["makeit", "Make It", totMakeIt], ["gadens", "Gadens Inc", 0]].map(t => ({
+    const conta = bu => { const b = this.anBase(bu); return b ? b.analistas.reduce((s, a) => s + a.total, 0) : 0; };
+    const anTabs = [["makeit", "Make It", conta("Make It") || (this.state.adata ? this.state.adata.analistas.reduce((s, a) => s + a.total, 0) : 0)], ["gadens", "Gadens Inc", conta("Gadens Inc")]].map(t => ({
       label: t[1], count: t[2], go: () => this.setAn({ tab: t[0], i: 0, filter: "all", q: "" }),
       style: "padding:7px 15px;border:0;border-radius:9px;cursor:pointer;font-family:var(--font-body);font-weight:700;font-size:12.5px;background:" +
         (an.tab === t[0] ? "var(--card)" : "transparent") + ";color:" + (an.tab === t[0] ? "var(--slate-700)" : "var(--slate-500)") +
         (an.tab === t[0] ? ";box-shadow:0 1px 2px rgba(15,23,42,.08)" : ""),
       countStyle: "font-family:var(--font-mono);font-size:11px;opacity:.7;margin-left:4px"
     }));
-    if (an.tab !== "makeit") return { anTabs, anEmpty: true, anShow: false, catLegend, anAnalistas: [], anStats: [],
+    if (!A.analistas.length) return { anTabs, anEmpty: true, anShow: false, catLegend, anAnalistas: [], anStats: [],
       anChips: [], anObras: [], anMacro: { rows: [], ticks: [], minStyle: "", vazio: false, ref: () => {} }, anVi: { rows: [], ticks: [], minStyle: "", vazio: false, ref: () => {} },
       anNome: "", anQ: "", anSemResultado: false, setAnQ: () => {} };
 
@@ -3727,7 +3977,7 @@ class Component extends DCLogic {
       String(this.state.fstate.fornecedores.filter(f => Object.keys(this.state.fstate.vinculos).some(k => this.state.fstate.vinculos[k] === f.id)).length) : "";
     const upMark = Object.keys(this.state.uploads || {}).length ? String(Object.keys(this.state.uploads).length) : "";
     const pages = [["Geral", ""], ["Prazos", ""], ["Financeiro", ""], ["Indicadores", ""], ["Riscos de Engenharia", ""], ["Reunião Diretoria", ""], ["Reunião Follow-up", ""],
-      ["Gestão de Fornecedores", fnMark], ["Gestão de Analistas", anMark], ["Exportação de dados", ""], ["Base de dados", upMark], ["Termos de Abertura de Projeto (TAP)", "↗"]]
+      ["Gestão de Fornecedores", fnMark], ["Gestão de Analistas", anMark], ["Organograma do Setor", ""], ["Exportação de dados", ""], ["Base de dados", upMark], ["Termos de Abertura de Projeto (TAP)", "↗"]]
       .concat(this.state.sessao && this.state.sessao.perfil === "admin" ? [["Usuários e publicação", ""]] : []);
     const nav = pages.map(p => ({
       label: p[0], mark: p[1], go: p[0] === "Termos de Abertura de Projeto (TAP)" ? () => { window.location.href = "tap.html"; } : this.go(p[0]),
@@ -3744,6 +3994,7 @@ class Component extends DCLogic {
       "Financeiro": "Contratado, composição por disciplina e curva de desembolso",
       "Gestão de Fornecedores": "Vínculo obra × disciplina → fornecedor e análise de concorrência de entregas",
       "Gestão de Analistas": "Atividades por analista, agrupadas por obra · projetos complementares",
+      "Organograma do Setor": "Organograma do setor · obras por analista, UH e área construída",
       "Base de dados": "Arquivos que alimentam o painel e atualização por upload",
       "Usuários e publicação": "Acessos ao painel e pacote criptografado para o GitHub",
       "Exportação de dados": "Apresentação do setor e planilha de indicadores da empresa",
@@ -3758,11 +4009,11 @@ class Component extends DCLogic {
         style: { width: "40px", height: "auto", flexShrink: 0, display: "block" } }),
       isGeral: page === "Geral", isPrazos: page === "Prazos", isIndicadores: page === "Indicadores",
       isRiscos: page === "Riscos de Engenharia", isFinanceiro: page === "Financeiro",
-      isAnalistas: page === "Gestão de Analistas", isFornecedores: page === "Gestão de Fornecedores",
+      isAnalistas: page === "Gestão de Analistas", isOrg: page === "Organograma do Setor", isFornecedores: page === "Gestão de Fornecedores",
       isBase: page === "Base de dados", isExport: page === "Exportação de dados", isReuniao: page === "Reunião Diretoria", isFollow: page === "Reunião Follow-up",
       isAdmin: page === "Usuários e publicação" && !!(this.state.sessao && this.state.sessao.perfil === "admin"),
-      showFilters: page.indexOf("Gestão") !== 0 && page !== "Reunião Follow-up" && page !== "Base de dados" && page !== "Exportação de dados" && page !== "Usuários e publicação",
-      ...this.authVals(),
+      showFilters: page.indexOf("Gestão") !== 0 && page !== "Reunião Follow-up" && page !== "Base de dados" && page !== "Exportação de dados" && page !== "Usuários e publicação" && page !== "Organograma do Setor",
+      ...this.authVals(), ...this.orgVals(), ...this.alt7Vals(d),
       stop: e => e.stopPropagation(), closeModal: () => this.setState({ modal: null, taskModal: null }),
       modalPill: this.state.taskModal ? "Atividades" : "Indicador",
       modalPillStyle: "font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:var(--blue-700);background:var(--blue-50);padding:4px 10px;border-radius:99px"
