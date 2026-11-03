@@ -118,7 +118,8 @@ export function detectKind(wb) {
 export function mapIndicadores(wb) {
   const t = wb[Object.keys(wb)[0]], H = t[0], k = n => H.indexOf(n);
   const g = (r, n) => r[k(n)] ?? null;
-  const rows = t.slice(1), pick = l => rows.filter(r => g(r, "Lists") === l);
+  const nl = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const rows = t.slice(1), pick = l => rows.filter(r => nl(g(r, "Lists")) === nl(l));
   const notaCols = ["NOTA Clareza das Informações (drop down)", "NOTA Compatibilização (drop down)",
     "NOTA Solução Otimizada (drop down)", "NOTA Conformidade Técnica (drop down)", "NOTA Confiabilidade na entrga (drop down)"];  const linhaBase = pick("Linha de Base Oficializada").map(r => ({
     obra: g(r, "Obra (drop down)") || g(r, "Task Name"), empreendimento: g(r, "Task Name"),
@@ -189,14 +190,14 @@ const isCompl = t => String(t || "").split(",").some(x => /^\s*(eng\s*-\s*)?comp
 // Fotografia das atividades complementares, para comparar bases entre uploads
 export function snapshotCompl(wb) {
   const t = wb[Object.keys(wb)[0]], H = t[0], i = n => H.indexOf(n);
-  const C = { id: i("Task ID"), name: i("Task Name"), st: i("Status"), sd: i("Start Date"), dd: i("Due Date"), tg: i("tags"), cl: colClasse(H) };
+  const C = { id: i("Task ID"), name: i("Task Name"), st: i("Status"), sd: i("Start Date"), dd: i("Due Date"), tg: i("tags"), cl: colClasse(H), sg: i("Obra Sigla") };
   const nm = r => (r[C.name] || "").replace(/^\s*\ud83d\udccc\s*/, "").trim();
   const MARCO = ["Marco Axial", "Marco Task"];
   const out = {};
   t.slice(1).forEach(r => {
     const id = r[C.id];
-    if (!id || !isCompl(r[C.tg]) || MARCO.indexOf(r[C.cl]) < 0) return;
-    out[id] = { nome: nm(r), status: r[C.st], start: ser(r[C.sd]), due: ser(r[C.dd]), classe: r[C.cl] };
+    if (!id || !isCompl(r[C.tg])) return;
+    out[id] = { nome: nm(r), status: r[C.st], start: ser(r[C.sd]), due: ser(r[C.dd]), classe: r[C.cl], sigla: C.sg >= 0 && r[C.sg] ? String(r[C.sg]).toUpperCase() : undefined };
   });
   return out;
 }
@@ -209,7 +210,8 @@ export function comparaAtrasos(prevSnap, curSnap, obras, dataAnterior, dataAtual
   let novas = 0;
   Object.keys(curSnap).forEach(id => {
     const c = curSnap[id], p = prevSnap ? prevSnap[id] : null;
-    const pre = (c.nome || "").slice(0, 3).toUpperCase();
+    if (["Marco Axial", "Marco Task"].indexOf(c.classe) < 0) return;
+    const pre = c.sigla || (c.nome || "").slice(0, 3).toUpperCase();
     const ob = sig[pre]; if (!ob) return;
     if (!p) novas++;
     const anterior = p ? p.due : null;
@@ -223,13 +225,39 @@ export function comparaAtrasos(prevSnap, curSnap, obras, dataAnterior, dataAtual
     comAtraso: comAtraso.length, itens: comAtraso.slice(0, 300) };
 }
 
+// Datas de início/término alteradas na janela (padrão 7 dias), a partir das fotografias diárias
+export function alteracoesJanela(hist, obras, hoje, janela = 7) {
+  const sig = {}; obras.forEach(o => { sig[o.sigla] = o; });
+  const H = hist.slice().sort((a, b) => a.quando.localeCompare(b.quando));
+  const cur = H[H.length - 1]; if (!cur) return null;
+  const lim = new Date(Date.parse(hoje) - janela * 864e5).toISOString().slice(0, 10);
+  const base = H.filter(h => h.quando <= lim).pop() || (H.length > 1 ? H[0] : null);
+  if (!base || base === cur) return { baseAnterior: null, baseAtual: cur.quando, janela, itens: [] };
+  const seq = H.filter(h => h.quando >= base.quando);
+  const itens = [];
+  Object.keys(cur.snap).forEach(id => {
+    const c = cur.snap[id], b = base.snap[id]; if (!b) return;
+    if (b.start === c.start && b.due === c.due) return;
+    const pre = c.sigla || (c.nome || "").slice(0, 3).toUpperCase(), ob = sig[pre]; if (!ob) return;
+    let quando = null;
+    for (let k = 1; k < seq.length; k++) { const a = seq[k - 1].snap[id], n = seq[k].snap[id];
+      if (a && n && (a.start !== n.start || a.due !== n.due)) quando = seq[k].quando; }
+    const dd = (p, q) => p && q ? Math.round((new Date(q) - new Date(p)) / 864e5) : null;
+    itens.push({ id, nome: c.nome, sigla: pre, obra: ob.nome, bu: ob.bu, status: c.status, classe: c.classe || null,
+      startAnt: b.start, start: c.start, dueAnt: b.due, due: c.due, dStart: dd(b.start, c.start), dDue: dd(b.due, c.due),
+      quando: quando || cur.quando, url: "https://app.clickup.com/t/" + id });
+  });
+  itens.sort((a, b) => Math.abs(b.dDue || b.dStart || 0) - Math.abs(a.dDue || a.dStart || 0));
+  return { baseAnterior: base.quando, baseAtual: cur.quando, janela, itens };
+}
+
 export function mapCronograma(wb, obras, hoje) {
   const t = wb[Object.keys(wb)[0]], H = t[0], i = n => H.indexOf(n);
   const C = { name: i("Task Name"), st: i("Status"), sd: i("Start Date"), dd: i("Due Date"),
-    tg: i("tags"), list: i("Lists"), cl: colClasse(H), id: i("Task ID"), par: i("Parent ID"), as: i("Assignee") };
+    tg: i("tags"), list: i("Lists"), cl: colClasse(H), id: i("Task ID"), par: i("Parent ID"), as: i("Assignee"), pr: i("Priority"), sg: i("Obra Sigla") };
   if (C.cl < 0) throw new Error("export sem a coluna Classe Datas Marco — refaça pela visão ATUALIZAÇÃO DE DATAS do ClickUp");
   const nm = r => (r[C.name] || "").replace(/^\s*📌\s*/, "").trim();
-  const rows = t.slice(1), pre = r => nm(r).slice(0, 3).toUpperCase();
+  const rows = t.slice(1), pre = r => (C.sg >= 0 && r[C.sg] ? String(r[C.sg]) : nm(r).slice(0, 3)).toUpperCase();
   const comClasse = rows.filter(r => r[C.cl]).length;
   const soMarcos = rows.length > 0 && comClasse / rows.length > 0.8;
   return obras.map(o0 => {
@@ -248,11 +276,11 @@ export function mapCronograma(wb, obras, hoje) {
     }
     o.soMarcos = soMarcos;
     o.axial = mine.filter(r => r[C.cl] === "Marco Axial").map(r => ({
-      label: clean(nm(r).split("|").slice(1).join(" · ")), status: r[C.st], kind: kindOf(r[C.st]),
+      label: clean(nm(r).split("|").slice(1).join(" · ")) || clean(nm(r).replace(/^[A-Z0-9]{2,4}\s*[-|]\s*/, "")), status: r[C.st], kind: kindOf(r[C.st]),
       start: ser(r[C.sd]), end: ser(r[C.dd])
     })).sort((a, b) => String(a.end || a.start).localeCompare(String(b.end || b.start)));
     o.gantt = mine.filter(r => r[C.cl] === "Marco Task").map(r => ({
-      label: clean(nm(r).split("|").slice(1).join(" · ")), grupo: clean((nm(r).split("|")[1] || "")),
+      label: clean(nm(r).split("|").slice(1).join(" · ")) || clean(nm(r).replace(/^[A-Z0-9]{2,4}\s*[-|]\s*/, "")), grupo: clean((nm(r).split("|")[1] || "")),
       status: r[C.st], kind: kindOf(r[C.st]), start: ser(r[C.sd]), end: ser(r[C.dd]), tag: r[C.tg] || ""
     })).filter(g => g.start && g.end).sort((a, b) => a.start.localeCompare(b.start));
     o.lista = (mine.map(r => r[C.list]).filter(Boolean)[0]) || o.lista || "";
@@ -293,6 +321,9 @@ export function mapCronograma(wb, obras, hoje) {
       n: nm(r).replace(/^[A-Z0-9]{2,4}\s*[-|]\s*/, ""), id: C.id >= 0 ? r[C.id] : null, url: url(C.id >= 0 ? r[C.id] : null),
       s: ser(r[C.sd]), d: ser(r[C.dd]), status: r[C.st], kind: kindOf(r[C.st]), ass: ass(r)
     })).filter(t => (t.d && t.d <= lim) || (t.s && t.s <= hoje));
+    o.tarefasCompl = mine.filter(r => isCompl(r[C.tg])).map(r => ({
+      n: nm(r), url: url(C.id >= 0 ? r[C.id] : null), s: ser(r[C.sd]), d: ser(r[C.dd]), status: r[C.st], ass: ass(r),
+      pri: C.pr >= 0 ? r[C.pr] || null : null, mae: !(C.par >= 0 && r[C.par]), cl: C.cl >= 0 ? r[C.cl] || null : null }));
     const filhos = {};
     if (C.par >= 0) mine.forEach(r => { const p = r[C.par]; if (p) (filhos[p] = filhos[p] || []).push(r); });
     o.legais = mine.filter(r => !(C.par >= 0 && r[C.par]) && /\|\s*LEG\s*\|/i.test(nm(r))).map(r => {
