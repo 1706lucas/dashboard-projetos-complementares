@@ -27,10 +27,10 @@ const PADRAO = [
   { tipo: "cronograma", nome: "Arena", sigla: "ARE", bu: "Make It", view: "li:901327999906" },
   { tipo: "cronograma", nome: "Fundação", sigla: "FUN", bu: "Make It", view: "li:901327965854" },
   { tipo: "cronograma", nome: "Zago", sigla: "ZAG", bu: "Make It", view: "li:901328072536" },
-  { tipo: "cronograma", nome: "Al Nasser I", sigla: "AL1", bu: "Make It", view: "li:901326874097" },
+  { tipo: "cronograma", nome: "Al Nasser I", sigla: "AN1", bu: "Make It", view: "li:901326874097" },
   { tipo: "cronograma", nome: "Rafitec", sigla: "RAF", bu: "Make It", view: "li:1400450000002217" },
   { tipo: "cronograma", nome: "Vert", sigla: "VER", bu: "Make It", view: "li:901322097447" },
-  { tipo: "cronograma", nome: "Al Nasser II", sigla: "AL2", bu: "Make It", view: "li:901327104307" },
+  { tipo: "cronograma", nome: "Al Nasser II", sigla: "AN2", bu: "Make It", view: "li:901327104307" },
   { tipo: "cronograma", nome: "Martim Afonso", sigla: "MAR", bu: "Gadens Inc", view: "li:901327721107" },
   { tipo: "cronograma", nome: "Core Evo (João Negrão)", sigla: "EVO", bu: "Gadens Inc", view: "li:901328360960" },
   { tipo: "cronograma", nome: "Guadalupe", sigla: "GUA", bu: "Gadens Inc", view: "li:1400450000008729" },
@@ -130,6 +130,11 @@ async function ler(f) {
   try { const t = await tarefasDaView(f.view); if (f.sigla) t.forEach(x => { x.__sigla = String(f.sigla).toUpperCase(); }); leitura.push({ view: f.view, nome: f.nome, tipo: f.tipo, n: t.length, erro: null }); return t; }
   catch (e) { leitura.push({ view: f.view, nome: f.nome, tipo: f.tipo, n: 0, erro: e.message.slice(0, 160) }); throw e; }
 }
+{ const nn = v => String(v || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\bii\b/g, "2").replace(/\bi\b/g, "1").replace(/[^a-z0-9]/g, "");
+  const ALIAS = { AL1: "AN1", AL2: "AN2" };
+  FONTES.forEach(f => { if (!f.sigla) return; let sg = String(f.sigla).toUpperCase(); sg = ALIAS[sg] || sg;
+    if (!d.obras.some(o => o.sigla === sg)) { const o = d.obras.find(o => nn(o.nome) === nn(f.nome)); if (o) sg = o.sigla; }
+    f.sigla = sg; }); }
 const VIEWS = { cronograma: FONTES.filter(f => f.tipo === "cronograma"),
   indicadores: FONTES.filter(f => f.tipo === "indicadores"), pendencias: FONTES.filter(f => f.tipo === "pendencias") };
 async function lerTodas(lista) {
