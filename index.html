@@ -1565,8 +1565,32 @@ a:hover{color:var(--blue-700)}
           </div>
           <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
           <div style="height:2px;background:var(--slate-200);width:calc(100% - 16.6%)"></div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;width:100%">
-            <sc-for list="{{ orgAn }}" as="a" hint-placeholder-count="6">
+          <div style="display:flex;flex-wrap:wrap;gap:0 24px;width:100%;align-items:flex-start">
+            <sc-for list="{{ orgBlocos }}" as="b" hint-placeholder-count="1">
+              <div style="{{ b.style }}">
+                <sc-if value="{{ b.temLider }}" hint-placeholder-val="{{ false }}">
+                  <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
+                  <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #6D28D9;display:flex;align-items:center;gap:12px;padding:12px 18px;min-width:220px;max-width:100%;box-sizing:border-box">
+                    <div style="width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:12px;flex:none;color:#6D28D9;background:#EFE9FE">{{ b.lider.ini }}</div>
+                    <sc-if value="{{ b.lider.ver }}" hint-placeholder-val="{{ true }}"><div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">{{ b.lider.cargo }}</div><div style="margin-top:2px;font-size:16px;font-weight:900">{{ b.lider.nome }}</div></div></sc-if>
+                    <sc-if value="{{ b.lider.edit }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:flex-start;gap:6px;min-width:0;flex:1">
+                        <div style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1">
+                          <input value="{{ b.lider.cargo }}" onChange="{{ b.lider.setCargo }}" placeholder="Cargo (ex.: Supervisor)" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">
+                          <input value="{{ b.lider.nome }}" onChange="{{ b.lider.setNome }}" placeholder="Nome" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-weight:900;font-size:16px">
+                        </div>
+                        <button onClick="{{ b.lider.rem }}" title="Remover cargo (os analistas passam a responder direto ao nível acima)" style="cursor:pointer;border:0;background:transparent;color:var(--slate-400);font-size:16px;font-weight:700;line-height:1;padding:2px 4px;flex:none">×</button>
+                      </div>
+                    </sc-if>
+                  </div>
+                  <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
+                  <div style="height:2px;background:var(--slate-200);width:{{ b.linha }}"></div>
+                </sc-if>
+                <sc-if value="{{ b.vazio }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:10px;border:1px dashed var(--slate-300);border-radius:10px;padding:12px;font-size:11.5px;color:var(--slate-400);width:100%;box-sizing:border-box">Nenhum analista ainda. No cartão do analista, escolha este cargo em "Responde a".</div>
+                </sc-if>
+                <div style="{{ b.gridStyle }}">
+            <sc-for list="{{ b.an }}" as="a" hint-placeholder-count="3">
               <div style="display:flex;flex-direction:column;min-width:0">
                 <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
                 <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #8B5CF6;padding:14px">
@@ -1578,6 +1602,13 @@ a:hover{color:var(--blue-700)}
                         <div style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1">
                           <input value="{{ a.n }}" onChange="{{ a.setN }}" placeholder="Nome do analista" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-weight:800;font-size:15px">
                           <input value="{{ a.cargo }}" onChange="{{ a.setCargo }}" placeholder="Cargo" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-size:11px;color:var(--slate-400);font-weight:600">
+                          <sc-if value="{{ orgTemGrupos }}" hint-placeholder-val="{{ false }}">
+                            <label style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--slate-400);font-weight:700;margin-top:3px">Responde a
+                              <select value="{{ a.g }}" onChange="{{ a.setG }}" style="flex:1;min-width:0;border:1px dashed var(--slate-300);border-radius:6px;background:transparent;color:var(--color-text);font-size:11px;font-family:var(--font-body);padding:2px 4px">
+                                <sc-for list="{{ orgGrupoOpts }}" as="d" hint-placeholder-count="0"><option value="{{ d.v }}">{{ d.l }}</option></sc-for>
+                              </select>
+                            </label>
+                          </sc-if>
                         </div>
                         <button onClick="{{ a.rem }}" title="Remover analista (as obras vão para Em avaliação)" style="cursor:pointer;border:0;background:transparent;color:var(--slate-400);font-size:16px;font-weight:700;line-height:1;padding:2px 4px;flex:none">×</button>
                       </div>
@@ -1642,13 +1673,16 @@ a:hover{color:var(--blue-700)}
                 </div>
               </div>
             </sc-for>
-            <sc-if value="{{ orgEditando }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex;flex-direction:column;min-width:0">
-                <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
-                <button onClick="{{ orgAddAnalista }}" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left;padding:22px 14px;font-size:13px">+ Analista</button>
+                </div>
               </div>
-            </sc-if>
+            </sc-for>
           </div>
+          <sc-if value="{{ orgEditando }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;width:100%;margin-top:14px">
+              <button onClick="{{ orgAddAnalista }}" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left;padding:14px 18px;font-size:13px">+ Analista</button>
+              <button onClick="{{ orgAddGrupo }}" title="Cria um cargo entre o nível acima e uma parte dos analistas" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left;padding:14px 18px;font-size:13px">+ Cargo intermediário (para parte da equipe)</button>
+            </div>
+          </sc-if>
           <sc-if value="{{ orgMostraPre }}" hint-placeholder-val="{{ true }}">
             <div onDragOver="{{ orgPreDragOver }}" onDrop="{{ orgPreDrop }}" style="{{ orgPreStyle }}">
               <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
@@ -3925,6 +3959,19 @@ class Component extends DCLogic {
       dst.splice(i, 0, ob); return { orgDraft: N, orgAlvo: null }; });
   }
   orgVals() {
+    const v = this.orgVals0(), A = v._A, T = v._T, G = T.grupos || [];
+    const blk = (lider, an) => { const n = Math.max(1, an.length);
+      return { temLider: !!lider, lider: lider || {}, an, vazio: !!lider && !an.length, linha: an.length > 1 ? "calc(100% - " + (100 / n).toFixed(1) + "%)" : "2px",
+        style: "flex:" + n + " 1 " + (n * 234) + "px;min-width:0;display:flex;flex-direction:column;align-items:center",
+        gridStyle: "display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;width:100%" }; };
+    const diretos = A.filter(a => !a.g);
+    v.orgBlocos = (diretos.length || !G.length ? [blk(null, diretos)] : []).concat(G.map((g, gi) => blk(v._lider(g, gi), A.filter(a => a.g === g.id))));
+    v.orgTemGrupos = v.orgEditando && G.length > 0;
+    v.orgGrupoOpts = [{ v: "", l: "Nível acima (direto)" }].concat(G.map(g => ({ v: g.id, l: (g.nome || "sem nome") + (g.cargo ? " · " + g.cargo : "") })));
+    delete v._A; delete v._T; delete v._lider; delete v.orgAn;
+    return v;
+  }
+  orgVals0() {
     const st = this.state, adm = !!(st.sessao && st.sessao.perfil === "admin"), editando = !!(st.orgDraft && adm);
     const T = editando ? st.orgDraft : this.orgDados(), fmt = (n, d = 0) => (Number(n) || 0).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
     const all = T.an.flatMap(a => a.o), sum = (arr, k) => arr.reduce((s, o) => s + (Number(o[k]) || 0), 0), by = b => all.filter(o => o.m === b);
@@ -3958,7 +4005,10 @@ class Component extends DCLogic {
       onDrop: e => { if (!editando) return; e.preventDefault(); this.orgMover(loc, null); } });
     const realce = loc => editando && alvo === loc ? "background:var(--blue-50);outline:2px dashed var(--blue-600);outline-offset:4px;" : "";
     const preZ = dropZone("pre");
-    return { orgVer: !editando, orgEditando: editando,
+    return { _T: T,
+      _lider: (g, gi) => Object.assign(pessoa(N => N.grupos, gi, g), {
+        rem: () => ed(N => { const id = N.grupos[gi].id; N.grupos.splice(gi, 1); N.an.forEach(a => { if (a.g === id) a.g = null; }); }) }),
+      orgVer: !editando, orgEditando: editando,
       orgFonte: editando ? "Alterações ainda não salvas" : T.atualizado ? "Atualizado em " + T.atualizado.split("-").reverse().join("/") + (T.por ? " por " + T.por : "") : "Versão padrão",
       orgTemMsg: !!st.orgMsg, orgMsg: st.orgMsg || "",
       orgMsgStyle: "width:100%;margin:0 0 16px;font-size:12.5px;padding:11px 14px;border-radius:12px;box-sizing:border-box;background:" + (st.orgErro ? "#FEF3C7;color:#92400E" : "#ECFDF5;color:#065F46"),
@@ -3969,9 +4019,11 @@ class Component extends DCLogic {
         ["#10B981","#E3F7F0","UH","Unidades habitacionais" + (est.length ? "*" : ""),fmt(sum(all, "uh")),fmt(sum(all, "m2"), 2) + " m² construído" + (est.length ? "*" : "")],
         ["#2563EB","#E8EFFD","GD","Gadens",by("g").length + " obras",fmt(sum(by("g"), "uh")) + " UH · " + fmt(sum(by("g"), "m2")) + " m²"],
         ["#F59E0B","#FEF3E2","MK","Make It",by("m").length + " obras",fmt(sum(by("m"), "uh")) + " UH · " + fmt(sum(by("m"), "m2")) + " m²"]].map(k => ({ cor:k[0], bg:k[1], ico:k[2], l:k[3], v:k[4], s:k[5] })),
-      orgAn: T.an.map((a, ai) => { const uh = sum(a.o, "uh"), e = a.o.some(o => o.est), q = a.o.length || 1, g = a.o.filter(o => o.m === "g").length, m = a.o.filter(o => o.m === "m").length, x = a.o.length - g - m;
+      orgAn: null,
+      _A: T.an.map((a, ai) => { const uh = sum(a.o, "uh"), e = a.o.some(o => o.est), q = a.o.length || 1, g = a.o.filter(o => o.m === "g").length, m = a.o.filter(o => o.m === "m").length, x = a.o.length - g - m;
         const z = dropZone(a.id), ab = a.abaixo || [];
-        return { n: a.n, cargo: a.cargo || (editando ? "" : "Analista de Projetos"), ini: ini(a.n), ver: !editando, edit: editando,
+        return { n: a.n, cargo: a.cargo || (editando ? "" : "Analista de Projetos"), ini: ini(a.n), ver: !editando, edit: editando, g: a.g && (T.grupos || []).some(x => x.id === a.g) ? a.g : "",
+          setG: ev => { const v = ev.target.value; ed(N => { N.an[ai].g = v || null; }); },
           qtd: a.o.length, uhL: "UH" + (e ? "*" : ""), m2L: "m²" + (e ? "*" : ""), uh: fmt(uh), pct: "(" + fmt(uh / tot * 100, 1) + "%)", m2: fmt(sum(a.o, "m2"), 2),
           wg: g / q * 100 + "%", wm: m / q * 100 + "%", wx: x / q * 100 + "%", mixT: "Gadens " + g + " · Make It " + m + (x ? " · sem marca " + x : ""),
           mostraAbaixo: editando || ab.length > 0, abaixo: ab.map((p, pi) => pessoa(N => (N.an[ai].abaixo = N.an[ai].abaixo || []), pi, p)),
@@ -3983,6 +4035,7 @@ class Component extends DCLogic {
           onDragOver: z.onDragOver, onDrop: z.onDrop,
           colStyle: "display:flex;flex-direction:column;gap:8px;margin:10px 0 0 14px;padding-left:12px;border-left:2px solid var(--slate-200);border-radius:4px;min-height:" + (editando ? "60px" : "0") + ";" + realce(a.id),
           obras: a.o.map((o, oi) => obra(a.id, oi, o)) }; }),
+      orgAddGrupo: () => ed(N => { (N.grupos = N.grupos || []).push({ id: this.uid(), cargo: "", nome: "" }); }),
       orgAddAnalista: () => ed(N => { N.an.push({ id: this.uid(), n: "", cargo: "Analista de Projetos", abaixo: [], o: [] }); }),
       orgMostraPre: editando || T.pre.length > 0,
       orgPreDragOver: preZ.onDragOver, orgPreDrop: preZ.onDrop,
