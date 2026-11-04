@@ -1513,25 +1513,48 @@ a:hover{color:var(--blue-700)}
 
       <!-- ══════════ ORGANOGRAMA DO SETOR ══════════ -->
       <sc-if value="{{ isOrg }}" hint-placeholder-val="{{ false }}">
-      <sc-if value="{{ orgVer }}" hint-placeholder-val="{{ false }}">
         <section style="display:flex;flex-direction:column;align-items:center">
-          <div style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px">
-            <span style="font-size:12px;color:var(--slate-400)">{{ orgFonte }}</span>
-          </div>
+          <sc-if value="{{ orgEditando }}" hint-placeholder-val="{{ false }}">
+            <div style="width:100%;box-sizing:border-box;position:sticky;top:0;z-index:5;margin-bottom:18px;background:var(--card);border:1px solid var(--blue-600);border-radius:14px;padding:12px 16px;box-shadow:var(--card-shadow);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+              <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400);color:var(--blue-700)">Modo de edição</div><div style="font-size:12.5px;color:var(--slate-500);margin-top:2px">Clique nos textos para alterar · arraste as obras (⠿) para realocar · clique na marca para trocar</div></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button onClick="{{ orgRestaurar }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">Restaurar padrão</button>
+                <button onClick="{{ orgCancelar }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">Cancelar</button>
+                <button onClick="{{ orgSalvar }}" style="cursor:pointer;border:0;border-radius:10px;padding:9px 16px;font-size:12.5px;font-weight:800;background:var(--blue-600);color:#fff;font-family:var(--font-body);white-space:nowrap">{{ orgSalvarLabel }}</button>
+              </div>
+            </div>
+          </sc-if>
+          <div style="width:100%;margin-bottom:14px;font-size:12px;color:var(--slate-400)">{{ orgFonte }}</div>
           <sc-if value="{{ orgTemMsg }}" hint-placeholder-val="{{ false }}"><p style="{{ orgMsgStyle }}">{{ orgMsg }}</p></sc-if>
+          <sc-if value="{{ orgEditando }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ orgAddNivelTopo }}" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left;margin-bottom:10px">+ Nível acima</button>
+          </sc-if>
           <sc-for list="{{ orgTopo }}" as="lv" hint-placeholder-count="1">
             <div style="display:flex;flex-direction:column;align-items:center;width:100%">
-              <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:14px">
+              <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:14px">
                 <sc-for list="{{ lv.pessoas }}" as="p" hint-placeholder-count="1">
-                  <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #8B5CF6;display:flex;align-items:center;gap:14px;padding:16px 26px">
+                  <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #8B5CF6;display:flex;align-items:center;gap:14px;padding:16px 22px;min-width:220px">
                     <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#8B5CF6;background:#EFE9FE">{{ p.ini }}</div>
-                    <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">{{ p.cargo }}</div><h2 style="margin:2px 0 0;font-size:20px;font-weight:900">{{ p.nome }}</h2></div>
+                    <sc-if value="{{ p.ver }}" hint-placeholder-val="{{ true }}"><div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">{{ p.cargo }}</div><h2 style="margin:2px 0 0;font-size:20px;font-weight:900">{{ p.nome }}</h2></div></sc-if>
+                    <sc-if value="{{ p.edit }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;align-items:flex-start;gap:6px;min-width:0;flex:1">
+                      <div style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1">
+                        <input value="{{ p.cargo }}" onChange="{{ p.setCargo }}" placeholder="Cargo" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">
+                        <input value="{{ p.nome }}" onChange="{{ p.setNome }}" placeholder="Nome" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-weight:900;font-size:18px">
+                      </div>
+                      <button onClick="{{ p.rem }}" title="Remover" style="cursor:pointer;border:0;background:transparent;color:var(--slate-400);font-size:16px;font-weight:700;line-height:1;padding:2px 4px;flex:none">×</button>
+                    </div>
+                    </sc-if>
                   </div>
                 </sc-for>
+                <sc-if value="{{ lv.edit }}" hint-placeholder-val="{{ false }}"><button onClick="{{ lv.addP }}" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left">+ Pessoa neste nível</button></sc-if>
               </div>
               <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
             </div>
           </sc-for>
+          <sc-if value="{{ orgEditando }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ orgAddNivelBase }}" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left;margin-bottom:10px">+ Nível logo acima dos analistas</button>
+          </sc-if>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;width:100%">
             <sc-for list="{{ orgKpis }}" as="k" hint-placeholder-count="4">
               <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid {{ k.cor }};display:flex;gap:14px;align-items:flex-start;padding:18px 20px">
@@ -1542,14 +1565,23 @@ a:hover{color:var(--blue-700)}
           </div>
           <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
           <div style="height:2px;background:var(--slate-200);width:calc(100% - 16.6%)"></div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;width:100%">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;width:100%">
             <sc-for list="{{ orgAn }}" as="a" hint-placeholder-count="6">
               <div style="display:flex;flex-direction:column;min-width:0">
                 <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
                 <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #8B5CF6;padding:14px">
                   <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
                     <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#8B5CF6;background:#EFE9FE">{{ a.ini }}</div>
-                    <div><h3 style="margin:0;font-size:15px;font-weight:800;line-height:1.2">{{ a.n }}</h3><div style="font-size:11px;color:var(--slate-400);font-weight:600">{{ a.cargo }}</div></div>
+                    <sc-if value="{{ a.ver }}" hint-placeholder-val="{{ true }}"><div><h3 style="margin:0;font-size:15px;font-weight:800;line-height:1.2">{{ a.n }}</h3><div style="font-size:11px;color:var(--slate-400);font-weight:600">{{ a.cargo }}</div></div></sc-if>
+                    <sc-if value="{{ a.edit }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:flex-start;gap:6px;min-width:0;flex:1">
+                        <div style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1">
+                          <input value="{{ a.n }}" onChange="{{ a.setN }}" placeholder="Nome do analista" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-weight:800;font-size:15px">
+                          <input value="{{ a.cargo }}" onChange="{{ a.setCargo }}" placeholder="Cargo" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-size:11px;color:var(--slate-400);font-weight:600">
+                        </div>
+                        <button onClick="{{ a.rem }}" title="Remover analista (as obras vão para Em avaliação)" style="cursor:pointer;border:0;background:transparent;color:var(--slate-400);font-size:16px;font-weight:700;line-height:1;padding:2px 4px;flex:none">×</button>
+                      </div>
+                    </sc-if>
                   </div>
                   <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:baseline">
                     <div class="mono" style="grid-row:span 2;font-size:28px;font-weight:900;line-height:1;padding-right:10px;border-right:1px solid var(--slate-200)">{{ a.qtd }}<small style="display:block;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--slate-400);margin-top:4px;font-family:var(--font-body)">obras</small></div>
@@ -1560,45 +1592,97 @@ a:hover{color:var(--blue-700)}
                     <i style="display:block;height:100%;background:#2563EB;width:{{ a.wg }}"></i><i style="display:block;height:100%;background:#F59E0B;width:{{ a.wm }}"></i><i style="display:block;height:100%;background:#94A0B4;width:{{ a.wx }}"></i>
                   </div>
                 </div>
-                <sc-if value="{{ a.temAbaixo }}" hint-placeholder-val="{{ false }}">
+                <sc-if value="{{ a.mostraAbaixo }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;flex-direction:column;gap:6px;margin:10px 0 0 14px;padding-left:12px;border-left:2px solid var(--slate-200)">
                     <sc-for list="{{ a.abaixo }}" as="p" hint-placeholder-count="1">
                       <div style="background:var(--card);border-radius:10px;box-shadow:var(--card-shadow);border-left:4px solid #C4B5FD;padding:8px 11px;display:flex;align-items:center;gap:9px">
                         <div style="width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:10.5px;flex:none;color:#8B5CF6;background:#EFE9FE">{{ p.ini }}</div>
-                        <div style="min-width:0"><div style="font-weight:800;font-size:12.5px">{{ p.nome }}</div><div style="font-size:10.5px;color:var(--slate-400);font-weight:600">{{ p.cargo }}</div></div>
+                        <sc-if value="{{ p.ver }}" hint-placeholder-val="{{ true }}"><div style="min-width:0"><div style="font-weight:800;font-size:12.5px">{{ p.nome }}</div><div style="font-size:10.5px;color:var(--slate-400);font-weight:600">{{ p.cargo }}</div></div></sc-if>
+                        <sc-if value="{{ p.edit }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;align-items:flex-start;gap:6px;min-width:0;flex:1">
+                      <div style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1">
+                        <input value="{{ p.cargo }}" onChange="{{ p.setCargo }}" placeholder="Cargo" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-size:10.5px;color:var(--slate-400);font-weight:600">
+                        <input value="{{ p.nome }}" onChange="{{ p.setNome }}" placeholder="Nome" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-weight:800;font-size:12.5px">
+                      </div>
+                      <button onClick="{{ p.rem }}" title="Remover" style="cursor:pointer;border:0;background:transparent;color:var(--slate-400);font-size:16px;font-weight:700;line-height:1;padding:2px 4px;flex:none">×</button>
+                    </div>
+                        </sc-if>
                       </div>
                     </sc-for>
+                    <sc-if value="{{ a.edit }}" hint-placeholder-val="{{ false }}"><button onClick="{{ a.addAbaixo }}" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left">+ Cargo abaixo</button></sc-if>
                   </div>
                 </sc-if>
-                <div style="display:flex;flex-direction:column;gap:8px;margin:10px 0 0 14px;padding-left:12px;border-left:2px solid var(--slate-200)">
+                <div onDragOver="{{ a.onDragOver }}" onDrop="{{ a.onDrop }}" style="{{ a.colStyle }}">
                   <sc-for list="{{ a.obras }}" as="o" hint-placeholder-count="4">
-                    <div style="background:var(--card);border-radius:10px;box-shadow:var(--card-shadow);border-left:4px solid {{ o.cor }};padding:9px 11px;position:relative">
-                      <span style="position:absolute;left:-18px;top:50%;width:14px;height:2px;background:var(--slate-200)"></span>
+                  <div draggable="{{ o.drag }}" onDragStart="{{ o.onDragStart }}" onDragEnd="{{ o.onDragEnd }}" onDragOver="{{ o.onDragOver }}" onDrop="{{ o.onDrop }}" style="background:var(--card);border-radius:10px;box-shadow:var(--card-shadow);border-left:4px solid {{ o.cor }};padding:9px 11px;position:relative;cursor:{{ o.cursor }}">
+                    <span style="position:absolute;left:-18px;top:50%;width:14px;height:2px;background:var(--slate-200)"></span>
+                    <sc-if value="{{ o.ver }}" hint-placeholder-val="{{ true }}">
                       <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:800;font-size:13px"><span>{{ o.n }}</span><span style="font-size:9.5px;font-weight:900;letter-spacing:.04em;padding:2px 6px;border-radius:6px;flex:none;color:{{ o.cor }};background:{{ o.bg }}">{{ o.chip }}</span></div>
                       <div style="display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11.5px;color:var(--slate-400);margin-top:3px">
-                        <span><b class="mono" style="color:var(--slate-500)">{{ o.uh }}</b> UH</span><span><b class="mono" style="color:var(--slate-500)">{{ o.m2 }}</b> m²</span>
+                        <span>{{ o.dados }}</span>
                         <sc-if value="{{ o.est }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px;font-weight:800;color:#B45309;background:#FEF3E2;border:1px dashed #F59E0B;border-radius:6px;padding:0 5px">estimativo</span></sc-if>
                       </div>
-                    </div>
+                    </sc-if>
+                    <sc-if value="{{ o.edit }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:center;gap:6px">
+                        <span title="Arraste para realocar" style="color:var(--slate-300);font-size:14px;cursor:grab;flex:none">⠿</span>
+                        <input value="{{ o.n }}" onChange="{{ o.setN }}" placeholder="Nome da obra" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-weight:800;font-size:13px">
+                        <button onClick="{{ o.togM }}" title="Trocar marca" style="font-size:9.5px;font-weight:900;letter-spacing:.04em;padding:2px 6px;border-radius:6px;flex:none;color:{{ o.cor }};background:{{ o.bg }};border:0;cursor:pointer">{{ o.chip }}</button>
+                        <button onClick="{{ o.rem }}" title="Excluir obra" style="cursor:pointer;border:0;background:transparent;color:var(--slate-400);font-size:16px;font-weight:700;line-height:1;padding:2px 4px;flex:none">×</button>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--slate-400);margin-top:6px">
+                        <input type="number" value="{{ o.uhIn }}" onChange="{{ o.setUh }}" placeholder="—" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;width:52px;font-family:var(--font-mono);font-size:11.5px"><span>UH</span>
+                        <input type="number" step="0.01" value="{{ o.m2In }}" onChange="{{ o.setM2 }}" placeholder="—" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;width:76px;font-family:var(--font-mono);font-size:11.5px"><span>m²</span>
+                        <button onClick="{{ o.togEst }}" title="Marcar como estimativo" style="{{ o.estBtn }}">est.</button>
+                      </div>
+                    </sc-if>
+                  </div>
                   </sc-for>
+                  <sc-if value="{{ a.edit }}" hint-placeholder-val="{{ false }}"><button onClick="{{ a.addObra }}" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left">+ Obra</button></sc-if>
                 </div>
               </div>
             </sc-for>
+            <sc-if value="{{ orgEditando }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;min-width:0">
+                <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
+                <button onClick="{{ orgAddAnalista }}" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left;padding:22px 14px;font-size:13px">+ Analista</button>
+              </div>
+            </sc-if>
           </div>
-          <sc-if value="{{ orgTemPre }}" hint-placeholder-val="{{ true }}">
-            <div style="width:100%;margin-top:28px;padding:16px 18px;background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border:1px dashed var(--slate-200);border-left:4px dashed #94A0B4">
+          <sc-if value="{{ orgMostraPre }}" hint-placeholder-val="{{ true }}">
+            <div onDragOver="{{ orgPreDragOver }}" onDrop="{{ orgPreDrop }}" style="{{ orgPreStyle }}">
               <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
                 <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#94A0B4;background:#EEF1F5">PD</div>
                 <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">Pré-due · sem analista definido</div><h3 style="margin:2px 0 0;font-size:16px;font-weight:900">{{ orgPreTit }} <span style="font-size:12.5px;font-weight:700;color:var(--slate-400)">{{ orgPreSub }}</span></h3></div>
                 <span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--slate-400);background:var(--slate-100);padding:3px 8px;border-radius:6px">Fora dos totais do organograma</span>
               </div>
-              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">
                 <sc-for list="{{ orgPre }}" as="o" hint-placeholder-count="7">
-                  <div style="background:var(--card);border-radius:10px;box-shadow:var(--card-shadow);border-left:4px dashed {{ o.cor }};padding:9px 11px">
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:800;font-size:13px"><span>{{ o.n }}</span><span style="font-size:9.5px;font-weight:900;letter-spacing:.04em;padding:2px 6px;border-radius:6px;flex:none;color:{{ o.cor }};background:{{ o.bg }}">{{ o.chip }}</span></div>
-                    <div style="font-size:11.5px;color:var(--slate-400);margin-top:3px">{{ o.dados }}</div>
+                  <div draggable="{{ o.drag }}" onDragStart="{{ o.onDragStart }}" onDragEnd="{{ o.onDragEnd }}" onDragOver="{{ o.onDragOver }}" onDrop="{{ o.onDrop }}" style="background:var(--card);border-radius:10px;box-shadow:var(--card-shadow);border-left:4px dashed {{ o.cor }};padding:9px 11px;position:relative;cursor:{{ o.cursor }}">
+                    
+                    <sc-if value="{{ o.ver }}" hint-placeholder-val="{{ true }}">
+                      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:800;font-size:13px"><span>{{ o.n }}</span><span style="font-size:9.5px;font-weight:900;letter-spacing:.04em;padding:2px 6px;border-radius:6px;flex:none;color:{{ o.cor }};background:{{ o.bg }}">{{ o.chip }}</span></div>
+                      <div style="display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11.5px;color:var(--slate-400);margin-top:3px">
+                        <span>{{ o.dados }}</span>
+                        <sc-if value="{{ o.est }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px;font-weight:800;color:#B45309;background:#FEF3E2;border:1px dashed #F59E0B;border-radius:6px;padding:0 5px">estimativo</span></sc-if>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ o.edit }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:center;gap:6px">
+                        <span title="Arraste para realocar" style="color:var(--slate-300);font-size:14px;cursor:grab;flex:none">⠿</span>
+                        <input value="{{ o.n }}" onChange="{{ o.setN }}" placeholder="Nome da obra" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-weight:800;font-size:13px">
+                        <button onClick="{{ o.togM }}" title="Trocar marca" style="font-size:9.5px;font-weight:900;letter-spacing:.04em;padding:2px 6px;border-radius:6px;flex:none;color:{{ o.cor }};background:{{ o.bg }};border:0;cursor:pointer">{{ o.chip }}</button>
+                        <button onClick="{{ o.rem }}" title="Excluir obra" style="cursor:pointer;border:0;background:transparent;color:var(--slate-400);font-size:16px;font-weight:700;line-height:1;padding:2px 4px;flex:none">×</button>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--slate-400);margin-top:6px">
+                        <input type="number" value="{{ o.uhIn }}" onChange="{{ o.setUh }}" placeholder="—" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;width:52px;font-family:var(--font-mono);font-size:11.5px"><span>UH</span>
+                        <input type="number" step="0.01" value="{{ o.m2In }}" onChange="{{ o.setM2 }}" placeholder="—" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;width:76px;font-family:var(--font-mono);font-size:11.5px"><span>m²</span>
+                        <button onClick="{{ o.togEst }}" title="Marcar como estimativo" style="{{ o.estBtn }}">est.</button>
+                      </div>
+                    </sc-if>
                   </div>
                 </sc-for>
+                <sc-if value="{{ orgEditando }}" hint-placeholder-val="{{ false }}"><button onClick="{{ orgAddPre }}" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left">+ Obra em avaliação</button></sc-if>
               </div>
             </div>
           </sc-if>
@@ -1609,113 +1693,14 @@ a:hover{color:var(--blue-700)}
               <span style="display:inline-flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:800;color:#B45309;background:#FEF3E2;border:1px dashed #F59E0B;border-radius:6px;padding:0 5px">estimativo</span>valor estimado</span>
             </div>
             <sc-if value="{{ orgTemEst }}" hint-placeholder-val="{{ false }}"><div><strong style="color:var(--color-text)">* Totais incluem estimativas:</strong> {{ orgEstTxt }}</div></sc-if>
-            <sc-for list="{{ orgNota }}" as="l" hint-placeholder-count="2"><div>{{ l.t }}</div></sc-for>
+            <sc-if value="{{ orgVer }}" hint-placeholder-val="{{ true }}">
+              <sc-for list="{{ orgNota }}" as="l" hint-placeholder-count="2"><div>{{ l.t }}</div></sc-for>
+            </sc-if>
+            <sc-if value="{{ orgEditando }}" hint-placeholder-val="{{ false }}">
+              <textarea value="{{ orgEdNota }}" onChange="{{ orgSetNota }}" rows="3" placeholder="Notas do rodapé · uma por linha" style="border:1px dashed var(--slate-300);border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.5;background:transparent;color:var(--color-text);font-family:var(--font-body);resize:vertical;width:100%;box-sizing:border-box"></textarea>
+            </sc-if>
           </div>
         </section>
-      </sc-if>
-
-      <!-- ══════════ ORGANOGRAMA · EDIÇÃO (admin) ══════════ -->
-      <sc-if value="{{ orgEditando }}" hint-placeholder-val="{{ false }}">
-        <section style="display:flex;flex-direction:column;gap:16px">
-          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:5">
-            <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">Modo de edição · administrador</div><div style="font-size:15px;font-weight:800;margin-top:2px">Editando o organograma</div></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button onClick="{{ orgRestaurar }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">Restaurar padrão</button>
-              <button onClick="{{ orgCancelar }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">Cancelar</button>
-              <button onClick="{{ orgSalvar }}" style="cursor:pointer;border:0;border-radius:10px;padding:9px 16px;font-size:12.5px;font-weight:800;background:var(--blue-600);color:#fff;font-family:var(--font-body);white-space:nowrap">{{ orgSalvarLabel }}</button>
-            </div>
-          </div>
-          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:12px">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-              <div><h3 style="margin:0;font-size:15px;font-weight:800">Cargos acima dos analistas</h3><p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">O nível 1 fica no topo. Cada nível pode ter mais de uma pessoa.</p></div>
-              <button onClick="{{ orgAddNivelTopo }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">+ Nível no topo</button>
-            </div>
-            <sc-for list="{{ orgEdTopo }}" as="lv" hint-placeholder-count="1">
-              <div style="border:1px solid var(--slate-100);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-                  <span style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">Nível {{ lv.num }}</span>
-                  <div style="display:flex;gap:6px"><button onClick="{{ lv.addP }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">+ Pessoa neste nível</button><button onClick="{{ lv.remLv }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap;color:#B91C1C">Remover nível</button></div>
-                </div>
-                <sc-for list="{{ lv.pessoas }}" as="p" hint-placeholder-count="1">
-                        <div style="display:grid;grid-template-columns:1fr 1fr 32px;gap:6px">
-                          <input value="{{ p.cargo }}" onChange="{{ p.setCargo }}" placeholder="Cargo" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
-                          <input value="{{ p.nome }}" onChange="{{ p.setNome }}" placeholder="Nome" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box;font-weight:700">
-                          <button onClick="{{ p.rem }}" title="Remover" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:8px;width:32px;height:32px;flex:none;font-size:15px;font-weight:700;background:var(--card);color:#B91C1C">×</button>
-                        </div>
-                </sc-for>
-              </div>
-            </sc-for>
-            <button onClick="{{ orgAddNivelBase }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap;align-self:flex-start">+ Nível logo acima dos analistas</button>
-          </div>
-          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:14px">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-              <div><h3 style="margin:0;font-size:15px;font-weight:800">Analistas, cargos abaixo e obras</h3><p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Use "Mover para" para realocar uma obra entre analistas ou para Em avaliação.</p></div>
-              <button onClick="{{ orgAddAnalista }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">+ Analista</button>
-            </div>
-            <sc-for list="{{ orgEdAn }}" as="a" hint-placeholder-count="2">
-              <div style="border:1px solid var(--slate-100);border-left:4px solid #8B5CF6;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;overflow-x:auto">
-                <div style="display:grid;grid-template-columns:minmax(140px,1fr) minmax(140px,1fr) auto;gap:6px;align-items:center">
-                  <input value="{{ a.n }}" onChange="{{ a.setN }}" placeholder="Nome do analista" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box;font-weight:800;font-size:13.5px">
-                  <input value="{{ a.cargo }}" onChange="{{ a.setCargo }}" placeholder="Cargo" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
-                  <button onClick="{{ a.rem }}" title="As obras vão para Em avaliação" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap;color:#B91C1C">Remover analista</button>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:6px;padding-left:12px;border-left:2px solid var(--slate-200)">
-                  <span style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400);font-size:9.5px">Cargos abaixo</span>
-                  <sc-for list="{{ a.abaixo }}" as="p" hint-placeholder-count="0">
-                        <div style="display:grid;grid-template-columns:1fr 1fr 32px;gap:6px">
-                          <input value="{{ p.cargo }}" onChange="{{ p.setCargo }}" placeholder="Cargo" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
-                          <input value="{{ p.nome }}" onChange="{{ p.setNome }}" placeholder="Nome" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box;font-weight:700">
-                          <button onClick="{{ p.rem }}" title="Remover" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:8px;width:32px;height:32px;flex:none;font-size:15px;font-weight:700;background:var(--card);color:#B91C1C">×</button>
-                        </div>
-                  </sc-for>
-                  <button onClick="{{ a.addAbaixo }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap;align-self:flex-start">+ Cargo abaixo</button>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:6px;padding-left:12px;border-left:2px solid var(--slate-200);min-width:760px">
-                  <div style="display:grid;grid-template-columns:minmax(120px,1fr) 104px 74px 104px 56px 150px 32px;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400);font-size:9.5px"><span>Obra</span><span>Marca</span><span>UH</span><span>m²</span><span>Est.</span><span>Mover para</span><span></span></div>
-                  <sc-for list="{{ a.obras }}" as="o" hint-placeholder-count="3">
-                    <div style="display:grid;grid-template-columns:minmax(120px,1fr) 104px 74px 104px 56px 150px 32px;gap:6px;align-items:center">
-                      <input value="{{ o.n }}" onChange="{{ o.setN }}" placeholder="Nome da obra" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box;font-weight:700">
-                      <select value="{{ o.m }}" onChange="{{ o.setM }}" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box"><option value="m">Make It</option><option value="g">Gadens</option><option value="x">Sem marca</option></select>
-                      <input type="number" value="{{ o.uh }}" onChange="{{ o.setUh }}" placeholder="UH" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
-                      <input type="number" step="0.01" value="{{ o.m2 }}" onChange="{{ o.setM2 }}" placeholder="m²" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
-                      <label title="Valor estimativo" style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--slate-500);cursor:pointer"><input type="checkbox" checked="{{ o.est }}" onChange="{{ o.setEst }}">est.</label>
-                      <select value="{{ o.loc }}" onChange="{{ o.mover }}" title="Realocar obra" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
-                        <sc-for list="{{ orgDestinos }}" as="d" hint-placeholder-count="0"><option value="{{ d.v }}">{{ d.l }}</option></sc-for>
-                      </select>
-                      <button onClick="{{ o.rem }}" title="Excluir obra" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:8px;width:32px;height:32px;flex:none;font-size:15px;font-weight:700;background:var(--card);color:#B91C1C">×</button>
-                    </div>
-                  </sc-for>
-                  <button onClick="{{ a.addObra }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap;align-self:flex-start">+ Obra</button>
-                </div>
-              </div>
-            </sc-for>
-          </div>
-          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:8px;overflow-x:auto">
-            <div><h3 style="margin:0;font-size:15px;font-weight:800">Obras em avaliação (pré-due)</h3><p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Ficam fora dos totais. Deixe UH e m² em branco se ainda não houver estimativa.</p></div>
-            <div style="display:flex;flex-direction:column;gap:6px;min-width:760px">
-              <div style="display:grid;grid-template-columns:minmax(120px,1fr) 104px 74px 104px 56px 150px 32px;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400);font-size:9.5px"><span>Obra</span><span>Marca</span><span>UH</span><span>m²</span><span>Est.</span><span>Mover para</span><span></span></div>
-              <sc-for list="{{ orgEdPre }}" as="o" hint-placeholder-count="3">
-                    <div style="display:grid;grid-template-columns:minmax(120px,1fr) 104px 74px 104px 56px 150px 32px;gap:6px;align-items:center">
-                      <input value="{{ o.n }}" onChange="{{ o.setN }}" placeholder="Nome da obra" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box;font-weight:700">
-                      <select value="{{ o.m }}" onChange="{{ o.setM }}" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box"><option value="m">Make It</option><option value="g">Gadens</option><option value="x">Sem marca</option></select>
-                      <input type="number" value="{{ o.uh }}" onChange="{{ o.setUh }}" placeholder="UH" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
-                      <input type="number" step="0.01" value="{{ o.m2 }}" onChange="{{ o.setM2 }}" placeholder="m²" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
-                      <label title="Valor estimativo" style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--slate-500);cursor:pointer"><input type="checkbox" checked="{{ o.est }}" onChange="{{ o.setEst }}">est.</label>
-                      <select value="{{ o.loc }}" onChange="{{ o.mover }}" title="Realocar obra" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
-                        <sc-for list="{{ orgDestinos }}" as="d" hint-placeholder-count="0"><option value="{{ d.v }}">{{ d.l }}</option></sc-for>
-                      </select>
-                      <button onClick="{{ o.rem }}" title="Excluir obra" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:8px;width:32px;height:32px;flex:none;font-size:15px;font-weight:700;background:var(--card);color:#B91C1C">×</button>
-                    </div>
-              </sc-for>
-            </div>
-            <button onClick="{{ orgAddPre }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap;align-self:flex-start">+ Obra em avaliação</button>
-          </div>
-          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:8px">
-            <div><h3 style="margin:0;font-size:15px;font-weight:800">Notas do rodapé</h3><p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Uma nota por linha. A linha de estimativas é calculada sozinha.</p></div>
-            <textarea value="{{ orgEdNota }}" onChange="{{ orgSetNota }}" rows="4" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box;height:auto;padding:8px;line-height:1.5;resize:vertical"></textarea>
-          </div>
-        </section>
-      </sc-if>
       </sc-if>
 
       <!-- ══════════ GESTÃO DE ANALISTAS ══════════ -->
@@ -3919,7 +3904,8 @@ class Component extends DCLogic {
     } catch (e) {}
   }
   async orgGravar() {
-    const D = Object.assign({}, this.state.orgDraft, { atualizado: new Date().toISOString().slice(0, 10), por: (this.state.sessao && this.state.sessao.nome) || "" });
+    const D0 = this.state.orgDraft; D0.topo = D0.topo.map(lv => lv.filter(p => p.nome || p.cargo)).filter(lv => lv.length);
+    const D = Object.assign({}, D0, { atualizado: new Date().toISOString().slice(0, 10), por: (this.state.sessao && this.state.sessao.nome) || "" });
     this.setState({ orgBusy: true });
     try { localStorage.setItem(this.OKEY, JSON.stringify(D)); } catch (e) {}
     const c = this.state.cfg; let ok = false, msg = "Supabase não configurado";
@@ -3930,74 +3916,91 @@ class Component extends DCLogic {
     this.setState({ org: D, orgDraft: null, orgBusy: false, orgErro: !ok,
       orgMsg: ok ? "Organograma salvo. Já vale para todos os usuários." : "Salvo só neste navegador (" + msg + "). Rode supabase-organograma.sql no Supabase e salve de novo." });
   }
+  orgMover(to, idx) {
+    const f = this._drag; this._drag = null; if (!f) { this.setState({ orgAlvo: null }); return; }
+    this.setState(s => { if (!s.orgDraft) return null; const N = JSON.parse(JSON.stringify(s.orgDraft));
+      const L = loc => loc === "pre" ? N.pre : (N.an.find(a => a.id === loc) || { o: [] }).o;
+      const ob = L(f.loc).splice(f.oi, 1)[0]; if (!ob) return { orgAlvo: null };
+      const dst = L(to); let i = idx == null ? dst.length : idx; if (f.loc === to && f.oi < i) i--;
+      dst.splice(i, 0, ob); return { orgDraft: N, orgAlvo: null }; });
+  }
   orgVals() {
     const st = this.state, adm = !!(st.sessao && st.sessao.perfil === "admin"), editando = !!(st.orgDraft && adm);
-    const T = this.orgDados(), fmt = (n, d = 0) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+    const T = editando ? st.orgDraft : this.orgDados(), fmt = (n, d = 0) => (Number(n) || 0).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
     const all = T.an.flatMap(a => a.o), sum = (arr, k) => arr.reduce((s, o) => s + (Number(o[k]) || 0), 0), by = b => all.filter(o => o.m === b);
-    const ini = n => { const w = String(n || "").split(" ").filter(x => x.length > 2); return (w.length > 1 ? w[0][0] + w[1][0] : String(n || "?").slice(0, 2)).toUpperCase(); };
+    const ini = n => { const w = String(n || "").split(" ").filter(x => x.length > 2); return (w.length > 1 ? w[0][0] + w[1][0] : (String(n || "").slice(0, 2) || "?")).toUpperCase(); };
     const C = { g: ["#2563EB", "#E8EFFD", "GD"], m: ["#F59E0B", "#FEF3E2", "MK"], x: ["#94A0B4", "#EEF1F5", "?"] }, cc = m => C[m] || C.x;
     const tot = sum(all, "uh") || 1, est = all.filter(o => o.est), nAn = T.an.length || 1;
-    const v = { orgVer: !editando, orgEditando: editando, orgPodeEditar: adm,
-      orgFonte: T.atualizado ? "Atualizado em " + T.atualizado.split("-").reverse().join("/") + (T.por ? " por " + T.por : "") : "Versão padrão",
+    const ed = fn => this.setState(s => { if (!s.orgDraft) return null; const N = JSON.parse(JSON.stringify(s.orgDraft)); fn(N); return { orgDraft: N }; });
+    const np = () => ({ id: this.uid(), cargo: "", nome: "" }), no = () => ({ id: this.uid(), n: "", m: "m", uh: null, m2: null, est: false });
+    const lista = (N, loc) => loc === "pre" ? N.pre : (N.an.find(a => a.id === loc) || { o: [] }).o;
+    const pessoa = (getArr, pi, p) => ({ cargo: p.cargo, nome: p.nome, ini: ini(p.nome), ver: !editando, edit: editando,
+      setCargo: e => { const x = e.target.value; ed(N => { getArr(N)[pi].cargo = x; }); },
+      setNome: e => { const x = e.target.value; ed(N => { getArr(N)[pi].nome = x; }); },
+      rem: () => ed(N => { getArr(N).splice(pi, 1); }) });
+    const alvo = st.orgAlvo;
+    const obra = (loc, oi, o) => { const set = (k, f) => e => { const x = f ? f(e) : e.target.value; ed(N => { lista(N, loc)[oi][k] = x; }); };
+      const num = e => e.target.value === "" ? null : Number(e.target.value), temD = o.uh != null && o.uh !== "";
+      return { n: o.n, cor: cc(o.m)[0], bg: cc(o.m)[1], chip: cc(o.m)[2], est: !!o.est, ver: !editando, edit: editando,
+        dados: temD ? fmt(o.uh) + " UH · " + fmt(o.m2, 2) + " m²" : "Sem dados estimativos ainda",
+        uhIn: o.uh == null ? "" : String(o.uh), m2In: o.m2 == null ? "" : String(o.m2),
+        drag: editando ? "true" : "false", cursor: editando ? "grab" : "default",
+        onDragStart: e => { if (!editando) return; this._drag = { loc, oi }; try { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", o.id || ""); } catch (x) {} },
+        onDragEnd: () => { this._drag = null; if (this.state.orgAlvo) this.setState({ orgAlvo: null }); },
+        onDragOver: e => { if (editando && this._drag) { e.preventDefault(); e.stopPropagation(); if (alvo !== loc) this.setState({ orgAlvo: loc }); } },
+        onDrop: e => { if (!editando) return; e.preventDefault(); e.stopPropagation(); this.orgMover(loc, oi); },
+        setN: set("n"), setUh: set("uh", num), setM2: set("m2", num),
+        togM: () => ed(N => { const ob = lista(N, loc)[oi]; ob.m = { m: "g", g: "x", x: "m" }[ob.m] || "m"; }),
+        togEst: () => ed(N => { const ob = lista(N, loc)[oi]; ob.est = !ob.est; }),
+        estBtn: "cursor:pointer;margin-left:auto;font-size:9.5px;font-weight:800;border-radius:6px;padding:1px 6px;font-family:var(--font-body);" + (o.est ? "color:#B45309;background:#FEF3E2;border:1px dashed #F59E0B" : "color:var(--slate-400);background:transparent;border:1px dashed var(--slate-300)"),
+        rem: () => { if (window.confirm("Excluir a obra " + (o.n || "sem nome") + "?")) ed(N => { lista(N, loc).splice(oi, 1); }); } }; };
+    const dropZone = loc => ({ onDragOver: e => { if (editando && this._drag) { e.preventDefault(); if (alvo !== loc) this.setState({ orgAlvo: loc }); } },
+      onDrop: e => { if (!editando) return; e.preventDefault(); this.orgMover(loc, null); } });
+    const realce = loc => editando && alvo === loc ? "background:var(--blue-50);outline:2px dashed var(--blue-600);outline-offset:4px;" : "";
+    const preZ = dropZone("pre");
+    return { orgVer: !editando, orgEditando: editando,
+      orgFonte: editando ? "Alterações ainda não salvas" : T.atualizado ? "Atualizado em " + T.atualizado.split("-").reverse().join("/") + (T.por ? " por " + T.por : "") : "Versão padrão",
       orgTemMsg: !!st.orgMsg, orgMsg: st.orgMsg || "",
       orgMsgStyle: "width:100%;margin:0 0 16px;font-size:12.5px;padding:11px 14px;border-radius:12px;box-sizing:border-box;background:" + (st.orgErro ? "#FEF3C7;color:#92400E" : "#ECFDF5;color:#065F46"),
-      orgAbrirEdicao: () => this.setState({ orgDraft: JSON.parse(JSON.stringify(T)), orgMsg: "" }),
-      orgTopo: T.topo.map(lv => ({ pessoas: lv.map(p => ({ cargo: p.cargo, nome: p.nome, ini: ini(p.nome) })) })),
+      orgAbrirEdicao: () => this.setState({ orgDraft: JSON.parse(JSON.stringify(this.orgDados())), orgMsg: "" }),
+      orgTopo: T.topo.map((lv, li) => ({ edit: editando, pessoas: lv.map((p, pi) => pessoa(N => N.topo[li], pi, p)),
+        addP: () => ed(N => { N.topo[li].push(np()); }) })),
       orgKpis: [["#8B5CF6","#EFE9FE","#","Empreendimentos",fmt(all.length),T.an.length + " analistas · " + fmt(all.length / nAn, 1) + " obras/analista"],
         ["#10B981","#E3F7F0","UH","Unidades habitacionais" + (est.length ? "*" : ""),fmt(sum(all, "uh")),fmt(sum(all, "m2"), 2) + " m² construído" + (est.length ? "*" : "")],
         ["#2563EB","#E8EFFD","GD","Gadens",by("g").length + " obras",fmt(sum(by("g"), "uh")) + " UH · " + fmt(sum(by("g"), "m2")) + " m²"],
         ["#F59E0B","#FEF3E2","MK","Make It",by("m").length + " obras",fmt(sum(by("m"), "uh")) + " UH · " + fmt(sum(by("m"), "m2")) + " m²"]].map(k => ({ cor:k[0], bg:k[1], ico:k[2], l:k[3], v:k[4], s:k[5] })),
-      orgAn: T.an.map(a => { const uh = sum(a.o, "uh"), e = a.o.some(o => o.est), q = a.o.length || 1, g = a.o.filter(o => o.m === "g").length, m = a.o.filter(o => o.m === "m").length, x = a.o.length - g - m;
-        return { n: a.n, cargo: a.cargo || "Analista de Projetos", ini: ini(a.n), qtd: a.o.length, uhL: "UH" + (e ? "*" : ""), m2L: "m²" + (e ? "*" : ""), uh: fmt(uh), pct: "(" + fmt(uh / tot * 100, 1) + "%)", m2: fmt(sum(a.o, "m2"), 2),
+      orgAn: T.an.map((a, ai) => { const uh = sum(a.o, "uh"), e = a.o.some(o => o.est), q = a.o.length || 1, g = a.o.filter(o => o.m === "g").length, m = a.o.filter(o => o.m === "m").length, x = a.o.length - g - m;
+        const z = dropZone(a.id), ab = a.abaixo || [];
+        return { n: a.n, cargo: a.cargo || (editando ? "" : "Analista de Projetos"), ini: ini(a.n), ver: !editando, edit: editando,
+          qtd: a.o.length, uhL: "UH" + (e ? "*" : ""), m2L: "m²" + (e ? "*" : ""), uh: fmt(uh), pct: "(" + fmt(uh / tot * 100, 1) + "%)", m2: fmt(sum(a.o, "m2"), 2),
           wg: g / q * 100 + "%", wm: m / q * 100 + "%", wx: x / q * 100 + "%", mixT: "Gadens " + g + " · Make It " + m + (x ? " · sem marca " + x : ""),
-          temAbaixo: (a.abaixo || []).length > 0, abaixo: (a.abaixo || []).map(p => ({ cargo: p.cargo, nome: p.nome, ini: ini(p.nome) })),
-          obras: a.o.map(o => ({ n: o.n, cor: cc(o.m)[0], bg: cc(o.m)[1], chip: cc(o.m)[2], uh: fmt(o.uh), m2: fmt(o.m2, 2), est: !!o.est })) }; }),
-      orgTemPre: T.pre.length > 0,
-      orgPreTit: T.pre.length + " obra" + (T.pre.length > 1 ? "s" : "") + " em avaliação",
+          mostraAbaixo: editando || ab.length > 0, abaixo: ab.map((p, pi) => pessoa(N => (N.an[ai].abaixo = N.an[ai].abaixo || []), pi, p)),
+          setN: ev => { const v = ev.target.value; ed(N => { N.an[ai].n = v; }); },
+          setCargo: ev => { const v = ev.target.value; ed(N => { N.an[ai].cargo = v; }); },
+          rem: () => { if (window.confirm("Remover " + (a.n || "o analista") + "? As obras dele vão para Em avaliação.")) ed(N => { const r = N.an.splice(ai, 1)[0]; N.pre = N.pre.concat(r.o); }); },
+          addAbaixo: () => ed(N => { (N.an[ai].abaixo = N.an[ai].abaixo || []).push(np()); }),
+          addObra: () => ed(N => { N.an[ai].o.push(no()); }),
+          onDragOver: z.onDragOver, onDrop: z.onDrop,
+          colStyle: "display:flex;flex-direction:column;gap:8px;margin:10px 0 0 14px;padding-left:12px;border-left:2px solid var(--slate-200);border-radius:4px;min-height:" + (editando ? "60px" : "0") + ";" + realce(a.id),
+          obras: a.o.map((o, oi) => obra(a.id, oi, o)) }; }),
+      orgAddAnalista: () => ed(N => { N.an.push({ id: this.uid(), n: "", cargo: "Analista de Projetos", abaixo: [], o: [] }); }),
+      orgMostraPre: editando || T.pre.length > 0,
+      orgPreDragOver: preZ.onDragOver, orgPreDrop: preZ.onDrop,
+      orgPreStyle: "width:100%;box-sizing:border-box;margin-top:28px;padding:16px 18px;background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border:1px dashed var(--slate-200);border-left:4px dashed #94A0B4;" + realce("pre"),
+      orgPreTit: T.pre.length + " obra" + (T.pre.length === 1 ? "" : "s") + " em avaliação",
       orgPreSub: "· " + T.pre.filter(o => o.m === "m").length + " MK · " + T.pre.filter(o => o.m === "g").length + " GD",
-      orgPre: T.pre.map(o => ({ n: o.n, cor: cc(o.m)[0], bg: cc(o.m)[1], chip: cc(o.m)[2], dados: o.uh != null && o.uh !== "" ? fmt(o.uh) + " UH · " + fmt(o.m2, 2) + " m²" : "Sem dados estimativos ainda" })),
+      orgPre: T.pre.map((o, oi) => obra("pre", oi, o)),
+      orgAddPre: () => ed(N => { N.pre.push(no()); }),
       orgTemEst: est.length > 0,
       orgEstTxt: est.map(o => o.n + " (" + fmt(o.uh) + " UH / " + fmt(o.m2, 2) + " m²)").join(", ") + ". Sem eles: " + fmt(sum(all, "uh") - sum(est, "uh")) + " UH / " + fmt(sum(all, "m2") - sum(est, "m2"), 2) + " m². Obras em avaliação não entram nos totais.",
-      orgNota: String(T.nota || "").split("\n").filter(s => s.trim()).map(t => ({ t })) };
-    if (!editando) return Object.assign(v, { orgEdTopo: [], orgEdAn: [], orgEdPre: [], orgDestinos: [] });
-    const D = st.orgDraft;
-    const ed = fn => this.setState(s => { const N = JSON.parse(JSON.stringify(s.orgDraft)); fn(N); return { orgDraft: N }; });
-    const np = () => ({ id: this.uid(), cargo: "", nome: "" }), no = () => ({ id: this.uid(), n: "", m: "m", uh: null, m2: null, est: false });
-    const lista = (N, loc) => loc === "pre" ? N.pre : (N.an.find(a => a.id === loc) || { o: [] }).o;
-    const pessoa = (getArr, pi, p) => ({ cargo: p.cargo, nome: p.nome,
-      setCargo: e => { const x = e.target.value; ed(N => { getArr(N)[pi].cargo = x; }); },
-      setNome: e => { const x = e.target.value; ed(N => { getArr(N)[pi].nome = x; }); },
-      rem: () => ed(N => { getArr(N).splice(pi, 1); }) });
-    const obra = (loc, oi, o) => { const set = (k, f) => e => { const x = f ? f(e) : e.target.value; ed(N => { lista(N, loc)[oi][k] = x; }); };
-      const num = e => e.target.value === "" ? null : Number(e.target.value);
-      return { n: o.n, m: o.m, uh: o.uh == null ? "" : String(o.uh), m2: o.m2 == null ? "" : String(o.m2), est: !!o.est, loc,
-        setN: set("n"), setM: set("m"), setUh: set("uh", num), setM2: set("m2", num), setEst: set("est", e => e.target.checked),
-        mover: e => { const to = e.target.value; ed(N => { const ob = lista(N, loc).splice(oi, 1)[0]; if (ob) lista(N, to).push(ob); }); },
-        rem: () => { if (window.confirm("Excluir a obra " + (o.n || "sem nome") + "?")) ed(N => { lista(N, loc).splice(oi, 1); }); } }; };
-    return Object.assign(v, {
+      orgNota: String(T.nota || "").split("\n").filter(s => s.trim()).map(t => ({ t })),
+      orgEdNota: T.nota || "", orgSetNota: e => { const x = e.target.value; ed(N => { N.nota = x; }); },
       orgSalvarLabel: st.orgBusy ? "Salvando…" : "Salvar e publicar",
       orgSalvar: () => { if (!st.orgBusy) this.orgGravar(); },
-      orgCancelar: () => this.setState({ orgDraft: null }),
+      orgCancelar: () => this.setState({ orgDraft: null, orgAlvo: null }),
       orgRestaurar: () => { if (window.confirm("Voltar ao organograma padrão? As alterações não salvas se perdem.")) this.setState({ orgDraft: this.orgPadrao() }); },
       orgAddNivelTopo: () => ed(N => { N.topo.unshift([np()]); }),
-      orgAddNivelBase: () => ed(N => { N.topo.push([np()]); }),
-      orgEdTopo: D.topo.map((lv, li) => ({ num: li + 1, pessoas: lv.map((p, pi) => pessoa(N => N.topo[li], pi, p)),
-        addP: () => ed(N => { N.topo[li].push(np()); }),
-        remLv: () => ed(N => { N.topo.splice(li, 1); }) })),
-      orgAddAnalista: () => ed(N => { N.an.push({ id: this.uid(), n: "", cargo: "Analista de Projetos", abaixo: [], o: [] }); }),
-      orgDestinos: D.an.map(a => ({ v: a.id, l: a.n || "(sem nome)" })).concat([{ v: "pre", l: "Em avaliação" }]),
-      orgEdAn: D.an.map((a, ai) => ({ n: a.n, cargo: a.cargo,
-        setN: e => { const x = e.target.value; ed(N => { N.an[ai].n = x; }); },
-        setCargo: e => { const x = e.target.value; ed(N => { N.an[ai].cargo = x; }); },
-        rem: () => { if (window.confirm("Remover " + (a.n || "o analista") + "? As obras dele vão para Em avaliação.")) ed(N => { const r = N.an.splice(ai, 1)[0]; N.pre = N.pre.concat(r.o); }); },
-        abaixo: (a.abaixo || []).map((p, pi) => pessoa(N => (N.an[ai].abaixo = N.an[ai].abaixo || []), pi, p)),
-        addAbaixo: () => ed(N => { (N.an[ai].abaixo = N.an[ai].abaixo || []).push(np()); }),
-        obras: a.o.map((o, oi) => obra(a.id, oi, o)),
-        addObra: () => ed(N => { N.an[ai].o.push(no()); }) })),
-      orgEdPre: D.pre.map((o, oi) => obra("pre", oi, o)),
-      orgAddPre: () => ed(N => { N.pre.push(no()); }),
-      orgEdNota: D.nota || "",
-      orgSetNota: e => { const x = e.target.value; ed(N => { N.nota = x; }); } });
+      orgAddNivelBase: () => ed(N => { N.topo.push([np()]); }) };
   }
   anVals() {
     const an = this.state.an;
