@@ -1584,6 +1584,14 @@ a:hover{color:var(--blue-700)}
                     </sc-if>
                   </div>
                   <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
+                  <sc-if value="{{ b.lider.edit }}" hint-placeholder-val="{{ false }}">
+                    <div style="width:100%;box-sizing:border-box;margin:0 0 8px;padding:10px 12px;border:1px dashed #C4B5FD;border-radius:10px;background:var(--card)">
+                      <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6D28D9;margin-bottom:6px">Ficam abaixo deste cargo</div>
+                      <div style="display:flex;flex-wrap:wrap;gap:6px">
+                        <sc-for list="{{ b.lider.subs }}" as="s" hint-placeholder-count="0"><button onClick="{{ s.tog }}" style="{{ s.style }}">{{ s.n }}</button></sc-for>
+                      </div>
+                    </div>
+                  </sc-if>
                   <div style="height:2px;background:var(--slate-200);width:{{ b.linha }}"></div>
                 </sc-if>
                 <sc-if value="{{ b.vazio }}" hint-placeholder-val="{{ false }}">
@@ -1602,13 +1610,7 @@ a:hover{color:var(--blue-700)}
                         <div style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1">
                           <input value="{{ a.n }}" onChange="{{ a.setN }}" placeholder="Nome do analista" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-weight:800;font-size:15px">
                           <input value="{{ a.cargo }}" onChange="{{ a.setCargo }}" placeholder="Cargo" style-focus="border-bottom:1px solid var(--blue-600)" style="border:0;border-bottom:1px dashed var(--slate-300);background:transparent;font-family:inherit;color:inherit;padding:2px 0;width:100%;min-width:0;outline:none;box-sizing:border-box;font-size:11px;color:var(--slate-400);font-weight:600">
-                          <sc-if value="{{ orgTemGrupos }}" hint-placeholder-val="{{ false }}">
-                            <label style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--slate-400);font-weight:700;margin-top:3px">Responde a
-                              <select value="{{ a.g }}" onChange="{{ a.setG }}" style="flex:1;min-width:0;border:1px dashed var(--slate-300);border-radius:6px;background:transparent;color:var(--color-text);font-size:11px;font-family:var(--font-body);padding:2px 4px">
-                                <sc-for list="{{ orgGrupoOpts }}" as="d" hint-placeholder-count="0"><option value="{{ d.v }}">{{ d.l }}</option></sc-for>
-                              </select>
-                            </label>
-                          </sc-if>
+
                         </div>
                         <button onClick="{{ a.rem }}" title="Remover analista (as obras vão para Em avaliação)" style="cursor:pointer;border:0;background:transparent;color:var(--slate-400);font-size:16px;font-weight:700;line-height:1;padding:2px 4px;flex:none">×</button>
                       </div>
@@ -3964,11 +3966,21 @@ class Component extends DCLogic {
       return { temLider: !!lider, lider: lider || {}, an, vazio: !!lider && !an.length, linha: an.length > 1 ? "calc(100% - " + (100 / n).toFixed(1) + "%)" : "2px",
         style: "flex:" + n + " 1 " + (n * 234) + "px;min-width:0;display:flex;flex-direction:column;align-items:center",
         gridStyle: "display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;width:100%" }; };
+    const ed = v._ed, nomeG = g => (g.nome || "sem nome") + (g.cargo ? " (" + g.cargo + ")" : "");
+    const chip = on => "cursor:pointer;border-radius:99px;padding:4px 10px;font-size:11.5px;font-weight:700;font-family:var(--font-body);" +
+      (on ? "border:1px solid #6D28D9;background:#EFE9FE;color:#5B21B6" : "border:1px dashed var(--slate-300);background:transparent;color:var(--slate-500)");
+    const subsDe = g => T.an.map((a, ai) => { const on = a.g === g.id, outro = !on && a.g ? G.find(x => x.id === a.g) : null;
+      return { n: (on ? "✓ " : "") + (a.n || "(sem nome)") + (outro ? " · com " + (outro.nome || "outro") : ""), style: chip(on),
+        tog: () => {
+          if (on) { ed(N => { N.an[ai].g = null; }); return; }
+          if (outro && !window.confirm((a.n || "Este analista") + " já está abaixo de " + nomeG(outro) + ".\n\nDeseja deslocar para " + nomeG(g) + "?")) return;
+          ed(N => { N.an[ai].g = g.id; });
+        } }; });
     const diretos = A.filter(a => !a.g);
-    v.orgBlocos = (diretos.length || !G.length ? [blk(null, diretos)] : []).concat(G.map((g, gi) => blk(v._lider(g, gi), A.filter(a => a.g === g.id))));
+    v.orgBlocos = (diretos.length || !G.length ? [blk(null, diretos)] : []).concat(G.map((g, gi) => blk(Object.assign(v._lider(g, gi), { subs: subsDe(g) }), A.filter(a => a.g === g.id))));
     v.orgTemGrupos = v.orgEditando && G.length > 0;
     v.orgGrupoOpts = [{ v: "", l: "Nível acima (direto)" }].concat(G.map(g => ({ v: g.id, l: (g.nome || "sem nome") + (g.cargo ? " · " + g.cargo : "") })));
-    delete v._A; delete v._T; delete v._lider; delete v.orgAn;
+    delete v._A; delete v._T; delete v._lider; delete v._ed; delete v.orgAn;
     return v;
   }
   orgVals0() {
@@ -4005,7 +4017,7 @@ class Component extends DCLogic {
       onDrop: e => { if (!editando) return; e.preventDefault(); this.orgMover(loc, null); } });
     const realce = loc => editando && alvo === loc ? "background:var(--blue-50);outline:2px dashed var(--blue-600);outline-offset:4px;" : "";
     const preZ = dropZone("pre");
-    return { _T: T,
+    return { _T: T, _ed: ed,
       _lider: (g, gi) => Object.assign(pessoa(N => N.grupos, gi, g), {
         rem: () => ed(N => { const id = N.grupos[gi].id; N.grupos.splice(gi, 1); N.an.forEach(a => { if (a.g === id) a.g = null; }); }) }),
       orgVer: !editando, orgEditando: editando,
