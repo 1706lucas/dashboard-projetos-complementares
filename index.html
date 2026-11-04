@@ -131,9 +131,22 @@ a:hover{color:var(--blue-700)}
   <main style="flex:1;min-width:0;overflow-y:auto">
     <div style="padding:26px 28px 64px;display:flex;flex-direction:column;gap:22px;max-width:1560px">
 
-      <header>
+      <header style="position:relative">
+        <sc-if value="{{ orgBotaoEditar }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ orgAbrirEdicao }}" title="Editar organograma" style="position:absolute;top:0;right:0;display:flex;align-items:center;gap:8px;cursor:pointer;border:1px solid var(--slate-200);border-radius:10px;padding:9px 14px;font-size:13px;font-weight:800;background:var(--card);color:var(--blue-700);font-family:var(--font-body);box-shadow:var(--card-shadow)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg>
+            Editar
+          </button>
+        </sc-if>
         <h1 style="font-size:26px">{{ pageTitle }}</h1>
         <p style="margin:4px 0 0;font-size:14px;color:var(--slate-400)">{{ pageSub }}</p>
+        <sc-if value="{{ temSubTabs }}" hint-placeholder-val="{{ false }}">
+          <div style="display:inline-flex;flex-wrap:wrap;gap:4px;background:var(--slate-100);border-radius:12px;padding:4px;margin-top:14px">
+            <sc-for list="{{ subTabs }}" as="s" hint-placeholder-count="2">
+              <button onClick="{{ s.go }}" style="{{ s.style }}">{{ s.label }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
       </header>
 
       <sc-if value="{{ showFilters }}" hint-placeholder-val="{{ true }}">
@@ -1475,14 +1488,50 @@ a:hover{color:var(--blue-700)}
         </section>
       </sc-if>
 
-      <!-- ══════════ ORGANOGRAMA DO SETOR (estático) ══════════ -->
-      <sc-if value="{{ isOrg }}" hint-placeholder-val="{{ false }}">
-        <section style="display:flex;flex-direction:column;align-items:center">
-          <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #8B5CF6;display:flex;align-items:center;gap:14px;padding:16px 26px">
-            <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#8B5CF6;background:#EFE9FE">{{ orgCoordIni }}</div>
-            <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">Coordenador de Projetos</div><h2 style="margin:2px 0 0;font-size:22px;font-weight:900">{{ orgCoord }}</h2></div>
+      <!-- ══════════ PROCESSOS (em construção) ══════════ -->
+      <sc-if value="{{ isProc }}" hint-placeholder-val="{{ false }}">
+        <section style="display:flex;flex-direction:column;gap:18px">
+          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);border-style:dashed;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+            <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#B45309;background:#FEF3E2">!</div>
+            <div style="flex:1;min-width:240px">
+              <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">Em construção</div>
+              <h2 style="margin:3px 0 6px;font-size:20px;font-weight:900">Processos de Projetos Complementares</h2>
+              <p style="margin:0;font-size:13px;color:var(--slate-500);line-height:1.5;max-width:720px;text-wrap:pretty">Esta aba vai reunir o mapeamento dos processos do setor e os links para os procedimentos operacionais (POP), as instruções de trabalho (IT) e as diretrizes de projeto de cada disciplina.</p>
+            </div>
           </div>
-          <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+            <sc-for list="{{ procBlocos }}" as="b" hint-placeholder-count="3">
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
+                <h3 style="margin:0;font-size:15px;font-weight:800">{{ b.t }}</h3>
+                <p style="margin:4px 0 14px;font-size:12px;color:var(--slate-400)">{{ b.s }}</p>
+                <div style="border:1px dashed var(--slate-200);border-radius:10px;padding:16px;font-size:12px;color:var(--slate-400)">Nenhum item cadastrado ainda</div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </sc-if>
+
+      <!-- ══════════ ORGANOGRAMA DO SETOR ══════════ -->
+      <sc-if value="{{ isOrg }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ orgVer }}" hint-placeholder-val="{{ false }}">
+        <section style="display:flex;flex-direction:column;align-items:center">
+          <div style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px">
+            <span style="font-size:12px;color:var(--slate-400)">{{ orgFonte }}</span>
+          </div>
+          <sc-if value="{{ orgTemMsg }}" hint-placeholder-val="{{ false }}"><p style="{{ orgMsgStyle }}">{{ orgMsg }}</p></sc-if>
+          <sc-for list="{{ orgTopo }}" as="lv" hint-placeholder-count="1">
+            <div style="display:flex;flex-direction:column;align-items:center;width:100%">
+              <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:14px">
+                <sc-for list="{{ lv.pessoas }}" as="p" hint-placeholder-count="1">
+                  <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #8B5CF6;display:flex;align-items:center;gap:14px;padding:16px 26px">
+                    <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#8B5CF6;background:#EFE9FE">{{ p.ini }}</div>
+                    <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">{{ p.cargo }}</div><h2 style="margin:2px 0 0;font-size:20px;font-weight:900">{{ p.nome }}</h2></div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
+            </div>
+          </sc-for>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;width:100%">
             <sc-for list="{{ orgKpis }}" as="k" hint-placeholder-count="4">
               <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid {{ k.cor }};display:flex;gap:14px;align-items:flex-start;padding:18px 20px">
@@ -1500,7 +1549,7 @@ a:hover{color:var(--blue-700)}
                 <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #8B5CF6;padding:14px">
                   <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
                     <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#8B5CF6;background:#EFE9FE">{{ a.ini }}</div>
-                    <div><h3 style="margin:0;font-size:15px;font-weight:800;line-height:1.2">{{ a.n }}</h3><div style="font-size:11px;color:var(--slate-400);font-weight:600">Analista de Projetos</div></div>
+                    <div><h3 style="margin:0;font-size:15px;font-weight:800;line-height:1.2">{{ a.n }}</h3><div style="font-size:11px;color:var(--slate-400);font-weight:600">{{ a.cargo }}</div></div>
                   </div>
                   <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:baseline">
                     <div class="mono" style="grid-row:span 2;font-size:28px;font-weight:900;line-height:1;padding-right:10px;border-right:1px solid var(--slate-200)">{{ a.qtd }}<small style="display:block;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--slate-400);margin-top:4px;font-family:var(--font-body)">obras</small></div>
@@ -1511,6 +1560,16 @@ a:hover{color:var(--blue-700)}
                     <i style="display:block;height:100%;background:#2563EB;width:{{ a.wg }}"></i><i style="display:block;height:100%;background:#F59E0B;width:{{ a.wm }}"></i><i style="display:block;height:100%;background:#94A0B4;width:{{ a.wx }}"></i>
                   </div>
                 </div>
+                <sc-if value="{{ a.temAbaixo }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:6px;margin:10px 0 0 14px;padding-left:12px;border-left:2px solid var(--slate-200)">
+                    <sc-for list="{{ a.abaixo }}" as="p" hint-placeholder-count="1">
+                      <div style="background:var(--card);border-radius:10px;box-shadow:var(--card-shadow);border-left:4px solid #C4B5FD;padding:8px 11px;display:flex;align-items:center;gap:9px">
+                        <div style="width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:10.5px;flex:none;color:#8B5CF6;background:#EFE9FE">{{ p.ini }}</div>
+                        <div style="min-width:0"><div style="font-weight:800;font-size:12.5px">{{ p.nome }}</div><div style="font-size:10.5px;color:var(--slate-400);font-weight:600">{{ p.cargo }}</div></div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
                 <div style="display:flex;flex-direction:column;gap:8px;margin:10px 0 0 14px;padding-left:12px;border-left:2px solid var(--slate-200)">
                   <sc-for list="{{ a.obras }}" as="o" hint-placeholder-count="4">
                     <div style="background:var(--card);border-radius:10px;box-shadow:var(--card-shadow);border-left:4px solid {{ o.cor }};padding:9px 11px;position:relative">
@@ -1526,31 +1585,137 @@ a:hover{color:var(--blue-700)}
               </div>
             </sc-for>
           </div>
-          <div style="width:100%;margin-top:28px;padding:16px 18px;background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border:1px dashed var(--slate-200);border-left:4px dashed #94A0B4">
-            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
-              <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#94A0B4;background:#EEF1F5">PD</div>
-              <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">Pré-due · sem analista definido</div><h3 style="margin:2px 0 0;font-size:16px;font-weight:900">{{ orgPreTit }} <span style="font-size:12.5px;font-weight:700;color:var(--slate-400)">{{ orgPreSub }}</span></h3></div>
-              <span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--slate-400);background:var(--slate-100);padding:3px 8px;border-radius:6px">Fora dos totais do organograma</span>
+          <sc-if value="{{ orgTemPre }}" hint-placeholder-val="{{ true }}">
+            <div style="width:100%;margin-top:28px;padding:16px 18px;background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border:1px dashed var(--slate-200);border-left:4px dashed #94A0B4">
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+                <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#94A0B4;background:#EEF1F5">PD</div>
+                <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">Pré-due · sem analista definido</div><h3 style="margin:2px 0 0;font-size:16px;font-weight:900">{{ orgPreTit }} <span style="font-size:12.5px;font-weight:700;color:var(--slate-400)">{{ orgPreSub }}</span></h3></div>
+                <span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--slate-400);background:var(--slate-100);padding:3px 8px;border-radius:6px">Fora dos totais do organograma</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+                <sc-for list="{{ orgPre }}" as="o" hint-placeholder-count="7">
+                  <div style="background:var(--card);border-radius:10px;box-shadow:var(--card-shadow);border-left:4px dashed {{ o.cor }};padding:9px 11px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:800;font-size:13px"><span>{{ o.n }}</span><span style="font-size:9.5px;font-weight:900;letter-spacing:.04em;padding:2px 6px;border-radius:6px;flex:none;color:{{ o.cor }};background:{{ o.bg }}">{{ o.chip }}</span></div>
+                    <div style="font-size:11.5px;color:var(--slate-400);margin-top:3px">{{ o.dados }}</div>
+                  </div>
+                </sc-for>
+              </div>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
-              <sc-for list="{{ orgPre }}" as="o" hint-placeholder-count="7">
-                <div style="background:var(--card);border-radius:10px;box-shadow:var(--card-shadow);border-left:4px dashed {{ o.cor }};padding:9px 11px">
-                  <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:800;font-size:13px"><span>{{ o.n }}</span><span style="font-size:9.5px;font-weight:900;letter-spacing:.04em;padding:2px 6px;border-radius:6px;flex:none;color:{{ o.cor }};background:{{ o.bg }}">{{ o.chip }}</span></div>
-                  <div style="font-size:11.5px;color:var(--slate-400);margin-top:3px">{{ o.dados }}</div>
-                </div>
-              </sc-for>
-            </div>
-          </div>
+          </sc-if>
           <div style="margin-top:26px;width:100%;max-width:980px;display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--slate-500)">
             <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
               <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:4px;height:16px;border-radius:2px;background:#2563EB"></i>Gadens (GD)</span>
               <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:4px;height:16px;border-radius:2px;background:#F59E0B"></i>Make It (MK)</span>
               <span style="display:inline-flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:800;color:#B45309;background:#FEF3E2;border:1px dashed #F59E0B;border-radius:6px;padding:0 5px">estimativo</span>valor estimado</span>
             </div>
-            <div><strong style="color:var(--color-text)">* Totais incluem estimativas:</strong> Rafitec (384 UH / 18.578,94 m²) e Container (336 UH / 14.207,20 m²). Sem eles: 5.864 UH / 284.201,68 m². Obras em pré-due não entram nos totais. Quadratto = Leilão (GDS 16); Aura = Alta Tensão (GDS 22). Quadratto, Fundação, Zago, Rafitec, Container, Martim Afonso e Guadalupe informados pelo coordenador em 03/11/2026.</div>
-            <div>Fonte: SA_DAS – MAKE IT R01 (aba CNPJ MAKE IT) e SA_DAS – GADENS (aba ORÇAMENTOS). Atualizado em 03/11/2026.</div>
+            <sc-if value="{{ orgTemEst }}" hint-placeholder-val="{{ false }}"><div><strong style="color:var(--color-text)">* Totais incluem estimativas:</strong> {{ orgEstTxt }}</div></sc-if>
+            <sc-for list="{{ orgNota }}" as="l" hint-placeholder-count="2"><div>{{ l.t }}</div></sc-for>
           </div>
         </section>
+      </sc-if>
+
+      <!-- ══════════ ORGANOGRAMA · EDIÇÃO (admin) ══════════ -->
+      <sc-if value="{{ orgEditando }}" hint-placeholder-val="{{ false }}">
+        <section style="display:flex;flex-direction:column;gap:16px">
+          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:5">
+            <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">Modo de edição · administrador</div><div style="font-size:15px;font-weight:800;margin-top:2px">Editando o organograma</div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button onClick="{{ orgRestaurar }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">Restaurar padrão</button>
+              <button onClick="{{ orgCancelar }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">Cancelar</button>
+              <button onClick="{{ orgSalvar }}" style="cursor:pointer;border:0;border-radius:10px;padding:9px 16px;font-size:12.5px;font-weight:800;background:var(--blue-600);color:#fff;font-family:var(--font-body);white-space:nowrap">{{ orgSalvarLabel }}</button>
+            </div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+              <div><h3 style="margin:0;font-size:15px;font-weight:800">Cargos acima dos analistas</h3><p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">O nível 1 fica no topo. Cada nível pode ter mais de uma pessoa.</p></div>
+              <button onClick="{{ orgAddNivelTopo }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">+ Nível no topo</button>
+            </div>
+            <sc-for list="{{ orgEdTopo }}" as="lv" hint-placeholder-count="1">
+              <div style="border:1px solid var(--slate-100);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">Nível {{ lv.num }}</span>
+                  <div style="display:flex;gap:6px"><button onClick="{{ lv.addP }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">+ Pessoa neste nível</button><button onClick="{{ lv.remLv }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap;color:#B91C1C">Remover nível</button></div>
+                </div>
+                <sc-for list="{{ lv.pessoas }}" as="p" hint-placeholder-count="1">
+                        <div style="display:grid;grid-template-columns:1fr 1fr 32px;gap:6px">
+                          <input value="{{ p.cargo }}" onChange="{{ p.setCargo }}" placeholder="Cargo" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
+                          <input value="{{ p.nome }}" onChange="{{ p.setNome }}" placeholder="Nome" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box;font-weight:700">
+                          <button onClick="{{ p.rem }}" title="Remover" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:8px;width:32px;height:32px;flex:none;font-size:15px;font-weight:700;background:var(--card);color:#B91C1C">×</button>
+                        </div>
+                </sc-for>
+              </div>
+            </sc-for>
+            <button onClick="{{ orgAddNivelBase }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap;align-self:flex-start">+ Nível logo acima dos analistas</button>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+              <div><h3 style="margin:0;font-size:15px;font-weight:800">Analistas, cargos abaixo e obras</h3><p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Use "Mover para" para realocar uma obra entre analistas ou para Em avaliação.</p></div>
+              <button onClick="{{ orgAddAnalista }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">+ Analista</button>
+            </div>
+            <sc-for list="{{ orgEdAn }}" as="a" hint-placeholder-count="2">
+              <div style="border:1px solid var(--slate-100);border-left:4px solid #8B5CF6;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;overflow-x:auto">
+                <div style="display:grid;grid-template-columns:minmax(140px,1fr) minmax(140px,1fr) auto;gap:6px;align-items:center">
+                  <input value="{{ a.n }}" onChange="{{ a.setN }}" placeholder="Nome do analista" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box;font-weight:800;font-size:13.5px">
+                  <input value="{{ a.cargo }}" onChange="{{ a.setCargo }}" placeholder="Cargo" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
+                  <button onClick="{{ a.rem }}" title="As obras vão para Em avaliação" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap;color:#B91C1C">Remover analista</button>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px;padding-left:12px;border-left:2px solid var(--slate-200)">
+                  <span style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400);font-size:9.5px">Cargos abaixo</span>
+                  <sc-for list="{{ a.abaixo }}" as="p" hint-placeholder-count="0">
+                        <div style="display:grid;grid-template-columns:1fr 1fr 32px;gap:6px">
+                          <input value="{{ p.cargo }}" onChange="{{ p.setCargo }}" placeholder="Cargo" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
+                          <input value="{{ p.nome }}" onChange="{{ p.setNome }}" placeholder="Nome" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box;font-weight:700">
+                          <button onClick="{{ p.rem }}" title="Remover" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:8px;width:32px;height:32px;flex:none;font-size:15px;font-weight:700;background:var(--card);color:#B91C1C">×</button>
+                        </div>
+                  </sc-for>
+                  <button onClick="{{ a.addAbaixo }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap;align-self:flex-start">+ Cargo abaixo</button>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px;padding-left:12px;border-left:2px solid var(--slate-200);min-width:760px">
+                  <div style="display:grid;grid-template-columns:minmax(120px,1fr) 104px 74px 104px 56px 150px 32px;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400);font-size:9.5px"><span>Obra</span><span>Marca</span><span>UH</span><span>m²</span><span>Est.</span><span>Mover para</span><span></span></div>
+                  <sc-for list="{{ a.obras }}" as="o" hint-placeholder-count="3">
+                    <div style="display:grid;grid-template-columns:minmax(120px,1fr) 104px 74px 104px 56px 150px 32px;gap:6px;align-items:center">
+                      <input value="{{ o.n }}" onChange="{{ o.setN }}" placeholder="Nome da obra" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box;font-weight:700">
+                      <select value="{{ o.m }}" onChange="{{ o.setM }}" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box"><option value="m">Make It</option><option value="g">Gadens</option><option value="x">Sem marca</option></select>
+                      <input type="number" value="{{ o.uh }}" onChange="{{ o.setUh }}" placeholder="UH" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
+                      <input type="number" step="0.01" value="{{ o.m2 }}" onChange="{{ o.setM2 }}" placeholder="m²" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
+                      <label title="Valor estimativo" style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--slate-500);cursor:pointer"><input type="checkbox" checked="{{ o.est }}" onChange="{{ o.setEst }}">est.</label>
+                      <select value="{{ o.loc }}" onChange="{{ o.mover }}" title="Realocar obra" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
+                        <sc-for list="{{ orgDestinos }}" as="d" hint-placeholder-count="0"><option value="{{ d.v }}">{{ d.l }}</option></sc-for>
+                      </select>
+                      <button onClick="{{ o.rem }}" title="Excluir obra" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:8px;width:32px;height:32px;flex:none;font-size:15px;font-weight:700;background:var(--card);color:#B91C1C">×</button>
+                    </div>
+                  </sc-for>
+                  <button onClick="{{ a.addObra }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap;align-self:flex-start">+ Obra</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:8px;overflow-x:auto">
+            <div><h3 style="margin:0;font-size:15px;font-weight:800">Obras em avaliação (pré-due)</h3><p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Ficam fora dos totais. Deixe UH e m² em branco se ainda não houver estimativa.</p></div>
+            <div style="display:flex;flex-direction:column;gap:6px;min-width:760px">
+              <div style="display:grid;grid-template-columns:minmax(120px,1fr) 104px 74px 104px 56px 150px 32px;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400);font-size:9.5px"><span>Obra</span><span>Marca</span><span>UH</span><span>m²</span><span>Est.</span><span>Mover para</span><span></span></div>
+              <sc-for list="{{ orgEdPre }}" as="o" hint-placeholder-count="3">
+                    <div style="display:grid;grid-template-columns:minmax(120px,1fr) 104px 74px 104px 56px 150px 32px;gap:6px;align-items:center">
+                      <input value="{{ o.n }}" onChange="{{ o.setN }}" placeholder="Nome da obra" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box;font-weight:700">
+                      <select value="{{ o.m }}" onChange="{{ o.setM }}" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box"><option value="m">Make It</option><option value="g">Gadens</option><option value="x">Sem marca</option></select>
+                      <input type="number" value="{{ o.uh }}" onChange="{{ o.setUh }}" placeholder="UH" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
+                      <input type="number" step="0.01" value="{{ o.m2 }}" onChange="{{ o.setM2 }}" placeholder="m²" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
+                      <label title="Valor estimativo" style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--slate-500);cursor:pointer"><input type="checkbox" checked="{{ o.est }}" onChange="{{ o.setEst }}">est.</label>
+                      <select value="{{ o.loc }}" onChange="{{ o.mover }}" title="Realocar obra" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box">
+                        <sc-for list="{{ orgDestinos }}" as="d" hint-placeholder-count="0"><option value="{{ d.v }}">{{ d.l }}</option></sc-for>
+                      </select>
+                      <button onClick="{{ o.rem }}" title="Excluir obra" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:8px;width:32px;height:32px;flex:none;font-size:15px;font-weight:700;background:var(--card);color:#B91C1C">×</button>
+                    </div>
+              </sc-for>
+            </div>
+            <button onClick="{{ orgAddPre }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap;align-self:flex-start">+ Obra em avaliação</button>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:8px">
+            <div><h3 style="margin:0;font-size:15px;font-weight:800">Notas do rodapé</h3><p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Uma nota por linha. A linha de estimativas é calculada sozinha.</p></div>
+            <textarea value="{{ orgEdNota }}" onChange="{{ orgSetNota }}" rows="4" style="height:32px;border:1px solid var(--slate-200);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--card);color:var(--color-text);font-family:var(--font-body);min-width:0;width:100%;box-sizing:border-box;height:auto;padding:8px;line-height:1.5;resize:vertical"></textarea>
+          </div>
+        </section>
+      </sc-if>
       </sc-if>
 
       <!-- ══════════ GESTÃO DE ANALISTAS ══════════ -->
@@ -2176,7 +2341,7 @@ class Component extends DCLogic {
     auth: "carregando", sessao: null, lgLogin: "", lgSenha: "", lgErro: "", lgBusy: false,
     usuarios: [], usuNovos: {}, nuLogin: "", nuNome: "", nuPerfil: "leitura", nuSenha: "",
     cfg: { url: "", anon: "", chave: "" }, admMsg: "", admErro: false, pacoteBusy: false,
-    adata: null, fdata: null, fstate: { fornecedores: [], vinculos: {} },
+    adata: null, fdata: null, fstate: { fornecedores: [], vinculos: {} }, org: null, orgDraft: null, orgMsg: "", orgErro: false, orgBusy: false,
     semanal: {}, uploads: {}, upMsg: null, upErro: false, upLoading: false,
     exSel: null, exMsg: null, exErro: false, qualForn: null, exTipo: null, tema: "claro", restr: {}, rdDraft: {}, marcoTipo: "task",
     obraModal: null, marcoModal: null,
@@ -2233,10 +2398,8 @@ class Component extends DCLogic {
       this.setState({ fdata: d, fstate: s && s.fornecedores ? s : { fornecedores: d.seed.fornecedores.slice(), vinculos: Object.assign({}, d.seed.vinculos) } });
     }).catch(falha);
     const ss = this.state.sessao;
-    if (C && ss && ss.perfil === "admin") {
-      C.listaUsuarios().then(u => this.setState({ usuarios: u }));
-      C.carregar("data/config.json").then(c => this.setState({ cfg: Object.assign({ url: "", anon: "", chave: "", fontes: null }, c) })).catch(() => {});
-    }
+    if (C && ss && ss.perfil === "admin") C.listaUsuarios().then(u => this.setState({ usuarios: u }));
+    if (C) C.carregar("data/config.json").then(c => { this.setState({ cfg: Object.assign({ url: "", anon: "", chave: "", fontes: null }, c) }); this.orgCarregar(c); }).catch(() => {});
   }
   async entrar(e) {
     if (e && e.preventDefault) e.preventDefault();
@@ -3720,7 +3883,7 @@ class Component extends DCLogic {
     }).filter(a => a.total >= 3).sort((a, b) => b.total - a.total);
     return { hoje, analistas };
   }
-  // Organograma estático · edite aqui: [obra, marca (g = Gadens, m = Make It, x = sem marca), UH, m², estimativo]
+  // Organograma · padrão (usado até haver uma versão salva no Supabase)
   ORG = { coord: "Lucas Lopes", an: [
     { n: "Lucas Camargo", o: [["Horizon","m",144,7703.31],["Edge","m",432,26828.44],["Alba","m",224,11556],["Al Nasser I","m",256,17131.8],["Al Nasser II","m",230,15742.2]] },
     { n: "Mariana", o: [["Vert","m",256,12575.29],["Aura","m",120,5933.04],["Arena","m",178,10238.31],["Fundação","m",239,9036]] },
@@ -3729,26 +3892,112 @@ class Component extends DCLogic {
     { n: "Luiz Lemes", o: [["Core Palácio","g",429,12432.52],["General Carneiro","g",174,7324.53],["João Negrão","g",351,15226.59]] },
     { n: "Francyelli Rossot", o: [["Core Faivre","g",238,8675.85],["Core Silva Jardim","g",241,8945.77],["Martim Afonso","g",116,4892.28],["Guadalupe","g",430,9602.60],["Pe. Agostinho","g",178,8362.37]] }
   ],
-  // pré-due: sem analista, fora dos totais · [obra, marca, UH, m²]
   pre: [["Galinha Pintadinha","m",null,null],["Cassol","m",null,null],["Yokohama","m",null,null],["Atubão","m",null,null],["Goleadores","m",null,null],["Koffee","g",null,null],["Sete Bar do Didi","g",null,null]] };
+  OKEY = "gd-organograma";
+  uid() { return Math.random().toString(36).slice(2, 9); }
+  orgPadrao() {
+    const ob = o => ({ id: this.uid(), n: o[0], m: o[1], uh: o[2], m2: o[3], est: !!o[4] });
+    return { topo: [[{ id: this.uid(), cargo: "Coordenador de Projetos", nome: this.ORG.coord }]],
+      an: this.ORG.an.map(a => ({ id: this.uid(), n: a.n, cargo: "Analista de Projetos", abaixo: [], o: a.o.map(ob) })),
+      pre: this.ORG.pre.map(ob),
+      nota: "Quadratto = Leilão (GDS 16); Aura = Alta Tensão (GDS 22). Quadratto, Fundação, Zago, Rafitec, Container, Martim Afonso e Guadalupe informados pelo coordenador em 03/11/2026.\nFonte: SA_DAS – MAKE IT R01 (aba CNPJ MAKE IT) e SA_DAS – GADENS (aba ORÇAMENTOS). Atualizado em 03/11/2026." };
+  }
+  orgDados() {
+    if (this.state.org && this.state.org.an) return this.state.org;
+    if (!this._orgPad) { try { const c = JSON.parse(localStorage.getItem(this.OKEY) || "null"); if (c && c.an) this._orgPad = c; } catch (e) {} }
+    return this._orgPad || (this._orgPad = this.orgPadrao());
+  }
+  sbOk(c) { return !!(c && c.url && c.anon && c.chave); }
+  sbFetch(c, path, opt) { opt = opt || {};
+    return fetch(c.url.replace(/\/$/, "") + "/rest/v1/" + path, Object.assign({}, opt, { headers: Object.assign({ apikey: c.anon, Authorization: "Bearer " + c.anon,
+      "x-tap-chave": c.chave, "Content-Type": "application/json" }, opt.headers || {}) })); }
+  async orgCarregar(c) {
+    if (!this.sbOk(c)) return;
+    try { const r = await this.sbFetch(c, "dash_org?id=eq.1&select=dados,atualizado");
+      if (!r.ok) return; const row = (await r.json())[0];
+      if (row && row.dados && row.dados.an) { this.setState({ org: row.dados }); try { localStorage.setItem(this.OKEY, JSON.stringify(row.dados)); } catch (e) {} }
+    } catch (e) {}
+  }
+  async orgGravar() {
+    const D = Object.assign({}, this.state.orgDraft, { atualizado: new Date().toISOString().slice(0, 10), por: (this.state.sessao && this.state.sessao.nome) || "" });
+    this.setState({ orgBusy: true });
+    try { localStorage.setItem(this.OKEY, JSON.stringify(D)); } catch (e) {}
+    const c = this.state.cfg; let ok = false, msg = "Supabase não configurado";
+    if (this.sbOk(c)) {
+      try { const r = await this.sbFetch(c, "dash_org", { method: "POST", headers: { Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ id: 1, dados: D, atualizado: new Date().toISOString() }) });
+        ok = r.ok; if (!ok) msg = "HTTP " + r.status + (r.status === 404 ? " · tabela dash_org não existe" : ""); } catch (e) { msg = e.message; }
+    }
+    this.setState({ org: D, orgDraft: null, orgBusy: false, orgErro: !ok,
+      orgMsg: ok ? "Organograma salvo. Já vale para todos os usuários." : "Salvo só neste navegador (" + msg + "). Rode supabase-organograma.sql no Supabase e salve de novo." });
+  }
   orgVals() {
-    const T = this.ORG, fmt = (n, d = 0) => n.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
-    const all = T.an.flatMap(a => a.o), sum = (arr, i) => arr.reduce((s, o) => s + (o[i] || 0), 0), by = b => all.filter(o => o[1] === b);
-    const ini = n => { const w = n.split(" ").filter(x => x.length > 2); return (w.length > 1 ? w[0][0] + w[1][0] : n.slice(0, 2)).toUpperCase(); };
-    const C = { g: ["#2563EB", "#E8EFFD", "GD"], m: ["#F59E0B", "#FEF3E2", "MK"], x: ["#94A0B4", "#EEF1F5", "?"] };
-    const tot = sum(all, 2);
-    return { orgCoord: T.coord, orgCoordIni: ini(T.coord),
-      orgKpis: [["#8B5CF6","#EFE9FE","#","Empreendimentos",fmt(all.length),T.an.length + " analistas · " + fmt(all.length / T.an.length, 1) + " obras/analista"],
-        ["#10B981","#E3F7F0","UH","Unidades habitacionais*",fmt(tot),fmt(sum(all, 3), 2) + " m² construído*"],
-        ["#2563EB","#E8EFFD","GD","Gadens",by("g").length + " obras",fmt(sum(by("g"), 2)) + " UH · " + fmt(sum(by("g"), 3)) + " m²"],
-        ["#F59E0B","#FEF3E2","MK","Make It",by("m").length + " obras",fmt(sum(by("m"), 2)) + " UH · " + fmt(sum(by("m"), 3)) + " m²"]].map(k => ({ cor:k[0], bg:k[1], ico:k[2], l:k[3], v:k[4], s:k[5] })),
-      orgAn: T.an.map(a => { const uh = sum(a.o, 2), est = a.o.some(o => o[4]), q = a.o.length, g = a.o.filter(o => o[1] === "g").length, m = a.o.filter(o => o[1] === "m").length, x = q - g - m;
-        return { n: a.n, ini: ini(a.n), qtd: q, uhL: "UH" + (est ? "*" : ""), m2L: "m²" + (est ? "*" : ""), uh: fmt(uh), pct: "(" + fmt(uh / tot * 100, 1) + "%)", m2: fmt(sum(a.o, 3), 2),
+    const st = this.state, adm = !!(st.sessao && st.sessao.perfil === "admin"), editando = !!(st.orgDraft && adm);
+    const T = this.orgDados(), fmt = (n, d = 0) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+    const all = T.an.flatMap(a => a.o), sum = (arr, k) => arr.reduce((s, o) => s + (Number(o[k]) || 0), 0), by = b => all.filter(o => o.m === b);
+    const ini = n => { const w = String(n || "").split(" ").filter(x => x.length > 2); return (w.length > 1 ? w[0][0] + w[1][0] : String(n || "?").slice(0, 2)).toUpperCase(); };
+    const C = { g: ["#2563EB", "#E8EFFD", "GD"], m: ["#F59E0B", "#FEF3E2", "MK"], x: ["#94A0B4", "#EEF1F5", "?"] }, cc = m => C[m] || C.x;
+    const tot = sum(all, "uh") || 1, est = all.filter(o => o.est), nAn = T.an.length || 1;
+    const v = { orgVer: !editando, orgEditando: editando, orgPodeEditar: adm,
+      orgFonte: T.atualizado ? "Atualizado em " + T.atualizado.split("-").reverse().join("/") + (T.por ? " por " + T.por : "") : "Versão padrão",
+      orgTemMsg: !!st.orgMsg, orgMsg: st.orgMsg || "",
+      orgMsgStyle: "width:100%;margin:0 0 16px;font-size:12.5px;padding:11px 14px;border-radius:12px;box-sizing:border-box;background:" + (st.orgErro ? "#FEF3C7;color:#92400E" : "#ECFDF5;color:#065F46"),
+      orgAbrirEdicao: () => this.setState({ orgDraft: JSON.parse(JSON.stringify(T)), orgMsg: "" }),
+      orgTopo: T.topo.map(lv => ({ pessoas: lv.map(p => ({ cargo: p.cargo, nome: p.nome, ini: ini(p.nome) })) })),
+      orgKpis: [["#8B5CF6","#EFE9FE","#","Empreendimentos",fmt(all.length),T.an.length + " analistas · " + fmt(all.length / nAn, 1) + " obras/analista"],
+        ["#10B981","#E3F7F0","UH","Unidades habitacionais" + (est.length ? "*" : ""),fmt(sum(all, "uh")),fmt(sum(all, "m2"), 2) + " m² construído" + (est.length ? "*" : "")],
+        ["#2563EB","#E8EFFD","GD","Gadens",by("g").length + " obras",fmt(sum(by("g"), "uh")) + " UH · " + fmt(sum(by("g"), "m2")) + " m²"],
+        ["#F59E0B","#FEF3E2","MK","Make It",by("m").length + " obras",fmt(sum(by("m"), "uh")) + " UH · " + fmt(sum(by("m"), "m2")) + " m²"]].map(k => ({ cor:k[0], bg:k[1], ico:k[2], l:k[3], v:k[4], s:k[5] })),
+      orgAn: T.an.map(a => { const uh = sum(a.o, "uh"), e = a.o.some(o => o.est), q = a.o.length || 1, g = a.o.filter(o => o.m === "g").length, m = a.o.filter(o => o.m === "m").length, x = a.o.length - g - m;
+        return { n: a.n, cargo: a.cargo || "Analista de Projetos", ini: ini(a.n), qtd: a.o.length, uhL: "UH" + (e ? "*" : ""), m2L: "m²" + (e ? "*" : ""), uh: fmt(uh), pct: "(" + fmt(uh / tot * 100, 1) + "%)", m2: fmt(sum(a.o, "m2"), 2),
           wg: g / q * 100 + "%", wm: m / q * 100 + "%", wx: x / q * 100 + "%", mixT: "Gadens " + g + " · Make It " + m + (x ? " · sem marca " + x : ""),
-          obras: a.o.map(o => ({ n: o[0], cor: C[o[1]][0], bg: C[o[1]][1], chip: C[o[1]][2], uh: fmt(o[2]), m2: fmt(o[3], 2), est: !!o[4] })) }; }),
+          temAbaixo: (a.abaixo || []).length > 0, abaixo: (a.abaixo || []).map(p => ({ cargo: p.cargo, nome: p.nome, ini: ini(p.nome) })),
+          obras: a.o.map(o => ({ n: o.n, cor: cc(o.m)[0], bg: cc(o.m)[1], chip: cc(o.m)[2], uh: fmt(o.uh), m2: fmt(o.m2, 2), est: !!o.est })) }; }),
+      orgTemPre: T.pre.length > 0,
       orgPreTit: T.pre.length + " obra" + (T.pre.length > 1 ? "s" : "") + " em avaliação",
-      orgPreSub: "· " + T.pre.filter(o => o[1] === "m").length + " MK · " + T.pre.filter(o => o[1] === "g").length + " GD",
-      orgPre: T.pre.map(o => ({ n: o[0], cor: C[o[1]][0], bg: C[o[1]][1], chip: C[o[1]][2], dados: o[2] != null ? fmt(o[2]) + " UH · " + fmt(o[3], 2) + " m²" : "Sem dados estimativos ainda" })) };
+      orgPreSub: "· " + T.pre.filter(o => o.m === "m").length + " MK · " + T.pre.filter(o => o.m === "g").length + " GD",
+      orgPre: T.pre.map(o => ({ n: o.n, cor: cc(o.m)[0], bg: cc(o.m)[1], chip: cc(o.m)[2], dados: o.uh != null && o.uh !== "" ? fmt(o.uh) + " UH · " + fmt(o.m2, 2) + " m²" : "Sem dados estimativos ainda" })),
+      orgTemEst: est.length > 0,
+      orgEstTxt: est.map(o => o.n + " (" + fmt(o.uh) + " UH / " + fmt(o.m2, 2) + " m²)").join(", ") + ". Sem eles: " + fmt(sum(all, "uh") - sum(est, "uh")) + " UH / " + fmt(sum(all, "m2") - sum(est, "m2"), 2) + " m². Obras em avaliação não entram nos totais.",
+      orgNota: String(T.nota || "").split("\n").filter(s => s.trim()).map(t => ({ t })) };
+    if (!editando) return Object.assign(v, { orgEdTopo: [], orgEdAn: [], orgEdPre: [], orgDestinos: [] });
+    const D = st.orgDraft;
+    const ed = fn => this.setState(s => { const N = JSON.parse(JSON.stringify(s.orgDraft)); fn(N); return { orgDraft: N }; });
+    const np = () => ({ id: this.uid(), cargo: "", nome: "" }), no = () => ({ id: this.uid(), n: "", m: "m", uh: null, m2: null, est: false });
+    const lista = (N, loc) => loc === "pre" ? N.pre : (N.an.find(a => a.id === loc) || { o: [] }).o;
+    const pessoa = (getArr, pi, p) => ({ cargo: p.cargo, nome: p.nome,
+      setCargo: e => { const x = e.target.value; ed(N => { getArr(N)[pi].cargo = x; }); },
+      setNome: e => { const x = e.target.value; ed(N => { getArr(N)[pi].nome = x; }); },
+      rem: () => ed(N => { getArr(N).splice(pi, 1); }) });
+    const obra = (loc, oi, o) => { const set = (k, f) => e => { const x = f ? f(e) : e.target.value; ed(N => { lista(N, loc)[oi][k] = x; }); };
+      const num = e => e.target.value === "" ? null : Number(e.target.value);
+      return { n: o.n, m: o.m, uh: o.uh == null ? "" : String(o.uh), m2: o.m2 == null ? "" : String(o.m2), est: !!o.est, loc,
+        setN: set("n"), setM: set("m"), setUh: set("uh", num), setM2: set("m2", num), setEst: set("est", e => e.target.checked),
+        mover: e => { const to = e.target.value; ed(N => { const ob = lista(N, loc).splice(oi, 1)[0]; if (ob) lista(N, to).push(ob); }); },
+        rem: () => { if (window.confirm("Excluir a obra " + (o.n || "sem nome") + "?")) ed(N => { lista(N, loc).splice(oi, 1); }); } }; };
+    return Object.assign(v, {
+      orgSalvarLabel: st.orgBusy ? "Salvando…" : "Salvar e publicar",
+      orgSalvar: () => { if (!st.orgBusy) this.orgGravar(); },
+      orgCancelar: () => this.setState({ orgDraft: null }),
+      orgRestaurar: () => { if (window.confirm("Voltar ao organograma padrão? As alterações não salvas se perdem.")) this.setState({ orgDraft: this.orgPadrao() }); },
+      orgAddNivelTopo: () => ed(N => { N.topo.unshift([np()]); }),
+      orgAddNivelBase: () => ed(N => { N.topo.push([np()]); }),
+      orgEdTopo: D.topo.map((lv, li) => ({ num: li + 1, pessoas: lv.map((p, pi) => pessoa(N => N.topo[li], pi, p)),
+        addP: () => ed(N => { N.topo[li].push(np()); }),
+        remLv: () => ed(N => { N.topo.splice(li, 1); }) })),
+      orgAddAnalista: () => ed(N => { N.an.push({ id: this.uid(), n: "", cargo: "Analista de Projetos", abaixo: [], o: [] }); }),
+      orgDestinos: D.an.map(a => ({ v: a.id, l: a.n || "(sem nome)" })).concat([{ v: "pre", l: "Em avaliação" }]),
+      orgEdAn: D.an.map((a, ai) => ({ n: a.n, cargo: a.cargo,
+        setN: e => { const x = e.target.value; ed(N => { N.an[ai].n = x; }); },
+        setCargo: e => { const x = e.target.value; ed(N => { N.an[ai].cargo = x; }); },
+        rem: () => { if (window.confirm("Remover " + (a.n || "o analista") + "? As obras dele vão para Em avaliação.")) ed(N => { const r = N.an.splice(ai, 1)[0]; N.pre = N.pre.concat(r.o); }); },
+        abaixo: (a.abaixo || []).map((p, pi) => pessoa(N => (N.an[ai].abaixo = N.an[ai].abaixo || []), pi, p)),
+        addAbaixo: () => ed(N => { (N.an[ai].abaixo = N.an[ai].abaixo || []).push(np()); }),
+        obras: a.o.map((o, oi) => obra(a.id, oi, o)),
+        addObra: () => ed(N => { N.an[ai].o.push(no()); }) })),
+      orgEdPre: D.pre.map((o, oi) => obra("pre", oi, o)),
+      orgAddPre: () => ed(N => { N.pre.push(no()); }),
+      orgEdNota: D.nota || "",
+      orgSetNota: e => { const x = e.target.value; ed(N => { N.nota = x; }); } });
   }
   anVals() {
     const an = this.state.an;
@@ -3976,15 +4225,24 @@ class Component extends DCLogic {
     const fnMark = this.state.fstate && this.state.fstate.fornecedores.length ?
       String(this.state.fstate.fornecedores.filter(f => Object.keys(this.state.fstate.vinculos).some(k => this.state.fstate.vinculos[k] === f.id)).length) : "";
     const upMark = Object.keys(this.state.uploads || {}).length ? String(Object.keys(this.state.uploads).length) : "";
-    const pages = [["Geral", ""], ["Prazos", ""], ["Financeiro", ""], ["Indicadores", ""], ["Riscos de Engenharia", ""], ["Reunião Diretoria", ""], ["Reunião Follow-up", ""],
-      ["Gestão de Fornecedores", fnMark], ["Gestão de Analistas", anMark], ["Organograma do Setor", ""], ["Exportação de dados", ""], ["Base de dados", upMark], ["Termos de Abertura de Projeto (TAP)", "↗"]]
-      .concat(this.state.sessao && this.state.sessao.perfil === "admin" ? [["Usuários e publicação", ""]] : []);
-    const nav = pages.map(p => ({
-      label: p[0], mark: p[1], go: p[0] === "Termos de Abertura de Projeto (TAP)" ? () => { window.location.href = "tap.html"; } : this.go(p[0]),
+    const isAdm = !!(this.state.sessao && this.state.sessao.perfil === "admin");
+    const GRUPOS = { "Reuniões": [["Reunião Diretoria", "Diretoria"], ["Reunião Follow-up", "Follow-up"]],
+      "Equipe": [["Organograma do Setor", "Organograma do Setor"], ["Gestão de Analistas", "Atividades por analista"]],
+      "Dados e publicação": [["Base de dados", "Base de dados"], ["Exportação de dados", "Exportação"]].concat(isAdm ? [["Usuários e publicação", "Usuários e publicação"]] : []) };
+    const grupoDe = p => Object.keys(GRUPOS).find(g => GRUPOS[g].some(s => s[0] === p));
+    const pages = [["Geral", ""], ["Prazos", ""], ["Financeiro", ""], ["Indicadores", ""], ["Riscos de Engenharia", ""], ["Reuniões", ""],
+      ["Gestão de Fornecedores", fnMark], ["Equipe", anMark], ["Processos", "em construção"], ["Dados e publicação", upMark], ["Termos de Abertura de Projeto (TAP)", "↗"]];
+    const gAtual = grupoDe(page);
+    const subTabs = gAtual ? GRUPOS[gAtual].map(s => ({ label: s[1], go: this.go(s[0]),
+      style: "padding:8px 16px;border:0;border-radius:9px;cursor:pointer;font-family:var(--font-body);font-size:12.5px;font-weight:" + (s[0] === page ? "800" : "600") +
+        ";background:" + (s[0] === page ? "var(--card)" : "transparent") + ";color:" + (s[0] === page ? "var(--blue-700)" : "var(--slate-500)") +
+        ";box-shadow:" + (s[0] === page ? "var(--card-shadow)" : "none") })) : [];
+    const nav = pages.map(p => ({ p0: GRUPOS[p[0]] ? GRUPOS[p[0]][0][0] : p[0], ativo: p[0] === page || p[0] === gAtual, p })).map(({ p0, ativo, p }) => ({
+      label: p[0], mark: p[1], go: p[0] === "Termos de Abertura de Projeto (TAP)" ? () => { window.location.href = "tap.html"; } : this.go(GRUPOS[p[0]] && gAtual === p[0] ? page : p0),
       markStyle: p[1] ? "font-family:var(--font-mono);font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;margin-left:auto;background:var(--slate-100);color:var(--slate-500)" : "display:none",
       style: "display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:10px 13px;border:0;border-radius:12px;cursor:pointer;font-family:var(--font-body);font-size:12.5px;font-weight:" +
-        (p[0] === page ? "800" : "600") + ";background:" + (p[0] === page ? "var(--blue-50)" : "transparent") +
-        ";color:" + (p[0] === page ? "var(--blue-700)" : "var(--slate-500)")
+        (ativo ? "800" : "600") + ";background:" + (ativo ? "var(--blue-50)" : "transparent") +
+        ";color:" + (ativo ? "var(--blue-700)" : "var(--slate-500)")
     }));
     const subs = {
       "Geral": "Visão consolidada por unidade de negócio e empreendimento",
@@ -3995,6 +4253,7 @@ class Component extends DCLogic {
       "Gestão de Fornecedores": "Vínculo obra × disciplina → fornecedor e análise de concorrência de entregas",
       "Gestão de Analistas": "Atividades por analista, agrupadas por obra · projetos complementares",
       "Organograma do Setor": "Organograma do setor · obras por analista, UH e área construída",
+      "Processos": "Processos mapeados, POPs, ITs e diretrizes de projeto",
       "Base de dados": "Arquivos que alimentam o painel e atualização por upload",
       "Usuários e publicação": "Acessos ao painel e pacote criptografado para o GitHub",
       "Exportação de dados": "Apresentação do setor e planilha de indicadores da empresa",
@@ -4002,17 +4261,19 @@ class Component extends DCLogic {
       "Reunião Follow-up": "Apresentação de cada analista · linha axial, atividades críticas, em andamento e riscos das obras dele"
     };
     const base = {
-      nav, pageTitle: page, pageSub: subs[page],
+      nav, pageTitle: gAtual || page, pageSub: subs[page], subTabs, temSubTabs: subTabs.length > 1,
       geradoEm: d ? d.geradoEm.split("-").reverse().join("/") : "—",
       versao: "v1.9",
       logo: React.createElement("img", { src: "data/logo-gadens.png", alt: "Grupo Gadens",
         style: { width: "40px", height: "auto", flexShrink: 0, display: "block" } }),
       isGeral: page === "Geral", isPrazos: page === "Prazos", isIndicadores: page === "Indicadores",
       isRiscos: page === "Riscos de Engenharia", isFinanceiro: page === "Financeiro",
-      isAnalistas: page === "Gestão de Analistas", isOrg: page === "Organograma do Setor", isFornecedores: page === "Gestão de Fornecedores",
+      isAnalistas: page === "Gestão de Analistas", isOrg: page === "Organograma do Setor",
+      orgBotaoEditar: page === "Organograma do Setor" && !!(this.state.sessao && this.state.sessao.perfil === "admin") && !this.state.orgDraft, isProc: page === "Processos",
+      procBlocos: [["Processos mapeados", "Fluxos do setor, etapa a etapa"], ["POPs e ITs", "Procedimentos operacionais e instruções de trabalho"], ["Diretrizes de projeto", "Diretrizes vigentes por disciplina"]].map(b => ({ t: b[0], s: b[1] })), isFornecedores: page === "Gestão de Fornecedores",
       isBase: page === "Base de dados", isExport: page === "Exportação de dados", isReuniao: page === "Reunião Diretoria", isFollow: page === "Reunião Follow-up",
       isAdmin: page === "Usuários e publicação" && !!(this.state.sessao && this.state.sessao.perfil === "admin"),
-      showFilters: page.indexOf("Gestão") !== 0 && page !== "Reunião Follow-up" && page !== "Base de dados" && page !== "Exportação de dados" && page !== "Usuários e publicação" && page !== "Organograma do Setor",
+      showFilters: page.indexOf("Gestão") !== 0 && page !== "Reunião Follow-up" && page !== "Base de dados" && page !== "Exportação de dados" && page !== "Usuários e publicação" && page !== "Organograma do Setor" && page !== "Processos",
       ...this.authVals(), ...this.orgVals(), ...this.alt7Vals(d),
       stop: e => e.stopPropagation(), closeModal: () => this.setState({ modal: null, taskModal: null }),
       modalPill: this.state.taskModal ? "Atividades" : "Indicador",
