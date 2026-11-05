@@ -1493,25 +1493,7 @@ a:hover{color:var(--blue-700)}
 
       <!-- ══════════ PROCESSOS (em construção) ══════════ -->
       <sc-if value="{{ isProc }}" hint-placeholder-val="{{ false }}">
-        <section style="display:flex;flex-direction:column;gap:18px">
-          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);border-style:dashed;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
-            <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#B45309;background:#FEF3E2">!</div>
-            <div style="flex:1;min-width:240px">
-              <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">Em construção</div>
-              <h2 style="margin:3px 0 6px;font-size:20px;font-weight:900">Processos de Projetos Complementares</h2>
-              <p style="margin:0;font-size:13px;color:var(--slate-500);line-height:1.5;max-width:720px;text-wrap:pretty">Esta aba vai reunir o mapeamento dos processos do setor e os links para os procedimentos operacionais (POP), as instruções de trabalho (IT) e as diretrizes de projeto de cada disciplina.</p>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
-            <sc-for list="{{ procBlocos }}" as="b" hint-placeholder-count="3">
-              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
-                <h3 style="margin:0;font-size:15px;font-weight:800">{{ b.t }}</h3>
-                <p style="margin:4px 0 14px;font-size:12px;color:var(--slate-400)">{{ b.s }}</p>
-                <div style="border:1px dashed var(--slate-200);border-radius:10px;padding:16px;font-size:12px;color:var(--slate-400)">Nenhum item cadastrado ainda</div>
-              </div>
-            </sc-for>
-          </div>
-        </section>
+        <div id="proc-canvas" style="min-height:300px"></div>
       </sc-if>
 
       <!-- ══════════ ORGANOGRAMA DO SETOR ══════════ -->
@@ -1529,6 +1511,22 @@ a:hover{color:var(--blue-700)}
           </sc-if>
           <div style="width:100%;margin-bottom:14px;font-size:12px;color:var(--slate-400)">{{ orgFonte }}</div>
           <sc-if value="{{ orgTemMsg }}" hint-placeholder-val="{{ false }}"><p style="{{ orgMsgStyle }}">{{ orgMsg }}</p></sc-if>
+          <div style="width:100%;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="display:flex;gap:6px;align-items:center">
+              <button onClick="{{ orgZMenos }}" title="Diminuir" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 11px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">−</button>
+              <span class="mono" style="min-width:46px;text-align:center;font-size:12px;font-weight:700;color:var(--slate-500)">{{ orgZLabel }}</span>
+              <button onClick="{{ orgZMais }}" title="Aumentar" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 11px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">+</button>
+              <button onClick="{{ orgZ100 }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 11px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">100%</button>
+              <button onClick="{{ orgZAjustar }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 11px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">Ajustar à tela</button>
+            </div>
+            <sc-if value="{{ orgVer }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:6px">
+                <button onClick="{{ orgRetrairTudo }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 11px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">Retrair todas</button>
+                <button onClick="{{ orgExpandirTudo }}" style="cursor:pointer;border:1px solid var(--slate-200);border-radius:9px;padding:6px 11px;font-size:12px;font-weight:700;background:var(--card);color:var(--slate-600);font-family:var(--font-body);white-space:nowrap">Expandir todas</button>
+              </div>
+            </sc-if>
+          </div>
+          <div id="org-scroll" style="{{ orgScrollStyle }}"><div style="{{ orgInnerStyle }}">
           <sc-if value="{{ orgEditando }}" hint-placeholder-val="{{ false }}">
             <button onClick="{{ orgAddNivelTopo }}" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left;margin-bottom:10px">+ Nível acima</button>
           </sc-if>
@@ -1578,8 +1576,8 @@ a:hover{color:var(--blue-700)}
             </sc-for>
           </div>
           <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
-          <div style="height:2px;background:var(--slate-200);width:calc(100% - 16.6%)"></div>
-          <div style="display:flex;flex-wrap:wrap;gap:0 24px;width:100%;align-items:flex-start">
+          <div style="{{ orgLinhaTopo }}"></div>
+          <div style="display:flex;flex-wrap:nowrap;gap:0 24px;width:100%;align-items:flex-start">
             <sc-for list="{{ orgBlocos }}" as="b" hint-placeholder-count="1">
               <div style="{{ b.style }}">
                 <sc-if value="{{ b.temLider }}" hint-placeholder-val="{{ false }}">
@@ -1616,7 +1614,7 @@ a:hover{color:var(--blue-700)}
               <div style="display:flex;flex-direction:column;min-width:0">
                 <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
                 <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #8B5CF6;padding:14px">
-                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                  <div style="{{ a.headStyle }}">
                     <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#8B5CF6;background:#EFE9FE">{{ a.ini }}</div>
                     <sc-if value="{{ a.ver }}" hint-placeholder-val="{{ true }}"><div><h3 style="margin:0;font-size:15px;font-weight:800;line-height:1.2">{{ a.n }}</h3><div style="font-size:11px;color:var(--slate-400);font-weight:600">{{ a.cargo }}</div></div></sc-if>
                     <sc-if value="{{ a.edit }}" hint-placeholder-val="{{ false }}">
@@ -1629,7 +1627,9 @@ a:hover{color:var(--blue-700)}
                         <button onClick="{{ a.rem }}" title="Remover analista (as obras vão para Em avaliação)" style="cursor:pointer;border:0;background:transparent;color:var(--slate-400);font-size:16px;font-weight:700;line-height:1;padding:2px 4px;flex:none">×</button>
                       </div>
                     </sc-if>
+                    <sc-if value="{{ a.ver }}" hint-placeholder-val="{{ true }}"><button onClick="{{ a.tog }}" title="{{ a.togT }}" style="margin-left:auto;flex:none;cursor:pointer;border:1px solid var(--slate-200);border-radius:8px;width:28px;height:28px;background:var(--card);color:var(--slate-500);font-size:13px;line-height:1">{{ a.togI }}</button></sc-if>
                   </div>
+                  <sc-if value="{{ a.aberto }}" hint-placeholder-val="{{ true }}">
                   <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:baseline">
                     <div class="mono" style="grid-row:span 2;font-size:28px;font-weight:900;line-height:1;padding-right:10px;border-right:1px solid var(--slate-200)">{{ a.qtd }}<small style="display:block;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--slate-400);margin-top:4px;font-family:var(--font-body)">obras</small></div>
                     <div style="display:flex;justify-content:space-between;gap:6px;font-size:12px;color:var(--slate-500)"><span>{{ a.uhL }}</span><b class="mono" style="color:var(--color-text)">{{ a.uh }} <span style="color:var(--slate-400);font-weight:600">{{ a.pct }}</span></b></div>
@@ -1638,6 +1638,7 @@ a:hover{color:var(--blue-700)}
                   <div title="{{ a.mixT }}" style="display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:12px;background:var(--slate-100)">
                     <i style="display:block;height:100%;background:#2563EB;width:{{ a.wg }}"></i><i style="display:block;height:100%;background:#F59E0B;width:{{ a.wm }}"></i><i style="display:block;height:100%;background:#94A0B4;width:{{ a.wx }}"></i>
                   </div>
+                  </sc-if>
                 </div>
                 <sc-if value="{{ a.mostraAbaixo }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;flex-direction:column;gap:6px;margin:10px 0 0 14px;padding-left:12px;border-left:2px solid var(--slate-200)">
@@ -1659,6 +1660,7 @@ a:hover{color:var(--blue-700)}
                     <sc-if value="{{ a.edit }}" hint-placeholder-val="{{ false }}"><button onClick="{{ a.addAbaixo }}" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left">+ Cargo abaixo</button></sc-if>
                   </div>
                 </sc-if>
+                <sc-if value="{{ a.aberto }}" hint-placeholder-val="{{ true }}">
                 <div onDragOver="{{ a.onDragOver }}" onDrop="{{ a.onDrop }}" style="{{ a.colStyle }}">
                   <sc-for list="{{ a.obras }}" as="o" hint-placeholder-count="4">
                   <div draggable="{{ o.drag }}" onDragStart="{{ o.onDragStart }}" onDragEnd="{{ o.onDragEnd }}" onDragOver="{{ o.onDragOver }}" onDrop="{{ o.onDrop }}" style="background:var(--card);border-radius:10px;box-shadow:var(--card-shadow);border-left:4px solid {{ o.cor }};padding:9px 11px;position:relative;cursor:{{ o.cursor }}">
@@ -1687,12 +1689,14 @@ a:hover{color:var(--blue-700)}
                   </sc-for>
                   <sc-if value="{{ a.edit }}" hint-placeholder-val="{{ false }}"><button onClick="{{ a.addObra }}" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left">+ Obra</button></sc-if>
                 </div>
+                </sc-if>
               </div>
             </sc-for>
                 </div>
               </div>
             </sc-for>
           </div>
+</div></div>
           <sc-if value="{{ orgEditando }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;gap:10px;flex-wrap:wrap;width:100%;margin-top:14px">
               <button onClick="{{ orgAddAnalista }}" style="cursor:pointer;border:1px dashed var(--slate-300);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;background:transparent;color:var(--slate-500);font-family:var(--font-body);text-align:left;padding:14px 18px;font-size:13px">+ Analista</button>
@@ -2586,7 +2590,40 @@ class Component extends DCLogic {
     this.aplicaTema(t);
     try { localStorage.setItem(this.TKEY, t); } catch (e) { /* sessão apenas */ }
   }
-  componentDidUpdate() { this.aplicaTema(this.state.tema); }
+  componentDidUpdate() { this.aplicaTema(this.state.tema); this.procMontar(); }
+  // Aba Processos: módulo à parte, montado fora do render. Se falhar, só esta aba mostra o erro.
+  PKEY = "gadens.processos.v1";
+  async procMontar() {
+    const raiz = document.getElementById("proc-canvas");
+    if (!raiz || raiz.dataset.pronto) return;
+    const adm = !!(this.state.sessao && this.state.sessao.perfil === "admin"), cfg = this.state.cfg;
+    raiz.dataset.pronto = "1"; raiz.textContent = "Carregando fluxos…";
+    try {
+      const X = await this.carregaModulo("./data/processos.js");
+      let dados = null, aviso = "";
+      if (this.sbOk(cfg)) {
+        try { const r = await this.sbFetch(cfg, "dash_processos?id=eq.1&select=dados");
+          if (r.ok) { const l = await r.json(); dados = l[0] && l[0].dados; } else if (adm) aviso = "Tabela dash_processos indisponível (HTTP " + r.status + "). Rode supabase-processos.sql."; }
+        catch (e) { aviso = "Não foi possível ler os fluxos publicados: " + e.message; }
+      }
+      if (!dados || !dados.fases) { try { dados = JSON.parse(localStorage.getItem(this.PKEY) || "null") || dados; } catch (e) {} }
+      if (!raiz.isConnected) return;
+      X.montar(raiz, { dados, admin: adm, msg: aviso, erroMsg: !!aviso,
+        rascunho: () => this._procRasc, setRascunho: d => { this._procRasc = d; },
+        salvar: d => this.procGravar(d) });
+    } catch (e) { console.error("[gadens] Processos:", e && e.message); raiz.textContent = "Não foi possível abrir os fluxos: " + (e && e.message); }
+  }
+  async procGravar(d) {
+    const D = Object.assign({}, d, { atualizado: new Date().toISOString().slice(0, 10), por: (this.state.sessao && this.state.sessao.nome) || "" });
+    try { localStorage.setItem(this.PKEY, JSON.stringify(D)); } catch (e) {}
+    const c = this.state.cfg; let msg = "Supabase não configurado";
+    if (this.sbOk(c)) {
+      try { const r = await this.sbFetch(c, "dash_processos", { method: "POST", headers: { Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ id: 1, dados: D, atualizado: new Date().toISOString() }) });
+        if (r.ok) return { ok: true, msg: "Fluxos salvos. Já valem para todos os usuários." };
+        msg = "HTTP " + r.status + (r.status === 404 ? " · tabela dash_processos não existe" : ""); } catch (e) { msg = e.message; }
+    }
+    return { ok: false, msg: "Salvo só neste navegador (" + msg + "). Rode supabase-processos.sql no Supabase e salve de novo." };
+  }
   // Carrega módulo local tolerando MIME errado no servidor: busca como texto e
   // avalia via blob, então o import() não depende do Content-Type do .js.
   async carregaModulo(path) {
@@ -4021,12 +4058,25 @@ class Component extends DCLogic {
       const dst = L(to); let i = idx == null ? dst.length : idx; if (f.loc === to && f.oi < i) i--;
       dst.splice(i, 0, ob); return { orgDraft: N, orgAlvo: null }; });
   }
+  ORG_COL = 240;
+  orgVista() {
+    if (this.state.orgVista) return this.state.orgVista;
+    if (!this._ov) { let c = null; try { c = JSON.parse(localStorage.getItem("gd-org-vista") || "null"); } catch (e) {} this._ov = Object.assign({ z: 1, fechados: {} }, c); }
+    return this._ov;
+  }
+  orgSetVista(p) {
+    const v = Object.assign({}, this.orgVista(), p); this._ov = v;
+    try { localStorage.setItem("gd-org-vista", JSON.stringify(v)); } catch (e) {}
+    this.setState({ orgVista: v });
+  }
   orgVals() {
     const v = this.orgVals0(), A = v._A, T = v._T, G = T.grupos || [];
-    const blk = (lider, an) => { const n = Math.max(1, an.length);
-      return { temLider: !!lider, lider: lider || {}, an, vazio: !!lider && !an.length, linha: an.length > 1 ? "calc(100% - " + (100 / n).toFixed(1) + "%)" : "2px",
-        style: "flex:" + n + " 1 " + (n * 234) + "px;min-width:0;display:flex;flex-direction:column;align-items:center",
-        gridStyle: "display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;width:100%" }; };
+    // Colunas de largura fixa: a hierarquia não muda com o espaço da tela; quem ajusta é o zoom.
+    const COL = this.ORG_COL, GAP = 14, GB = 24, larg = n => n * COL + (n - 1) * GAP;
+    const blk = (lider, an) => { const n = Math.max(1, an.length), w = larg(n);
+      return { temLider: !!lider, lider: lider || {}, an, vazio: !!lider && !an.length, _w: w, _n: n, linha: an.length > 1 ? (n - 1) * (COL + GAP) + "px" : "2px",
+        style: "flex:0 0 " + w + "px;width:" + w + "px;min-width:0;display:flex;flex-direction:column;align-items:center",
+        gridStyle: "display:grid;grid-template-columns:repeat(" + n + "," + COL + "px);gap:" + GAP + "px;width:100%" }; };
     const ed = v._ed, nomeG = g => (g.nome || "sem nome") + (g.cargo ? " (" + g.cargo + ")" : "");
     const chip = on => "cursor:pointer;border-radius:99px;padding:4px 10px;font-size:11.5px;font-weight:700;font-family:var(--font-body);" +
       (on ? "border:1px solid #6D28D9;background:#EFE9FE;color:#5B21B6" : "border:1px dashed var(--slate-300);background:transparent;color:var(--slate-500)");
@@ -4053,6 +4103,17 @@ class Component extends DCLogic {
     }));
     const diretos = A.filter(a => !a.g);
     v.orgBlocos = (diretos.length || !G.length ? [blk(null, diretos)] : []).concat(G.map((g, gi) => blk(Object.assign(v._lider(g, gi), { subs: subsDe(g) }), A.filter(a => a.g === g.id))));
+    const bl = v.orgBlocos, tot = bl.reduce((a, b) => a + b._w, 0) + (bl.length - 1) * GB, W = Math.max(tot, 900), ini = (W - tot) / 2;
+    const ponta = (b, ld) => b.temLider ? b._w / 2 : ld ? COL / 2 : b._w - COL / 2, p0 = ponta(bl[0], true), p1 = tot - (bl[bl.length - 1].temLider ? bl[bl.length - 1]._w / 2 : COL / 2);
+    v.orgLinhaTopo = "height:2px;background:var(--slate-200);align-self:flex-start;margin-left:" + (ini + p0) + "px;width:" + Math.max(p1 - p0, 2) + "px";
+    const z = this.orgVista().z; this._orgW = W;
+    v.orgInnerStyle = "display:flex;flex-direction:column;align-items:center;width:" + W + "px;margin:0 auto;zoom:" + z;
+    v.orgScrollStyle = "width:100%;box-sizing:border-box;overflow:auto;max-height:calc(100vh - 215px);padding:6px 8px 14px;border-radius:14px;border:1px solid var(--slate-100)";
+    v.orgZLabel = Math.round(z * 100) + "%";
+    const setZ = n => this.orgSetVista({ z: Math.max(.4, Math.min(1.6, Math.round(n * 100) / 100)) });
+    v.orgZMenos = () => setZ(z - .1); v.orgZMais = () => setZ(z + .1); v.orgZ100 = () => setZ(1);
+    v.orgZAjustar = () => { const c = document.getElementById("org-scroll"); if (c) setZ((c.clientWidth - 20) / this._orgW); };
+    bl.forEach(b => { delete b._w; delete b._n; });
     v.orgTemGrupos = v.orgEditando && G.length > 0;
     v.orgGrupoOpts = [{ v: "", l: "Nível acima (direto)" }].concat(G.map(g => ({ v: g.id, l: (g.nome || "sem nome") + (g.cargo ? " · " + g.cargo : "") })));
     delete v._A; delete v._T; delete v._lider; delete v._ed; delete v.orgAn;
@@ -4108,8 +4169,11 @@ class Component extends DCLogic {
         ["#F59E0B","#FEF3E2","MK","Make It",by("m").length + " obras",fmt(sum(by("m"), "uh")) + " UH · " + fmt(sum(by("m"), "m2")) + " m²"]].map(k => ({ cor:k[0], bg:k[1], ico:k[2], l:k[3], v:k[4], s:k[5] })),
       orgAn: null,
       _A: T.an.map((a, ai) => { const uh = sum(a.o, "uh"), e = a.o.some(o => o.est), q = a.o.length || 1, g = a.o.filter(o => o.m === "g").length, m = a.o.filter(o => o.m === "m").length, x = a.o.length - g - m;
-        const z = dropZone(a.id), ab = a.abaixo || [];
-        return { n: a.n, cargo: a.cargo || (editando ? "" : "Analista de Projetos"), ini: ini(a.n), ver: !editando, edit: editando, g: a.g && (T.grupos || []).some(x => x.id === a.g) ? a.g : "",
+        const z = dropZone(a.id), ab = a.abaixo || [], chave = a.n || a.id, aberto = editando || !this.orgVista().fechados[chave];
+        return { aberto, togI: aberto ? "▾" : "▸", togT: aberto ? "Retrair" : "Expandir",
+          headStyle: "display:flex;align-items:center;gap:10px" + (aberto ? ";margin-bottom:12px" : ""),
+          tog: () => { const f = Object.assign({}, this.orgVista().fechados); if (aberto) f[chave] = 1; else delete f[chave]; this.orgSetVista({ fechados: f }); },
+          n: a.n, cargo: a.cargo || (editando ? "" : "Analista de Projetos"), ini: ini(a.n), ver: !editando, edit: editando, g: a.g && (T.grupos || []).some(x => x.id === a.g) ? a.g : "",
           setG: ev => { const v = ev.target.value; ed(N => { N.an[ai].g = v || null; }); },
           qtd: a.o.length, uhL: "UH" + (e ? "*" : ""), m2L: "m²" + (e ? "*" : ""), uh: fmt(uh), pct: "(" + fmt(uh / tot * 100, 1) + "%)", m2: fmt(sum(a.o, "m2"), 2),
           wg: g / q * 100 + "%", wm: m / q * 100 + "%", wx: x / q * 100 + "%", mixT: "Gadens " + g + " · Make It " + m + (x ? " · sem marca " + x : ""),
@@ -4122,6 +4186,8 @@ class Component extends DCLogic {
           onDragOver: z.onDragOver, onDrop: z.onDrop,
           colStyle: "display:flex;flex-direction:column;gap:8px;margin:10px 0 0 14px;padding-left:12px;border-left:2px solid var(--slate-200);border-radius:4px;min-height:" + (editando ? "60px" : "0") + ";" + realce(a.id),
           obras: a.o.map((o, oi) => obra(a.id, oi, o)) }; }),
+      orgRetrairTudo: () => { const f = {}; T.an.forEach(a => { f[a.n || a.id] = 1; }); this.orgSetVista({ fechados: f }); },
+      orgExpandirTudo: () => this.orgSetVista({ fechados: {} }),
       orgAddGrupo: () => ed(N => { (N.grupos = N.grupos || []).push({ id: this.uid(), cargo: "", nome: "" }); }),
       orgAddAnalista: () => ed(N => { N.an.push({ id: this.uid(), n: "", cargo: "Analista de Projetos", abaixo: [], o: [] }); }),
       orgMostraPre: editando || T.pre.length > 0,
@@ -4374,7 +4440,7 @@ class Component extends DCLogic {
       "Dados e publicação": [["Base de dados", "Base de dados"], ["Exportação de dados", "Exportação"]].concat(isAdm ? [["Usuários e publicação", "Usuários e publicação"]] : []) };
     const grupoDe = p => Object.keys(GRUPOS).find(g => GRUPOS[g].some(s => s[0] === p));
     const pages = [["Geral", ""], ["Prazos", ""], ["Financeiro", ""], ["Indicadores", ""], ["Riscos de Engenharia", ""], ["Reuniões", ""],
-      ["Gestão de Fornecedores", fnMark], ["Equipe", anMark], ["Processos", "em construção"], ["Dados e publicação", upMark], ["Termos de Abertura de Projeto (TAP)", "↗"]];
+      ["Gestão de Fornecedores", fnMark], ["Equipe", anMark], ["Processos", ""], ["Dados e publicação", upMark], ["Termos de Abertura de Projeto (TAP)", "↗"]];
     const gAtual = grupoDe(page);
     const subTabs = gAtual ? GRUPOS[gAtual].map(s => ({ label: s[1], go: this.go(s[0]),
       style: "padding:8px 16px;border:0;border-radius:9px;cursor:pointer;font-family:var(--font-body);font-size:12.5px;font-weight:" + (s[0] === page ? "800" : "600") +
@@ -4396,7 +4462,7 @@ class Component extends DCLogic {
       "Gestão de Fornecedores": "Vínculo obra × disciplina → fornecedor e análise de concorrência de entregas",
       "Gestão de Analistas": "Atividades por analista, agrupadas por obra · projetos complementares",
       "Organograma do Setor": "Organograma do setor · obras por analista, UH e área construída",
-      "Processos": "Processos mapeados, POPs, ITs e diretrizes de projeto",
+      "Processos": "Fluxo de projetos por fase, com documentos, formulários e indicadores",
       "Base de dados": "Arquivos que alimentam o painel e atualização por upload",
       "Usuários e publicação": "Acessos ao painel e pacote criptografado para o GitHub",
       "Exportação de dados": "Apresentação do setor e planilha de indicadores da empresa",
