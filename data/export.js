@@ -238,7 +238,7 @@ export function buildFollow(ctx) {
     return s + '</div><p class="vz">Impacto ↑ · Probabilidade →</p>'; };
   const pg = a => '<section class="pg"><header><div class="k">Apresentação de</div><h1>' + esc(a.nome) + '</h1><div class="ob">' + a.obras.map(esc).join(" · ") + "</div></header>" +
     '<div class="kp">' + a.kpis.map(k => "<div><b>" + esc(k[0]) + "</b><span>" + esc(k[1]) + "</span></div>").join("") + "</div>" +
-    "<h2>Linha Axial do Projeto</h2>" + axial(a) +
+    "<h2>Linha axial · próximas entregas</h2>" + axial(a) +
     "<h2>Atividades críticas</h2>" + tab(["Atividade", "Obra", "Situação", "Prazo"], a.criticas, "Nenhuma atividade crítica.", 4) +
     "<h2>Atividades em andamento</h2>" + tab(["Atividade", "Obra", "Status", "Prazo"], a.andamento, "Nenhuma atividade em andamento.", 4) +
     '<div class="g2"><div><h2>Matriz de risco</h2>' + matriz(a.matriz) + "</div><div><h2>Riscos e status</h2>" + tab(["Risco", "Obra", "Score", "Status"], a.riscos, "Nenhum risco cadastrado.") + "</div></div>" +
@@ -251,8 +251,8 @@ export function buildFollow(ctx) {
     ".k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:#94A3B8}h1{font-size:25px;margin:4px 0 6px;font-weight:900}.ob{font-size:11.5px;color:#64748B}" +
     ".kp{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.kp div{border:1px solid #E2E8F0;border-left:4px solid #2563EB;padding:9px 12px}.kp b{display:block;font-size:21px;font-weight:900}.kp span{font-size:10.5px;color:#64748B}" +
     "h2{font-size:13px;margin:18px 0 8px;font-weight:800}.g2{display:grid;grid-template-columns:260px 1fr;gap:24px}" +
-    ".ao{font-size:11.5px;font-weight:800;margin:8px 0 4px}.ax{display:flex;flex-wrap:wrap;gap:8px;position:relative;margin-bottom:6px}" +
-    ".pn{flex:1 0 13%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px}.pn i{width:16px;height:16px;border-radius:99px}.pn small{font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:#64748B}" +
+    ".ao{font-size:11.5px;font-weight:800;margin:8px 0 4px}.ax{display:flex;gap:8px;position:relative;margin-bottom:6px}" +
+    ".pn{flex:1;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px}.pn i{width:16px;height:16px;border-radius:99px}.pn small{font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:#64748B}" +
     ".pn b{font-size:10.5px;line-height:1.25}.pn span{font-family:'DM Mono',monospace;font-size:10px;color:#64748B}" +
     ".mx{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.mx div{height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px}" +
     "table{width:100%;border-collapse:collapse;font-size:11px}th{text-align:left;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8;padding:5px 6px;border-bottom:1px solid #E2E8F0}" +
