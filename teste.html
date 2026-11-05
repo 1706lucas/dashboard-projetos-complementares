@@ -2720,14 +2720,15 @@ class Component extends DCLogic {
     return out;
   }
   dados() {
+    // Cache pela origem (base, uploads, config). dadosBase() gera objeto novo quando há upload no navegador.
+    const m = this._vig, cfg = this.state.cfg, base = this.state.data, u = this.state.uploads;
+    if (m && m.base === base && m.cfg === cfg && m.u === u) return m.out;
     const b = this.dadosBase(); if (!b) return null;
-    const m = this._vig, cfg = this.state.cfg;
-    if (m && m.b === b && m.cfg === cfg && m.u === this.state.uploads) return m.out;
     // Falha ou lista vazia nunca derruba o painel: mostra a base completa e registra o motivo.
     let out = b;
     try { const v = this.obrasVigentes(b); if (v.obras.length) out = v; else console.error("[gadens] Mapa das fontes não casou com nenhuma obra da base"); }
     catch (e) { console.error("[gadens] obrasVigentes:", e && e.message); }
-    this._vig = { b, cfg, u: this.state.uploads, out };
+    this._vig = { base, cfg, u, out };
     return out;
   }
   // base efetiva: original + uploads aplicados
