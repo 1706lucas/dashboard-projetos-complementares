@@ -1005,27 +1005,30 @@ a:hover{color:var(--blue-700)}
               </sc-for>
 
               <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
-                <h3 style="font-size:15px">Linha axial · próximas entregas</h3>
-                <p style="margin:3px 0 16px;font-size:12px;color:var(--slate-400)">3 próximas grandes entregas de projetos complementares (Marco Task), seguidas do Lançamento Comercial e do Início de Obra</p>
-                <sc-if value="{{ fuAxialVazio }}"><p style="margin:0;font-size:12.5px;color:var(--slate-400)">Sem marcos cadastrados para as obras deste analista.</p></sc-if>
-                <div style="display:flex;flex-direction:column;gap:22px">
+                <h3 style="font-size:15px">Linha Axial do Projeto</h3>
+                <p style="margin:3px 0 16px;font-size:12px;color:var(--slate-400)">Classe Datas Marco = Marco Axial · ordem cronológica</p>
+                <sc-if value="{{ fuAxialVazio }}"><p style="margin:0;font-size:12.5px;color:var(--slate-400)">Sem obras na carteira deste analista.</p></sc-if>
+                <div style="display:flex;flex-direction:column;gap:24px">
                   <sc-for list="{{ fuAxial }}" as="ax" hint-placeholder-count="2">
-                    <div style="display:flex;flex-direction:column;gap:10px">
-                      <span style="{{ ax.tituloStyle }}"><span class="mono" style="color:var(--blue-600)">{{ ax.sigla }}</span> {{ ax.nome }}</span>
-                      <div style="overflow-x:auto;padding-bottom:4px">
-                        <div style="{{ ax.trilhoStyle }}">
-                          <div style="{{ ax.linhaStyle }}"></div>
-                          <sc-for list="{{ ax.pins }}" as="p" hint-placeholder-count="5">
-                            <div style="flex:1 0 0;min-width:124px;display:flex;flex-direction:column;align-items:center;gap:7px;position:relative;z-index:1;padding:0 6px">
-                              <div style="{{ p.pinStyle }}">{{ p.pin }}</div>
-                              <span style="{{ p.grupoStyle }}">{{ p.grupo }}</span>
-                              <a href="{{ p.url }}" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;text-align:center;line-height:1.25;color:var(--color-text);text-decoration:none">{{ p.label }}</a>
-                              <span class="mono" style="font-size:11px;color:var(--slate-500)">{{ p.data }}</span>
-                              <span style="{{ p.stStyle }}">{{ p.status }}</span>
+                    <div style="display:flex;flex-direction:column;gap:12px">
+                      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+                        <span style="font-size:13px;font-weight:800"><span class="mono" style="color:var(--blue-600)">{{ ax.sigla }}</span> {{ ax.nome }}</span>
+                        <span class="mono" style="font-size:12px;color:var(--slate-400)">{{ ax.n }} marcos</span>
+                      </div>
+                      <div style="overflow-x:auto;padding-bottom:6px">
+                        <div style="{{ ax.innerStyle }}">
+                          <div style="{{ ax.trackStyle }}"></div>
+                          <div style="{{ ax.fillStyle }}"></div>
+                          <sc-for list="{{ ax.axial }}" as="a" hint-placeholder-count="6">
+                            <div style="flex:1 0 0;min-width:116px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;z-index:1;padding:0 4px">
+                              <div style="{{ a.pinStyle }}">{{ a.pinText }}</div>
+                              <div style="{{ a.labelStyle }}">{{ a.label }}</div>
+                              <div class="mono" style="font-size:11px;color:var(--slate-400)">{{ a.date }}</div>
                             </div>
                           </sc-for>
                         </div>
                       </div>
+                      <sc-if value="{{ ax.sem }}"><p style="margin:0;font-size:12.5px;color:var(--slate-400)">Sem marcos axiais cadastrados para esta obra.</p></sc-if>
                     </div>
                   </sc-for>
                 </div>
@@ -2488,7 +2491,7 @@ class Component extends DCLogic {
     try {
       const C = await this.cofre();
       const X = await this.carregaModulo("./data/export.js");
-      const d = this.dados();
+      const d = this.dadosBase();
       if (!d || !this.state.adata || !this.state.fdata) throw new Error("Aguarde o carregamento completo dos dados.");
       const forn = Object.assign({}, this.state.fdata, { seed: this.state.fstate || this.state.fdata.seed });
       const cfg = this.state.cfg || { url: "", anon: "", chave: "" };
@@ -2663,8 +2666,67 @@ class Component extends DCLogic {
       this.saveUploads(u, "Atualização de " + (this.FONTES[kind] ? this.FONTES[kind].titulo : kind) + " descartada — voltou à base original.", false);
     };
   }
-  // base efetiva: original + uploads aplicados
+  // Linha axial: mesmo desenho em Prazos, Geral e Follow-up
+  axialVisual(ax) {
+    const firstOpen = ax.findIndex(a => a.kind !== "done");
+    const axial = ax.map((a, i) => {
+      const kd = this.statusKind(a.status, a.kind);
+      const done = kd === "done", active = i === firstOpen;
+      const bg = done ? "var(--blue-600)" : "var(--card)";
+      const bd = done ? "var(--blue-600)" : active ? "var(--blue-500)" : "var(--slate-200)";
+      const fg = done ? "#fff" : active ? "var(--blue-600)" : "var(--slate-400)";
+      return {
+        label: a.label, date: this.mesAno(a.end || a.start), pinText: done ? "✓" : String(i + 1),
+        pinStyle: "width:38px;height:38px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:800;font-size:14px;background:" +
+          bg + ";border:2px solid " + bd + ";color:" + fg + (active ? ";box-shadow:0 0 0 4px var(--blue-50)" : ""),
+        labelStyle: "font-size:12px;font-weight:" + (done || active ? "800" : "600") + ";text-align:center;line-height:1.25;color:" +
+          (active ? "var(--blue-600)" : done ? "var(--slate-700)" : "var(--slate-400)")
+      };
+    });
+    const pct = ax.length > 1 ? ((firstOpen < 0 ? ax.length - 1 : Math.max(firstOpen, 0)) / (ax.length - 1)) * 100 : 0;
+    const halfCol = ax.length ? 50 / ax.length : 0;
+    return { axial,
+      innerStyle: "position:relative;display:flex;flex-wrap:nowrap;width:100%;min-width:" + (ax.length * 124) + "px",
+      trackStyle: "position:absolute;top:18px;left:" + halfCol + "%;right:" + halfCol + "%;height:3px;background:var(--slate-200);border-radius:99px",
+      fillStyle: "position:absolute;top:18px;left:" + halfCol + "%;width:" + ((100 - 2 * halfCol) * pct / 100).toFixed(2) + "%;height:3px;background:var(--blue-600);border-radius:99px" };
+  }
+  // Obras do Mapa das fontes: é a lista que define o que existe no painel. O robô regrava a base, por isso a regra fica aqui.
+  OBRA_APELIDOS = { VER: ["Follador"], QUA: ["Leilão"], AUR: ["Alta Tensão"], RAF: ["Rafitec", "Raftec"], EVO: ["Core Evo", "Core Evo (João Negrão)"], PAG: ["Pe Agostinho", "Padre Agostinho"] };
+  obrasVigentes(d) {
+    const fontes = this.mfLista().filter(f => f.tipo === "cronograma" && f.sigla);
+    const porSigla = {}; d.obras.forEach(o => { porSigla[o.sigla] = o; });
+    const obras = fontes.filter(f => porSigla[f.sigla]).map(f => {
+      const o = porSigla[f.sigla], ap = [].concat(o.apelidos || [], this.OBRA_APELIDOS[f.sigla] || [], f.nome ? [f.nome] : []);
+      return Object.assign({}, o, { nome: f.sigla === "EVO" || !f.nome ? o.nome : String(f.nome).replace(/ I$/, " 1").replace(/ II$/, " 2"), apelidos: ap, axial: o.axial || [], gantt: o.gantt || [] });
+    });
+    const achar = nome => { const n = this.norm(nome); if (!n) return null;
+      return obras.find(o => this.norm(o.nome) === n) || obras.find(o => o.apelidos.some(x => this.norm(x) === n)) ||
+        obras.find(o => this.norm(o.lista).indexOf(n) >= 0 || n.indexOf(this.norm(o.nome)) >= 0) || null; };
+    const vale = x => { if (!x) return false; const nome = x.obra || x.empreendimento; return !nome || !!achar(nome); };
+    const lst = v => Array.isArray(v) ? v.filter(vale) : v;
+    const ind = Object.assign({}, d.indicadores);
+    Object.keys(ind).forEach(k => { ind[k] = lst(ind[k]); });
+    const fin = Object.assign({}, d.financeiro);
+    Object.keys(fin).forEach(k => { fin[k] = lst(fin[k]); });
+    const out = Object.assign({}, d, { obras, indicadores: ind, financeiro: fin, geo: lst(d.geo) });
+    if (d.pendencias) out.pendencias = Object.assign({}, d.pendencias, { itens: lst(d.pendencias.itens) });
+    if (d.atrasos) out.atrasos = Object.assign({}, d.atrasos, { itens: Array.isArray(d.atrasos.itens) ? d.atrasos.itens.filter(x => x && (obras.some(o => o.sigla === x.sigla) || vale(x))) : d.atrasos.itens });
+    return out;
+  }
   dados() {
+    // Cache pela origem (base, uploads, config). dadosBase() gera objeto novo quando há upload no navegador.
+    const m = this._vig, cfg = this.state.cfg, base = this.state.data, u = this.state.uploads;
+    if (m && m.base === base && m.cfg === cfg && m.u === u) return m.out;
+    const b = this.dadosBase(); if (!b) return null;
+    // Falha ou lista vazia nunca derruba o painel: mostra a base completa e registra o motivo.
+    let out = b;
+    try { const v = this.obrasVigentes(b); if (v.obras.length) out = v; else console.error("[gadens] Mapa das fontes não casou com nenhuma obra da base"); }
+    catch (e) { console.error("[gadens] obrasVigentes:", e && e.message); }
+    this._vig = { base, cfg, u, out };
+    return out;
+  }
+  // base efetiva: original + uploads aplicados
+  dadosBase() {
     const d = this.state.data; if (!d) return null;
     const u = this.state.uploads || {};
     if (!Object.keys(u).length) return d;
@@ -3393,7 +3455,13 @@ class Component extends DCLogic {
     const out = {}; this.RLISTAS.forEach(l => { out[l[0]] = its.filter(p => p.tipo === l[0]); }); return out;
   }
   FUKEY = "gadens.followup.v1";
-  FU_ANALISTAS = ["Lucas Vaz de Camargo", "Jaira Ataíde", "Mariana Azevedo", "Francyelli Rossot", "Luiz Lemes"];
+  FU_ANALISTAS = ["Lucas Vaz de Camargo", "Jaira Ataíde", "Mariana Azevedo", "João Vitor Matos", "Francyelli Rossot", "Luiz Lemes"];
+  // Lista e carteira vêm do Organograma do Setor: cada obra pertence a um único analista.
+  fuLista() { return (this.orgDados().an || []).filter(a => a && a.n).map(a => this.FU_ANALISTAS.find(f => this.fuMesmo(f, a.n)) || a.n); }
+  fuCarteira(nome) {
+    const an = (this.orgDados().an || []).find(a => a && a.n && this.fuMesmo(a.n, nome)), vistos = {};
+    return ((an && an.o) || []).map(x => this.matchObra(x && x.n)).filter(o => o && !vistos[o.sigla] && (vistos[o.sigla] = 1));
+  }
   fuMesmo(a, b) {
     const t = s => this.norm(s).split(" ").filter(Boolean);
     const x = t(a), y = t(b);
@@ -3415,15 +3483,11 @@ class Component extends DCLogic {
   fuDados(nome, sigla) {
     const d = this.dados(), hoje = this.fuHoje();
     const em15 = new Date(Date.parse(hoje) + 15 * 864e5).toISOString().slice(0, 10);
-    const minhas = []; const obrasSet = {};
-    d.obras.forEach(o => (o.complAbertas || []).forEach(t => {
-      if (!(t.ass || []).some(x => x === nome || this.fuMesmo(x, nome))) return;
-      if (sigla && o.sigla !== sigla) { obrasSet[o.sigla] = o; return; }
-      minhas.push(Object.assign({ sigla: o.sigla, obra: o.nome }, t)); obrasSet[o.sigla] = o;
-    }));
-    const todasObras = Object.keys(obrasSet).map(k => obrasSet[k]).sort((a, b) => a.sigla.localeCompare(b.sigla));
+    const todasObras = this.fuCarteira(nome).sort((a, b) => a.sigla.localeCompare(b.sigla));
     const obras = sigla ? todasObras.filter(o => o.sigla === sigla) : todasObras;
-    const siglas = obras.map(o => o.sigla), nomes = obras.map(o => this.norm(o.nome));
+    const siglas = obras.map(o => o.sigla);
+    const minhas = [];
+    obras.forEach(o => (o.complAbertas || []).forEach(t => minhas.push(Object.assign({ sigla: o.sigla, obra: o.nome }, t))));
     const entregas = minhas.filter(t => t.d && t.d >= hoje && t.d <= em15).sort((a, b) => a.d.localeCompare(b.d));
     const h7 = new Date(Date.parse(hoje) - 7 * 864e5).toISOString().slice(0, 10);
     const naoIniciada = t => /EM ABERTO|TO DO|SEM IN[IÍ]CIO/i.test(t.status);
@@ -3434,22 +3498,25 @@ class Component extends DCLogic {
     }).filter(Boolean).sort((a, b) => (a.tipo === "Atrasada" ? 0 : 1) - (b.tipo === "Atrasada" ? 0 : 1) || b.diasRef - a.diasRef);
     const ids = {}; criticas.forEach(t => { ids[t.url] = 1; });
     const andamento = minhas.filter(t => !ids[t.url] && !naoIniciada(t) && t.kind === "prog").sort((a, b) => String(a.d || "9").localeCompare(String(b.d || "9")));
-    const isC = g => String(g.tag || "").split(",").some(x => /^\s*(eng\s*-\s*)?complementares\s*$/i.test(x));
-    const fim = (lista, re) => lista.find(a => re.test(this.norm(a.label)));
-    const axial = obras.map(o => ({ o,
-      prox: (o.gantt || []).filter(g => isC(g) && g.kind !== "done" && g.end).sort((a, b) => a.end.localeCompare(b.end)).slice(0, 3),
-      lanc: fim(o.axial || [], /lancamento/), obra: fim(o.axial || [], /inicio d[ae] obra/) }));
+    const axial = obras.map(o => ({ o, marcos: o.axial || [] }));
     const A = d.atrasos || { itens: [] };
     const atrasos = (A.itens || []).filter(x => x.dias > 0 && siglas.indexOf(x.sigla) >= 0).sort((a, b) => b.dias - a.dias);
     const encerrado = s => /conclu|tratado|cancel/i.test(String(s || ""));
-    const riscos = ((d.indicadores && d.indicadores.riscos) || []).filter(r => nomes.indexOf(this.norm(r.obra)) >= 0)
-      .map(r => Object.assign({ s: this.riscoScore(r), aberto: !encerrado(r.status), sigla: (obras.find(o => this.norm(o.nome) === this.norm(r.obra)) || {}).sigla }, r))
+    const siglaRisco = r => (this.matchObra(r.obra) || {}).sigla;
+    const riscos = ((d.indicadores && d.indicadores.riscos) || []).filter(r => siglas.indexOf(siglaRisco(r)) >= 0)
+      .map(r => Object.assign({ s: this.riscoScore(r), aberto: !encerrado(r.status), sigla: siglaRisco(r) }, r))
       .sort((a, b) => (b.aberto - a.aberto) || (b.s || 0) - (a.s || 0));
     const legais = [];
     obras.forEach(o => (o.legais || []).forEach(l => { if (l.kind !== "done") legais.push(Object.assign({ sigla: o.sigla }, l)); }));
     legais.sort((a, b) => String(a.d || "9").localeCompare(String(b.d || "9")));
     const legAtraso = l => /ATRASO|FORA DO PRAZO/i.test(l.status) || (l.d && l.d < hoje);
     return { obras, todasObras, entregas, criticas, andamento, axial, atrasos, riscos, legais, legAtraso, hoje, base: A };
+  }
+  // O Follow-up é calculado em toda renderização: erro aqui não pode derrubar as outras abas.
+  fuSeguro() {
+    try { return this.fuVals(); }
+    catch (e) { console.error("[gadens] Follow-up:", e && e.message);
+      return { fuAnalistas: [], fuSemAnalista: true, fuTem: false, fuObraChips: [], fuAxial: [], fuResumo: [], fuCriticas: [], fuAndamento: [], fuMatriz: [], fuImp: [], fuProb: [], fuRiscos: [], fuPdfOpts: [], fuPdfAberto: false }; }
   }
   fuVals() {
     const d = this.dados(), st = this.fuStore(), fu = this.state.fu || {};
@@ -3460,7 +3527,7 @@ class Component extends DCLogic {
     const cont = {};
     d.obras.forEach(o => (o.complAbertas || []).forEach(t => (t.ass || []).forEach(a => { cont[a] = (cont[a] || 0) + 1; })));
     const editar = false;
-    const visiveis = this.FU_ANALISTAS.slice(), lista = visiveis;
+    const visiveis = this.fuLista(), lista = visiveis;
     const sel = visiveis.indexOf(fu.sel) >= 0 ? fu.sel : visiveis[0];
     const setFu = p => this.setState({ fu: Object.assign({}, this.state.fu, p) });
     const fuAnalistas = lista.map(a => {
@@ -3505,23 +3572,7 @@ class Component extends DCLogic {
     const stPill = s => { const c = /ATRASO/i.test(s) && !/CONCLU/i.test(s) ? ["#FEE2E2", "#991B1B"] : /FORA DO PRAZO|PROGRESS|ANDAMENTO|AN[AÁ]LISE/i.test(s) ? ["#FEF3C7", "#92400E"] : /CONCLU|TRATADO/i.test(s) ? ["#D1FAE5", "#065F46"] : ["var(--slate-200)", "var(--slate-600)"];
       return "font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0;background:" + c[0] + ";color:" + c[1]; };
     const tagSt = (bg, fg) => "font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0;background:" + bg + ";color:" + fg;
-    const pin = (it, grupo, cor) => {
-      const done = it && it.kind === "done", prog = it && it.kind === "prog";
-      return { label: it ? (it.label || "Sem nome") : "—", grupo, data: it ? this.br(it.end || it.start) : "sem data",
-        status: it ? (it.status || "—") : "não cadastrado",
-        stStyle: (it ? stPill(it.status || "") : tagSt("var(--slate-100)", "var(--slate-400)")).replace("white-space:nowrap;flex-shrink:0;", "white-space:normal;text-align:center;max-width:100%;line-height:1.3;"),
-        pin: done ? "✓" : "", url: null,
-        grupoStyle: "font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:" + cor,
-        pinStyle: "width:36px;height:36px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#fff;border:3px solid " +
-          (done ? "#10B981" : prog ? "#F59E0B" : "var(--slate-300)") + ";background:" + (done ? "#10B981" : prog ? "#F59E0B" : "var(--card)") };
-    };
-    const fuAxial = D.axial.map(x => { const pins = x.prox.map((it, i) => pin(it, "Entrega " + (i + 1), "var(--blue-600)"))
-        .concat([pin(x.lanc, "Lançamento", "#8B5CF6"), pin(x.obra, "Início de obra", "#EF4444")]);
-      const meia = (50 / pins.length).toFixed(2);
-      return { sigla: x.o.sigla, nome: x.o.nome, pins,
-        tituloStyle: D.axial.length > 1 ? "font-size:13px;font-weight:800" : "display:none",
-        trilhoStyle: "position:relative;display:flex;min-width:" + (pins.length * 124) + "px",
-        linhaStyle: "position:absolute;top:17px;left:" + meia + "%;right:" + meia + "%;height:3px;background:var(--slate-200);border-radius:99px" }; });
+    const fuAxial = D.axial.map(x => Object.assign({ sigla: x.o.sigla, nome: x.o.nome, n: x.marcos.length, sem: !x.marcos.length }, this.axialVisual(x.marcos)));
     const dd = this.dados();
     const segs = (lista, total, cores, fmt) => lista.map((x, i) => ({ label: x[0], valor: fmt(x[1]), title: x[0] + " · " + fmt(x[1]),
       style: "height:100%;background:" + cores[i % cores.length] + ";width:" + (total ? (x[1] / total * 100).toFixed(2) : 0) + "%",
@@ -3598,8 +3649,7 @@ class Component extends DCLogic {
           kpis: [[D.criticas.filter(t => t.tipo === "Atrasada").length, "atrasadas > 7 dias"], [D.criticas.filter(t => t.tipo !== "Atrasada").length, "sem início, prazo correndo"],
             [D.andamento.length, "em andamento"], [D.riscos.filter(r => r.aberto && (r.s || 0) > 12).length, "riscos em aberto > 12"]],
           axial: D.axial.map(x => ({ obra: x.o.sigla + " · " + x.o.nome,
-            pins: x.prox.map((it, i) => ["Entrega " + (i + 1), it]).concat([["Lançamento", x.lanc], ["Início de obra", x.obra]])
-              .map(p => [p[0], p[1] ? p[1].label : "—", p[1] ? this.br(p[1].end || p[1].start) : "", p[1] ? p[1].kind : "todo"]) })),
+            pins: x.marcos.map((a, i) => ["Marco " + (i + 1), a.label, this.mesAno(a.end || a.start), this.statusKind(a.status, a.kind)]) })),
           criticas: D.criticas.map(t => [t.n, t.sigla, t.tipo === "Atrasada" ? "Atrasada +" + t.diasRef + " d" : "Sem início", this.br(t.d), t.url]),
           andamento: D.andamento.map(t => [t.n, t.sigla, t.status, this.br(t.d), t.url]),
           matriz: (() => { const c = {}; D.riscos.forEach(r => { if (r.impacto && r.probabilidade) c[r.impacto + "-" + r.probabilidade] = (c[r.impacto + "-" + r.probabilidade] || 0) + 1; }); return c; })(),
@@ -3736,7 +3786,7 @@ class Component extends DCLogic {
   }
   br(d) { return d ? d.slice(8, 10) + "/" + d.slice(5, 7) + "/" + d.slice(2, 4) : "—"; }
   mesAno(d) {
-    if (!d) return "—";
+    if (typeof d !== "string" || !d) return "—";
     const mn = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     return mn[+d.slice(5, 7) - 1] + " " + d.slice(2, 4);
   }
@@ -4390,7 +4440,7 @@ class Component extends DCLogic {
       ganttVazio: "", ganttVazioStyle: "display:none",
       ganttWrapStyle: "border:1px solid var(--slate-100);border-radius:12px;overflow-x:auto",
       ganttLegendaWrapStyle: "display:flex;gap:18px;margin-top:14px;flex-wrap:wrap;align-items:center"
-    }, this.anVals(), this.fnVals(), this.baseVals(), this.mfVals(), this.exVals(), this.consVals(null, [], []), this.rdVals(), this.fuVals());
+    }, this.anVals(), this.fnVals(), this.baseVals(), this.mfVals(), this.exVals(), this.consVals(null, [], []), this.rdVals(), this.fuSeguro());
 
     const list = this.obras();
     const o = this.obra();
@@ -4402,24 +4452,8 @@ class Component extends DCLogic {
     }));
 
     // ── linha axial em pins ──
-    const ax = o ? o.axial : [];
-    const firstOpen = ax.findIndex(a => a.kind !== "done");
-    const axial = ax.map((a, i) => {
-      const kd = this.statusKind(a.status, a.kind);
-      const done = kd === "done", active = i === firstOpen;
-      const bg = done ? "var(--blue-600)" : "var(--card)";
-      const bd = done ? "var(--blue-600)" : active ? "var(--blue-500)" : "var(--slate-200)";
-      const fg = done ? "#fff" : active ? "var(--blue-600)" : "var(--slate-400)";
-      return {
-        label: a.label, date: this.mesAno(a.end || a.start), pinText: done ? "✓" : String(i + 1),
-        pinStyle: "width:38px;height:38px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:800;font-size:14px;background:" +
-          bg + ";border:2px solid " + bd + ";color:" + fg + (active ? ";box-shadow:0 0 0 4px var(--blue-50)" : ""),
-        labelStyle: "font-size:12px;font-weight:" + (done || active ? "800" : "600") + ";text-align:center;line-height:1.25;color:" +
-          (active ? "var(--blue-600)" : done ? "var(--slate-700)" : "var(--slate-400)")
-      };
-    });
-    const pct = ax.length > 1 ? ((firstOpen < 0 ? ax.length - 1 : Math.max(firstOpen, 0)) / (ax.length - 1)) * 100 : 0;
-    const halfCol = ax.length ? 50 / ax.length : 0;
+    const ax = (o && o.axial) || [];
+    const axV = this.axialVisual(ax);
 
     // ── gantt ──
     const okDate = s => typeof s === "string" && s.length === 10 && s >= "2015-01-01" && s <= "2040-12-31";
@@ -4925,13 +4959,11 @@ class Component extends DCLogic {
       prazosNuloStyle: o && o.totalCompl === 0 ? "margin:10px 0 0;font-size:12px;color:var(--slate-400)" : "display:none",
       prazosAviso: this.state.sigla ? "" : "obra de referência — selecione uma obra no filtro",
       prazosAvisoStyle: this.state.sigla ? "display:none" : "font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:4px 10px;border-radius:99px;background:var(--blue-50);color:var(--blue-700);white-space:nowrap",
-      fases, axial, nAxial: ax.length, semAxial: ax.length === 0,
+      fases, axial: axV.axial, nAxial: ax.length, semAxial: ax.length === 0,
       fasesLinha, semFases: fasesLinha.length === 0,
       vidaResumo: vida.dias == null ? "—" : "Vida útil " + vida.dias + " dias",
       axialWrapStyle: ax.length ? "overflow-x:auto;margin-top:26px;padding-bottom:6px" : "display:none",
-      axialInnerStyle: "position:relative;display:flex;flex-wrap:nowrap;width:100%;min-width:" + (ax.length * 124) + "px",
-      axialTrackStyle: "position:absolute;top:18px;left:" + halfCol + "%;right:" + halfCol + "%;height:3px;background:var(--slate-200);border-radius:99px",
-      axialFillStyle: "position:absolute;top:18px;left:" + halfCol + "%;width:" + ((100 - 2 * halfCol) * pct / 100).toFixed(2) + "%;height:3px;background:var(--blue-600);border-radius:99px",
+      axialInnerStyle: axV.innerStyle, axialTrackStyle: axV.trackStyle, axialFillStyle: axV.fillStyle,
       gantt, months, ganttMinStyle, ganttRange,
       ganttLegend,
       ganttVazio: g.length ? "" : "Sem marcos de cronograma cadastrados para esta obra.",
@@ -5007,7 +5039,7 @@ class Component extends DCLogic {
       ].map(c => ({ title: c.title, sub: c.sub, bars: c.bars, vazio: c.bars.length === 0 })),
       modalEmpty: !!md && md.rows.length === 0 && mk !== "estouro",
       modalCharts: md ? md.charts.map(c => ({ title: c.title, sub: c.sub, bars: c.bars, vazio: c.bars.length === 0 })) : []
-    }, this.anVals(), this.fnVals(), this.baseVals(), this.mfVals(), this.exVals(), this.consVals(d, list, ganttLegend), this.rdVals(), this.fuVals());
+    }, this.anVals(), this.fnVals(), this.baseVals(), this.mfVals(), this.exVals(), this.consVals(d, list, ganttLegend), this.rdVals(), this.fuSeguro());
   }
 }
 </script>
