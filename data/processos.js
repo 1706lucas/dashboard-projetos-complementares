@@ -101,6 +101,10 @@ const CSS = `
 .pc-no.sup{justify-content:flex-start;gap:8px;text-align:left;font-weight:600;font-size:11.5px;border-width:1px;border-color:var(--slate-200,#E2E8F0);border-left:4px solid var(--cor)}
 .pc-no.sup svg{position:static;flex:none;width:18px;height:18px;color:var(--cor)}
 .pc-no.sup.vazio{border-style:dashed;border-left-style:solid;color:var(--slate-500,#64748B)}
+.pc-no.pc-salta{cursor:pointer;border-color:var(--blue-600,#2563EB)}.pc-no.pc-salta:hover{box-shadow:0 0 0 3px var(--blue-50,#EFF6FF);text-decoration:underline}
+.pc-no.pc-salta::after{border-color:var(--blue-600,#2563EB);color:var(--blue-600,#2563EB)}
+.pc-marca{font-size:12.5px;font-weight:800;color:var(--slate-500,#64748B)}
+.pc-check{flex-direction:row!important;align-items:center;gap:7px!important}.pc-check input{width:auto}
 a.pc-no{cursor:pointer}a.pc-no:hover{box-shadow:0 0 0 3px var(--blue-50,#EFF6FF);text-decoration:underline}
 .pc-no.ini,.pc-no.fim{flex-direction:column;justify-content:flex-start;gap:5px;background:transparent;border:0;padding:0;font-weight:600;font-size:11px}
 .pc-no.ini i,.pc-no.fim i{display:block;flex:none;width:30px;height:30px;border-radius:99px;border:3px solid #65A30D;background:#D9F99D}
@@ -136,6 +140,8 @@ function normaliza(d) {
   const ok = d && Array.isArray(d.fases) && d.fases.length ? copia(d) : semente();
   ok.fases.forEach(f => { f.nos = Array.isArray(f.nos) ? f.nos.filter(n => n && TIPOS[n.tipo]) : []; f.setas = Array.isArray(f.setas) ? f.setas : [];
     const ids = {}; f.nos.forEach(n => { ids[n.id] = 1; }); f.setas = f.setas.filter(s => ids[s.de] && ids[s.para]); });
+  const fases = {}; ok.fases.forEach(f => { fases[f.id] = 1; });
+  ok.fases.forEach(f => f.nos.forEach(n => { if (n.destino && !fases[n.destino]) delete n.destino; }));
   return ok;
 }
 
@@ -165,11 +171,14 @@ export function montar(raiz, opts) {
   if (!document.getElementById("pc-css")) { const st = el("style"); st.id = "pc-css"; st.textContent = CSS; document.head.appendChild(st); }
   const S = {
     pub: normaliza(opts.dados), edita: false, dados: null, hist: [], fase: 0, sel: null, msg: opts.msg || "", erro: !!opts.erroMsg,
-    z: 1, px: 20, py: 20, salvando: false
+    z: 1, px: 20, py: 20, salvando: false, pilha: []
   };
   S.dados = S.pub;
   if (opts.rascunho && opts.rascunho() && opts.admin) { S.dados = normaliza(opts.rascunho()); S.edita = true; }
   const fase = () => S.dados.fases[Math.min(S.fase, S.dados.fases.length - 1)];
+  const idxFase = id => S.dados.fases.findIndex(f => f.id === id);
+  function ir(id) { const i = idxFase(id); if (i < 0) return; S.pilha.push(S.fase); S.fase = i; S.sel = null; tudo(); ajustar(); }
+  function voltar() { if (!S.pilha.length) return; S.fase = S.pilha.pop(); S.sel = null; tudo(); ajustar(); }
   const guarda = () => { if (opts.setRascunho) opts.setRascunho(S.edita ? S.dados : null); };
   const marca = () => { S.hist.push(JSON.stringify(S.dados)); if (S.hist.length > 60) S.hist.shift(); };
 
@@ -183,7 +192,7 @@ export function montar(raiz, opts) {
   wrap.append(barra, msg, corpo, legenda, apoio); raiz.appendChild(wrap);
   [["Atividade", "var(--blue-600,#2563EB)"], ["Subprocesso", COR.subprocesso], ["Documento", COR.documento], ["Formulário", COR.formulario], ["Indicador", COR.indicador]]
     .forEach(l => { const s = el("span"); const b = el("b"); b.style.setProperty("--cor", l[1]); s.append(b, l[0]); legenda.appendChild(s); });
-  const dica = el("span", null, "Clique em um item de apoio para abrir. Use as barras de rolagem para ver todo o fluxo.");
+  const dica = el("span", null, "Clique em um item de apoio ou subprocesso para abrir. Use as barras de rolagem para ver todo o fluxo.");
   legenda.appendChild(dica);
 
   const aplicaVista = () => { palco.classList.toggle("pc-fixo", !S.edita); mundo.style.transform = "translate(" + S.px + "px," + S.py + "px) scale(" + S.z + ")";
@@ -226,10 +235,11 @@ export function montar(raiz, opts) {
   function desenhaNos() {
     mundo.querySelectorAll(".pc-no").forEach(n => n.remove());
     fase().nos.forEach(n => {
-      const t = TIPOS[n.tipo], lk = linkOk(n.link), ehLink = lk && !S.edita;
+      const t = TIPOS[n.tipo], salta = !S.edita && n.destino && idxFase(n.destino) >= 0, lk = linkOk(n.link), ehLink = lk && !S.edita && !salta;
       const d = el(ehLink ? "a" : "div", "pc-no " + n.tipo + (n.tipo === "inicio" ? " ini" : "") + (suporte(n) ? " sup" + (lk ? "" : " vazio") : ""));
       d.dataset.no = n.id; d.style.left = n.x + "px"; d.style.top = n.y + "px"; d.style.width = t.w + "px"; d.style.minHeight = t.h + "px";
       if (suporte(n)) d.style.setProperty("--cor", COR[n.tipo]);
+      if (salta) { d.classList.add("pc-salta"); d.dataset.destino = n.destino; d.title = "Abrir " + S.dados.fases[idxFase(n.destino)].nome; d.tabIndex = 0; d.setAttribute("role", "link"); }
       if (ehLink) { d.href = n.link.trim(); d.target = "_blank"; d.rel = "noopener noreferrer"; d.title = "Abrir"; }
       else if (suporte(n) && !lk) d.title = "Link ainda não cadastrado";
       if (ICONE[n.tipo]) { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.innerHTML = ICONE[n.tipo]; d.appendChild(s); }
@@ -242,7 +252,12 @@ export function montar(raiz, opts) {
   function desenhaBarra() {
     barra.textContent = "";
     const g = el("div", "pc-grupo");
-    S.dados.fases.forEach((f, i) => g.appendChild(botao(f.nome, () => { S.fase = i; S.sel = null; tudo(); ajustar(); }, i === S.fase ? "on" : "")));
+    const atual = fase();
+    S.dados.fases.forEach((f, i) => { if (f.sub && !S.edita) return;
+      g.appendChild(botao((f.sub ? "↳ " : "") + f.nome, () => { S.fase = i; S.sel = null; S.pilha = []; tudo(); ajustar(); }, f === atual ? "on" : "")); });
+    if (!S.edita && S.pilha.length) { const o = S.dados.fases[S.pilha[S.pilha.length - 1]];
+      g.appendChild(botao("← Voltar para " + (o ? o.nome : "o processo"), voltar)); }
+    if (!S.edita && atual.sub) g.appendChild(el("span", "pc-marca", atual.nome));
     if (S.edita) g.appendChild(botao("+ Fase", () => { const nome = window.prompt("Nome da nova fase:"); if (!nome || !nome.trim()) return;
       marca(); S.dados.fases.push({ id: novoId("f"), nome: nome.trim(), nos: [], setas: [] }); S.fase = S.dados.fases.length - 1; S.sel = null; guarda(); tudo(); ajustar(); }));
     const d = el("div", "pc-grupo");
@@ -264,12 +279,17 @@ export function montar(raiz, opts) {
     const nome = el("input"); nome.value = f.nome; nome.addEventListener("focus", marca);
     nome.addEventListener("input", () => { f.nome = nome.value; guarda(); }); nome.addEventListener("change", desenhaBarra);
     lateral.appendChild(campo("Nome", nome));
+    const sb = el("input"); sb.type = "checkbox"; sb.checked = !!f.sub;
+    sb.addEventListener("change", () => { marca(); f.sub = sb.checked; guarda(); desenhaBarra(); });
+    const lb = el("label", "pc-check"); lb.appendChild(sb); lb.append("Processo interno (fora das abas)"); lateral.appendChild(lb);
     const mv = el("div", "pc-grupo");
     const mover = dl => { const i = S.dados.fases.indexOf(f), j = i + dl; if (j < 0 || j >= S.dados.fases.length) return; marca(); const fs = S.dados.fases; fs.splice(i, 1); fs.splice(j, 0, f); S.fase = j; guarda(); tudo(); };
     mv.append(botao("← Mover", () => mover(-1)), botao("Mover →", () => mover(1)), botao("Excluir fase", () => {
       if (S.dados.fases.length < 2) { window.alert("O fluxo precisa de pelo menos uma fase."); return; }
       if (!window.confirm("Excluir a fase " + f.nome + " e todo o fluxo dela?")) return;
-      marca(); S.dados.fases.splice(S.dados.fases.indexOf(f), 1); S.fase = 0; S.sel = null; guarda(); tudo(); ajustar(); }, "per"));
+      marca(); S.dados.fases.splice(S.dados.fases.indexOf(f), 1);
+      S.dados.fases.forEach(x => x.nos.forEach(n => { if (n.destino === f.id) delete n.destino; }));
+      S.fase = 0; S.sel = null; guarda(); tudo(); ajustar(); }, "per"));
     lateral.appendChild(mv);
     lateral.appendChild(el("h4", null, "Adicionar"));
     const p = el("div", "pc-paleta");
@@ -287,6 +307,16 @@ export function montar(raiz, opts) {
       const tp = el("select"); Object.keys(TIPOS).forEach(k => { const o = el("option", null, TIPOS[k].nome); o.value = k; o.selected = k === n.tipo; tp.appendChild(o); });
       tp.addEventListener("change", () => { marca(); n.tipo = tp.value; guarda(); tudo(); });
       lateral.appendChild(campo("Tipo", tp));
+      if (n.tipo === "subprocesso") {
+        const ds = el("select"), nada = el("option", null, "Nenhum"); nada.value = ""; ds.appendChild(nada);
+        S.dados.fases.forEach(x => { if (x === f) return; const o = el("option", null, x.nome); o.value = x.id; o.selected = x.id === n.destino; ds.appendChild(o); });
+        ds.addEventListener("change", () => { marca(); if (ds.value) n.destino = ds.value; else delete n.destino; guarda(); desenhaLateral(); });
+        lateral.appendChild(campo("Ao clicar, abre o processo", ds));
+        if (n.destino) lateral.appendChild(botao("Abrir para editar", () => { S.fase = idxFase(n.destino); S.sel = null; tudo(); ajustar(); }));
+        else lateral.appendChild(botao("Criar processo vinculado", () => { marca();
+          const nv = { id: novoId("f"), nome: (n.texto || "Novo processo").trim(), sub: true, nos: [], setas: [] };
+          S.dados.fases.push(nv); n.destino = nv.id; guarda(); desenhaLateral(); desenhaBarra(); }));
+      }
       const lk = el("input"); lk.placeholder = "https://… link do SharePoint"; lk.value = n.link || ""; lk.addEventListener("focus", marca);
       const av = el("p", "pc-aviso");
       const conf = () => { const v = lk.value.trim(); av.className = "pc-aviso" + (v && !linkOk(v) ? " err" : "");
@@ -334,6 +364,8 @@ export function montar(raiz, opts) {
 
   // ── interações ──
   let g = null;
+  palco.addEventListener("click", e => { if (S.edita) return; const a = e.target.closest && e.target.closest("[data-destino]"); if (a) ir(a.dataset.destino); });
+  palco.addEventListener("keydown", e => { if (S.edita || e.key !== "Enter") return; const a = e.target.closest && e.target.closest("[data-destino]"); if (a) ir(a.dataset.destino); });
   palco.addEventListener("pointerdown", e => {
     if (e.button || !S.edita) return;
     const noEl = e.target.closest && e.target.closest(".pc-no"), seta = e.target.dataset && e.target.dataset.seta;
