@@ -278,7 +278,7 @@ export function exportar(base, lancs, ests, bu) {
       rows: base.contratos.filter(c => c.bu === bu).map(c => { const u = L.filter(x => x.contratoId === c.id).reduce((a, x) => a + x.valor, 0); return [O(c.obraId).nome, c.disciplina, F(c.fornecedorId).nome || "", c.valor, u, c.valor - u]; }) },
     { nome: "Motivos de estouro", cab: ["Nº Pedido", "Empreendimento", "Disciplina", "Fornecedor", "Excesso contrato", "Excesso obra", "Causa raiz", "Descrição", "Composição", "Ação", "Analista", "Status", "Respondido em"],
       tipos: ["t", "t", "t", "t", "m", "m", "t", "t", "t", "t", "t", "t", "d"], larg: [10, 18, 18, 22, 14, 14, 26, 40, 40, 30, 18, 12, 13],
-      rows: ests.filter(e => e.bu === bu).map(e => { const r = e.resposta || {};
+      rows: ests.filter(e => e.bu === bu && e.status !== "excluido").map(e => { const r = e.resposta || {};
         return [String(e.numero || ""), O(e.obraId).nome, e.disciplina, F(e.fornecedorId).nome || "", e.contrato || null, e.obra || null, r.causa || "", r.descricao || "",
           (r.composicao || []).map(c => c.item + ": " + moeda(num(c.valor))).join("; "), r.acao || "", e.analista || "", e.status, r.em || null]; }) }
   ];
@@ -360,7 +360,8 @@ button.fi-bh-l{cursor:pointer}button.fi-bh-l:hover{background:var(--slate-50,#F8
 .fi-li-d{display:flex;flex-direction:column;align-items:center;line-height:1}.fi-li-d b{font-size:18px;font-weight:900}.fi-li-d span{font-size:10.5px;color:var(--slate-500,#64748B)}
 .fi-li>div:nth-child(2){display:flex;flex-direction:column;gap:2px;min-width:0}.fi-li-v{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
 .fi-drawer-bg{position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:9000;display:flex;justify-content:flex-end}
-.fi-drawer{width:min(600px,100vw);height:100%;background:var(--bg,var(--card,#fff));background:var(--card,#fff);box-shadow:-12px 0 40px rgba(15,23,42,.2);display:flex;flex-direction:column;gap:0;animation:fiIn .18s ease-out}
+.fi-drawer{width:min(600px,100vw);height:100%;background:var(--bg,var(--card,#fff));background:var(--card,#fff);box-shadow:-12px 0 40px rgba(15,23,42,.2);display:flex;flex-direction:column;gap:0}
+.fi-drawer.entra{animation:fiIn .18s ease-out}
 @keyframes fiIn{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
 .fi-dw-cab{padding:18px 22px 12px;border-bottom:1px solid var(--slate-100,#F1F5F9);display:flex;flex-direction:column;gap:12px}
 .fi-passos{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.fi .fi-passos button{font-size:11.5px;padding:6px 4px;border-radius:99px;background:var(--slate-100,#F1F5F9);border:0;color:var(--slate-500,#64748B)}
@@ -770,7 +771,7 @@ export function montar(raiz, opts) {
     if (f.causa && LC.indexOf(f.causa) < 0 && !f.descricao) { f.descricao = f.causa; f.causa = ""; } // rascunho antigo com causa em texto livre
     const est0 = f.obraId ? estouroDe(f) : { contrato: 0, obra: 0 }, temEst = !!(est0.contrato || est0.obra);
     if (f.passo === 4 && !temEst) f.passo = 5;
-    const ov = el("div", "fi-drawer-bg"), dw = el("div", "fi-drawer fi");
+    const ov = el("div", "fi-drawer-bg"), dw = el("div", "fi-drawer fi" + (S.dwId !== f.id ? " entra" : "")); S.dwId = f.id; // desliza só ao abrir
     const fechar = () => { if (f.obraId && !window.confirm("Descartar este lançamento?")) return; S.form = null; tudo(); };
     ov.addEventListener("click", ev => { if (ev.target === ov) fechar(); });
     const cab = el("div", "fi-dw-cab"), l = el("div", "fi-l fi-sb"); l.append(el("h3", null, "Novo lançamento"), bt("✕", fechar, "fi-link")); cab.appendChild(l);
@@ -880,6 +881,14 @@ export function montar(raiz, opts) {
     rod.appendChild(dir); dw.appendChild(rod);
     ov.appendChild(dw); return ov;
   }
+  async function excluirLanc(x) {
+    if (!window.confirm("Excluir o lançamento nº " + x.numero + "?\n\nEle sai das listas, do utilizado, das parcelas, da exportação e da base de estouros. O número não é reaproveitado.")) return;
+    S.ocupado = true; tudo();
+    x.status = "excluido"; x.excluidoEm = hojeISO(); x.excluidoPor = opts.usuario || "";
+    const r = await gravaLanc(x); let r2 = { ok: true };
+    const es = x.estouroId && S.est.find(e => e.id === x.estouroId); if (es) { es.status = "excluido"; r2 = await gravaEst(es); }
+    S.ocupado = false; r.ok && r2.ok ? ok("Lançamento nº " + x.numero + " excluído.") : falha((r.ok ? r2 : r).msg); tudo();
+  }
   function lancamentos() {
     const c = el("div", "fi-card"), lt = el("div", "fi-l fi-sb");
     lt.append(el("h3", null, "Lançamentos feitos no painel"), inp(S.busca, v => { S.busca = v; desenha(); }, "Buscar nº, causa, fornecedor")); c.appendChild(lt);
@@ -901,6 +910,7 @@ export function montar(raiz, opts) {
           if (x.estouroId) { const es = S.est.find(e => e.id === x.estouroId); if (es) { ac.appendChild(bt(es.status === "pendente" ? "Responder estouro" : "Ver estouro", () => { S.estForm = es; tudo(); }, "mini"));
             if (es.status !== "pendente") ac.appendChild(bt("E-mail estouro", () => emailEst(es), "mini")); } }
           if (adm) ac.appendChild(bt("Cancelar", async () => { if (!window.confirm("Cancelar o lançamento nº " + x.numero + "? Ele sai do utilizado e das parcelas.")) return; x.status = "cancelado"; await gravaLanc(x); tudo(); }, "mini per")); }
+        if (adm && (x.status === "finalizado" || x.status === "cancelado")) ac.appendChild(bt("Excluir", () => excluirLanc(x), "mini per"));
         r.appendChild(ac); return r; })));
     }
     desenha(); return c;
@@ -908,7 +918,7 @@ export function montar(raiz, opts) {
 
   // ── estouros ──
   function estouros() {
-    const c = el("div", "fi-card"), es = S.est.filter(passa).sort((a, b) => (a.status === "pendente" ? 0 : 1) - (b.status === "pendente" ? 0 : 1) || (b.numero || 0) - (a.numero || 0));
+    const c = el("div", "fi-card"), es = S.est.filter(e => e.status !== "excluido" && passa(e)).sort((a, b) => (a.status === "pendente" ? 0 : 1) - (b.status === "pendente" ? 0 : 1) || (b.numero || 0) - (a.numero || 0));
     c.appendChild(el("h3", null, "Base de motivos de estouro"));
     const cont = {}; es.filter(e => e.resposta && e.resposta.causa).forEach(e => { cont[e.resposta.causa] = (cont[e.resposta.causa] || 0) + Math.max(e.contrato || 0, e.obra || 0); });
     const ks = Object.keys(cont).sort((a, b) => cont[b] - cont[a]);
@@ -1006,7 +1016,7 @@ export function montar(raiz, opts) {
     const ch = el("div", "fi-l"); ch.style.marginTop = "8px";
     CPS.forEach(x => ch.appendChild(bt(x, () => { const p = co.selectionStart || co.value.length; co.value = co.value.slice(0, p) + x + co.value.slice(co.selectionEnd || p); e.corpo = co.value; co.focus(); }, "fi-chip"))); c.appendChild(ch);
     let pv = null, rot = "";
-    if (est) { const x = S.est.filter(y => y.status !== "pendente").slice(-1)[0]; if (x) { pv = montaEmailEstouro(S.base, lancDe(x), x); rot = "estouro do lançamento nº " + x.numero; } }
+    if (est) { const x = S.est.filter(y => y.status === "respondido").slice(-1)[0]; if (x) { pv = montaEmailEstouro(S.base, lancDe(x), x); rot = "estouro do lançamento nº " + x.numero; } }
     else { const x = S.lanc.filter(y => y.status === "finalizado").slice(-1)[0]; if (x) { pv = montaEmail(S.base, x, x.estouroId && (S.est.find(y => y.id === x.estouroId) || {}).status === "pendente" ? link(x.estouroId) : ""); rot = "lançamento nº " + x.numero; } }
     if (pv) { const p = el("pre"); p.style.cssText = "white-space:pre-wrap;font-size:12px;background:var(--slate-50,#F8FAFC);padding:12px;border-radius:10px;margin-top:12px";
       p.textContent = "Prévia com o " + rot + "\nPara: " + pv.para + "\nCc: " + pv.cc + "\nTítulo: " + pv.titulo + "\n\n" + pv.corpo; c.appendChild(p); }
@@ -1017,7 +1027,7 @@ export function montar(raiz, opts) {
     const ls = S.base.causas = Array.isArray(S.base.causas) && S.base.causas.length ? S.base.causas : CAUSAS.slice();
     const h = el("h3", null, "Causas raiz (lista do pedido e do estouro)"); h.style.marginTop = "12px"; c.appendChild(h);
     c.appendChild(el("p", "fi-aviso", "A ordem aqui é a ordem do formulário. \"" + CAUSA_OK + "\" não pode ser usada como causa de estouro. Renomear não altera lançamentos já feitos: eles mantêm o nome antigo."));
-    const uso = {}; S.lanc.forEach(x => { if (x.causa) uso[x.causa] = (uso[x.causa] || 0) + 1; }); S.est.forEach(x => { const q = x.resposta && x.resposta.causa; if (q) uso[q] = (uso[q] || 0) + 1; });
+    const uso = {}; S.lanc.forEach(x => { if (x.causa && x.status !== "excluido") uso[x.causa] = (uso[x.causa] || 0) + 1; }); S.est.forEach(x => { const q = x.status !== "excluido" && x.resposta && x.resposta.causa; if (q) uso[q] = (uso[q] || 0) + 1; });
     const box = el("div"); box.style.cssText = "display:flex;flex-direction:column;gap:6px;margin-top:10px";
     ls.forEach((x, i) => { const ln = el("div", "fi-l"); const t = inp(x, v => { ls[i] = v; }); t.style.flex = "1";
       ln.append(el("b", null, String(i + 1).padStart(2, "0")), t, el("span", "fi-aviso", (uso[x] || 0) + " uso(s)"),
@@ -1046,6 +1056,7 @@ export function montar(raiz, opts) {
     wrap.appendChild(({ inicio, lanc: lancamentos, atr: () => pagamentos(true), pag: () => pagamentos(false), forn: fornecedores, est: estouros, base: adm ? baseOrc : inicio, email: adm ? modeloEmail : inicio }[S.view] || inicio)());
     if (["inicio", "pag", "atr", "lanc"].indexOf(S.view) >= 0) wrap.appendChild(exportarBloco());
     escondeDica();
+    if (!S.form) S.dwId = null;
     if (S.form) { const y = window.scrollY; wrap.appendChild(telaForm()); window.scrollTo(0, y); }
     if (S.fornSel) wrap.appendChild(fichaFornecedor());
     if (S.estForm) wrap.appendChild(telaEstouro());
