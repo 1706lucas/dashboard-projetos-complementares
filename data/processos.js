@@ -11,6 +11,8 @@ const TIPOS = {
   inicio: { nome: "Início", w: 96, h: 66 },
   fim: { nome: "Fim", w: 96, h: 66 }
 };
+const STATUS = { nao: { nome: "Não efetuado", cor: "#DC2626" }, elab: { nome: "Em elaboração", cor: "#D97706" }, emit: { nome: "Emitido", cor: "#16A34A" } };
+const COM_STATUS = { documento: 1, formulario: 1 };
 const COR = { documento: "#0D9488", formulario: "#8B5CF6", indicador: "#D97706", subprocesso: "#64748B" };
 const ICONE = {
   documento: '<path d="M6 2h8l5 5v15H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 2v5h5" fill="none" stroke="currentColor" stroke-width="2"/>',
@@ -21,6 +23,8 @@ const ICONE = {
 let seq = 0;
 const novoId = p => p + Date.now().toString(36) + (seq++).toString(36);
 const copia = o => JSON.parse(JSON.stringify(o));
+const hoje = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+const brData = iso => iso ? iso.slice(8, 10) + "/" + iso.slice(5, 7) + "/" + iso.slice(0, 4) : "";
 const linkOk = s => /^https?:\/\/[^\s]+$/i.test(String(s || "").trim());
 const suporte = n => !!SUPORTE[n.tipo];
 
@@ -31,7 +35,7 @@ function fluxo(id, nome, itens, setas) {
 export function semente() {
   const y = 150, d = 300, a = 20;
   const px = i => 150 + i * 178;
-  return { versao: 1, fases: [
+  return { versao: 2, processos: [{ id: "pdp", nome: "Desenvolvimento de Projetos" }], fases: [
     fluxo("ep", "Estudo Preliminar", [
       ["inicio", a, y, "Início de Estudo Preliminar"],
       ["atividade", px(0), y, "Preenchimento de TAP"], ["atividade", px(1), y, "Definição de Escopo de Projetos"],
@@ -103,6 +107,15 @@ const CSS = `
 .pc-no.sup.vazio{border-style:dashed;border-left-style:solid;color:var(--slate-500,#64748B)}
 .pc-no.pc-salta{cursor:pointer;border-color:var(--blue-600,#2563EB)}.pc-no.pc-salta:hover{box-shadow:0 0 0 3px var(--blue-50,#EFF6FF);text-decoration:underline}
 .pc-no.pc-salta::after{border-color:var(--blue-600,#2563EB);color:var(--blue-600,#2563EB)}
+.pc-procs{flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-bottom:8px;margin-bottom:2px;border-bottom:1px solid var(--slate-100,#F1F5F9)}
+.pc-procs>b{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:var(--slate-400,#94A3B8);margin-right:4px}
+.pc button.proc{border-radius:99px}.pc button.proc.on{background:var(--color-text,#0F172A);border-color:var(--color-text,#0F172A);color:var(--card,#fff)}
+.pc-rev{font-size:11px;font-weight:600;color:var(--slate-400,#94A3B8);margin-left:4px}
+.pc-no.sup[data-st]{background:color-mix(in srgb,var(--stc) 9%,var(--card,#fff));border-color:color-mix(in srgb,var(--stc) 45%,transparent);border-left-color:var(--stc)}
+.pc-no.sup[data-st]{padding-top:12px}
+.pc-no .pc-st{position:absolute;top:-8px;right:6px;font-style:normal;font-size:9.5px;font-weight:800;line-height:1;padding:3px 6px;border-radius:99px;background:var(--stc);color:#fff;white-space:nowrap}
+.pc-pill{display:inline-block;font-style:normal;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:99px;color:#fff;background:var(--stc);margin-left:6px}
+.pc-resumo-st{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11.5px;color:var(--slate-500,#64748B);margin:-4px 0 8px}
 .pc-marca{font-size:12.5px;font-weight:800;color:var(--slate-500,#64748B)}
 .pc-check{flex-direction:row!important;align-items:center;gap:7px!important}.pc-check input{width:auto}
 a.pc-no{cursor:pointer}a.pc-no:hover{box-shadow:0 0 0 3px var(--blue-50,#EFF6FF);text-decoration:underline}
@@ -140,6 +153,9 @@ function normaliza(d) {
   const ok = d && Array.isArray(d.fases) && d.fases.length ? copia(d) : semente();
   ok.fases.forEach(f => { f.nos = Array.isArray(f.nos) ? f.nos.filter(n => n && TIPOS[n.tipo]) : []; f.setas = Array.isArray(f.setas) ? f.setas : [];
     const ids = {}; f.nos.forEach(n => { ids[n.id] = 1; }); f.setas = f.setas.filter(s => ids[s.de] && ids[s.para]); });
+  if (!Array.isArray(ok.processos) || !ok.processos.length) ok.processos = [{ id: "pdp", nome: "Desenvolvimento de Projetos" }];
+  const procs = {}; ok.processos.forEach(p => { procs[p.id] = 1; });
+  ok.fases.forEach(f => { if (!procs[f.proc]) f.proc = ok.processos[0].id; f.nos.forEach(n => { if (n.status && !STATUS[n.status]) delete n.status; }); });
   const fases = {}; ok.fases.forEach(f => { fases[f.id] = 1; });
   ok.fases.forEach(f => f.nos.forEach(n => { if (n.destino && !fases[n.destino]) delete n.destino; }));
   return ok;
@@ -192,6 +208,7 @@ export function montar(raiz, opts) {
   wrap.append(barra, msg, corpo, legenda, apoio); raiz.appendChild(wrap);
   [["Atividade", "var(--blue-600,#2563EB)"], ["Subprocesso", COR.subprocesso], ["Documento", COR.documento], ["Formulário", COR.formulario], ["Indicador", COR.indicador]]
     .forEach(l => { const s = el("span"); const b = el("b"); b.style.setProperty("--cor", l[1]); s.append(b, l[0]); legenda.appendChild(s); });
+  Object.keys(STATUS).forEach(k => { const sp = el("span"); const b = el("b"); b.style.setProperty("--cor", STATUS[k].cor); b.style.borderRadius = "99px"; sp.append(b, STATUS[k].nome); legenda.appendChild(sp); });
   const dica = el("span", null, "Clique em um item de apoio ou subprocesso para abrir. Use as barras de rolagem para ver todo o fluxo.");
   legenda.appendChild(dica);
 
@@ -239,6 +256,7 @@ export function montar(raiz, opts) {
       const d = el(ehLink ? "a" : "div", "pc-no " + n.tipo + (n.tipo === "inicio" ? " ini" : "") + (suporte(n) ? " sup" + (lk ? "" : " vazio") : ""));
       d.dataset.no = n.id; d.style.left = n.x + "px"; d.style.top = n.y + "px"; d.style.width = t.w + "px"; d.style.minHeight = t.h + "px";
       if (suporte(n)) d.style.setProperty("--cor", COR[n.tipo]);
+      if (COM_STATUS[n.tipo] && STATUS[n.status]) { d.dataset.st = n.status; d.style.setProperty("--stc", STATUS[n.status].cor); const b = el("em", "pc-st", STATUS[n.status].nome); d.appendChild(b); }
       if (salta) { d.classList.add("pc-salta"); d.dataset.destino = n.destino; d.title = "Abrir " + S.dados.fases[idxFase(n.destino)].nome; d.tabIndex = 0; d.setAttribute("role", "link"); }
       if (ehLink) { d.href = n.link.trim(); d.target = "_blank"; d.rel = "noopener noreferrer"; d.title = "Abrir"; }
       else if (suporte(n) && !lk) d.title = "Link ainda não cadastrado";
@@ -249,17 +267,26 @@ export function montar(raiz, opts) {
       mundo.appendChild(d);
     });
   }
+  const procDe = f => S.dados.processos.find(p => p.id === f.proc) || S.dados.processos[0];
+  function irProc(id) { const i = S.dados.fases.findIndex(f => f.proc === id && (!f.sub || S.edita)); S.fase = i >= 0 ? i : S.fase; S.sel = null; S.pilha = []; tudo(); ajustar(); }
   function desenhaBarra() {
     barra.textContent = "";
+    const atual = fase(), pa = procDe(atual);
+    const pr = el("div", "pc-procs"); pr.appendChild(el("b", null, "Processos"));
+    S.dados.processos.forEach(p => pr.appendChild(botao(p.nome, () => irProc(p.id), "proc" + (p === pa ? " on" : ""))));
+    if (!S.edita && (pa.rev || pa.atualizado)) pr.appendChild(el("span", "pc-rev", "Rev. " + String(pa.rev || 0).padStart(2, "0") + (pa.atualizado ? " · atualizado em " + brData(pa.atualizado) : "")));
+    if (S.edita) pr.appendChild(botao("+ Processo", () => { const nome = window.prompt("Nome do novo processo (ex.: Pagamento de Projetistas):"); if (!nome || !nome.trim()) return;
+      marca(); const p = { id: novoId("p"), nome: nome.trim() }; S.dados.processos.push(p);
+      S.dados.fases.push({ id: novoId("f"), proc: p.id, nome: "Fluxo principal", nos: [], setas: [] }); S.fase = S.dados.fases.length - 1; S.sel = null; guarda(); tudo(); ajustar(); }));
+    barra.appendChild(pr);
     const g = el("div", "pc-grupo");
-    const atual = fase();
-    S.dados.fases.forEach((f, i) => { if (f.sub && !S.edita) return;
+    S.dados.fases.forEach((f, i) => { if (f.proc !== pa.id || (f.sub && !S.edita)) return;
       g.appendChild(botao((f.sub ? "↳ " : "") + f.nome, () => { S.fase = i; S.sel = null; S.pilha = []; tudo(); ajustar(); }, f === atual ? "on" : "")); });
     if (!S.edita && S.pilha.length) { const o = S.dados.fases[S.pilha[S.pilha.length - 1]];
       g.appendChild(botao("← Voltar para " + (o ? o.nome : "o processo"), voltar)); }
     if (!S.edita && atual.sub) g.appendChild(el("span", "pc-marca", atual.nome));
-    if (S.edita) g.appendChild(botao("+ Fase", () => { const nome = window.prompt("Nome da nova fase:"); if (!nome || !nome.trim()) return;
-      marca(); S.dados.fases.push({ id: novoId("f"), nome: nome.trim(), nos: [], setas: [] }); S.fase = S.dados.fases.length - 1; S.sel = null; guarda(); tudo(); ajustar(); }));
+    if (S.edita) g.appendChild(botao("+ Fase", () => { const nome = window.prompt("Nome da nova fase de " + pa.nome + ":"); if (!nome || !nome.trim()) return;
+      marca(); S.dados.fases.push({ id: novoId("f"), proc: pa.id, nome: nome.trim(), nos: [], setas: [] }); S.fase = S.dados.fases.length - 1; S.sel = null; guarda(); tudo(); ajustar(); }));
     const d = el("div", "pc-grupo");
     if (S.edita) {
       d.append(botao("−", () => zoom(.85)), botao("+", () => zoom(1.18)), botao("Ajustar", ajustar));
@@ -274,7 +301,21 @@ export function montar(raiz, opts) {
   function desenhaLateral() {
     lateral.style.display = S.edita ? "" : "none"; lateral.textContent = "";
     if (!S.edita) return;
-    const f = fase();
+    const f = fase(), pa = procDe(f);
+    lateral.appendChild(el("h4", null, "Processo"));
+    const pn = el("input"); pn.value = pa.nome; pn.addEventListener("focus", marca);
+    pn.addEventListener("input", () => { pa.nome = pn.value; guarda(); }); pn.addEventListener("change", desenhaBarra);
+    lateral.appendChild(campo("Nome do processo", pn));
+    const pm = el("div", "pc-grupo");
+    const moverP = dl => { const ps = S.dados.processos, i = ps.indexOf(pa), j = i + dl; if (j < 0 || j >= ps.length) return; marca(); ps.splice(i, 1); ps.splice(j, 0, pa); guarda(); desenhaBarra(); };
+    pm.append(botao("← Mover", () => moverP(-1)), botao("Mover →", () => moverP(1)), botao("Excluir processo", () => {
+      if (S.dados.processos.length < 2) { window.alert("É preciso ter pelo menos um processo."); return; }
+      const fs = S.dados.fases.filter(x => x.proc === pa.id);
+      if (!window.confirm("Excluir o processo " + pa.nome + " e suas " + fs.length + " fase(s)?")) return;
+      marca(); S.dados.processos.splice(S.dados.processos.indexOf(pa), 1); S.dados.fases = S.dados.fases.filter(x => x.proc !== pa.id);
+      const ids = {}; fs.forEach(x => { ids[x.id] = 1; }); S.dados.fases.forEach(x => x.nos.forEach(n => { if (ids[n.destino]) delete n.destino; }));
+      S.fase = 0; S.sel = null; guarda(); tudo(); ajustar(); }, "per"));
+    lateral.appendChild(pm);
     lateral.appendChild(el("h4", null, "Fase"));
     const nome = el("input"); nome.value = f.nome; nome.addEventListener("focus", marca);
     nome.addEventListener("input", () => { f.nome = nome.value; guarda(); }); nome.addEventListener("change", desenhaBarra);
@@ -283,13 +324,14 @@ export function montar(raiz, opts) {
     sb.addEventListener("change", () => { marca(); f.sub = sb.checked; guarda(); desenhaBarra(); });
     const lb = el("label", "pc-check"); lb.appendChild(sb); lb.append("Processo interno (fora das abas)"); lateral.appendChild(lb);
     const mv = el("div", "pc-grupo");
-    const mover = dl => { const i = S.dados.fases.indexOf(f), j = i + dl; if (j < 0 || j >= S.dados.fases.length) return; marca(); const fs = S.dados.fases; fs.splice(i, 1); fs.splice(j, 0, f); S.fase = j; guarda(); tudo(); };
+    const mover = dl => { const fs = S.dados.fases, i = fs.indexOf(f); let j = i + dl; while (j >= 0 && j < fs.length && fs[j].proc !== f.proc) j += dl;
+      if (j < 0 || j >= fs.length) return; marca(); fs.splice(i, 1); fs.splice(j, 0, f); S.fase = fs.indexOf(f); guarda(); tudo(); };
     mv.append(botao("← Mover", () => mover(-1)), botao("Mover →", () => mover(1)), botao("Excluir fase", () => {
-      if (S.dados.fases.length < 2) { window.alert("O fluxo precisa de pelo menos uma fase."); return; }
+      if (S.dados.fases.filter(x => x.proc === f.proc).length < 2) { window.alert("O processo precisa de pelo menos uma fase. Para remover tudo, use Excluir processo."); return; }
       if (!window.confirm("Excluir a fase " + f.nome + " e todo o fluxo dela?")) return;
       marca(); S.dados.fases.splice(S.dados.fases.indexOf(f), 1);
       S.dados.fases.forEach(x => x.nos.forEach(n => { if (n.destino === f.id) delete n.destino; }));
-      S.fase = 0; S.sel = null; guarda(); tudo(); ajustar(); }, "per"));
+      const k = S.dados.fases.findIndex(x => x.proc === f.proc); S.fase = k >= 0 ? k : 0; S.sel = null; guarda(); tudo(); ajustar(); }, "per"));
     lateral.appendChild(mv);
     lateral.appendChild(el("h4", null, "Adicionar"));
     const p = el("div", "pc-paleta");
@@ -309,14 +351,16 @@ export function montar(raiz, opts) {
       lateral.appendChild(campo("Tipo", tp));
       if (n.tipo === "subprocesso") {
         const ds = el("select"), nada = el("option", null, "Nenhum"); nada.value = ""; ds.appendChild(nada);
-        S.dados.fases.forEach(x => { if (x === f) return; const o = el("option", null, x.nome); o.value = x.id; o.selected = x.id === n.destino; ds.appendChild(o); });
+        S.dados.fases.forEach(x => { if (x === f) return; const px = procDe(x), o = el("option", null, (px !== pa ? px.nome + " › " : "") + x.nome); o.value = x.id; o.selected = x.id === n.destino; ds.appendChild(o); });
         ds.addEventListener("change", () => { marca(); if (ds.value) n.destino = ds.value; else delete n.destino; guarda(); desenhaLateral(); });
         lateral.appendChild(campo("Ao clicar, abre o processo", ds));
         if (n.destino) lateral.appendChild(botao("Abrir para editar", () => { S.fase = idxFase(n.destino); S.sel = null; tudo(); ajustar(); }));
         else lateral.appendChild(botao("Criar processo vinculado", () => { marca();
-          const nv = { id: novoId("f"), nome: (n.texto || "Novo processo").trim(), sub: true, nos: [], setas: [] };
+          const nv = { id: novoId("f"), proc: f.proc, nome: (n.texto || "Novo processo").trim(), sub: true, nos: [], setas: [] };
           S.dados.fases.push(nv); n.destino = nv.id; guarda(); desenhaLateral(); desenhaBarra(); }));
       }
+      if (COM_STATUS[n.tipo]) { const sx = el("select"); [["", "Sem status"]].concat(Object.keys(STATUS).map(k => [k, STATUS[k].nome])).forEach(o => { const op = el("option", null, o[1]); op.value = o[0]; op.selected = (n.status || "") === o[0]; sx.appendChild(op); });
+        sx.addEventListener("change", () => { marca(); if (sx.value) n.status = sx.value; else delete n.status; guarda(); desenhaNos(); desenhaApoio(); }); lateral.appendChild(campo("Status do documento", sx)); }
       const lk = el("input"); lk.placeholder = "https://… link do SharePoint"; lk.value = n.link || ""; lk.addEventListener("focus", marca);
       const av = el("p", "pc-aviso");
       const conf = () => { const v = lk.value.trim(); av.className = "pc-aviso" + (v && !linkOk(v) ? " err" : "");
@@ -337,9 +381,13 @@ export function montar(raiz, opts) {
     [["documento", "Documentos"], ["formulario", "Formulários"], ["indicador", "Indicadores"]].forEach(g => {
       const its = f.nos.filter(n => n.tipo === g[0]); if (!its.length) return;
       const b = el("div"); b.appendChild(el("h4", null, g[1] + " · " + its.length)); const ul = el("ul");
+      if (COM_STATUS[g[0]]) { const cnt = {}; its.forEach(n => { if (STATUS[n.status]) cnt[n.status] = (cnt[n.status] || 0) + 1; });
+        if (Object.keys(cnt).length) { const rs = el("div", "pc-resumo-st"); Object.keys(STATUS).forEach(k => { if (cnt[k]) rs.appendChild(el("span", null, cnt[k] + " " + STATUS[k].nome.toLowerCase())); });
+          const sem = its.length - Object.keys(cnt).reduce((a, k) => a + cnt[k], 0); if (sem) rs.appendChild(el("span", null, sem + " sem status")); b.appendChild(rs); } }
       its.forEach(n => { const li = el("li");
         if (linkOk(n.link)) { const a = el("a", null, n.texto || TIPOS[n.tipo].nome); a.href = n.link.trim(); a.target = "_blank"; a.rel = "noopener noreferrer"; li.appendChild(a); }
         else { li.append(n.texto || TIPOS[n.tipo].nome, " "); li.appendChild(el("em", null, "link pendente")); }
+        if (COM_STATUS[n.tipo] && STATUS[n.status]) { const p = el("i", "pc-pill", STATUS[n.status].nome); p.style.setProperty("--stc", STATUS[n.status].cor); li.appendChild(p); }
         ul.appendChild(li); });
       b.appendChild(ul); apoio.appendChild(b); });
     apoio.style.display = apoio.childNodes.length ? "" : "none";
@@ -356,6 +404,9 @@ export function montar(raiz, opts) {
   async function salvar() {
     const ruim = []; S.dados.fases.forEach(f => f.nos.forEach(n => { if (n.link && !linkOk(n.link)) ruim.push(n.texto || TIPOS[n.tipo].nome); }));
     if (ruim.length) { S.msg = "Corrija o link de: " + ruim.slice(0, 5).join(", "); S.erro = true; desenhaMsg(); return; }
+    const assin = (d, pid) => JSON.stringify([(d.processos.find(p => p.id === pid) || {}).nome, d.fases.filter(f => f.proc === pid)]);
+    S.dados.processos.forEach(p => { if (!S.pub.processos.some(q => q.id === p.id) || assin(S.dados, p.id) !== assin(S.pub, p.id)) { p.rev = (p.rev || 0) + 1; p.atualizado = hoje(); } });
+    S.dados.versao = 2;
     S.salvando = true; desenhaBarra();
     const r = await opts.salvar(copia(S.dados));
     S.salvando = false; S.msg = r.msg; S.erro = !r.ok;

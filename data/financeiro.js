@@ -3,14 +3,26 @@
 // Módulo isolado: erro aqui não afeta as outras abas. Gravação feita pelo painel (opts.api).
 
 export const BUS = [{ bu: "Make It", nome: "Make It" }, { bu: "Gadens Inc", nome: "Gadens" }];
-export const CAUSAS = ["Erro ou omissão de projeto", "Alteração de escopo", "Exigência legal ou de concessionária", "Orçamento subdimensionado",
-  "Solicitação comercial ou de produto", "Reajuste do fornecedor", "Retrabalho por terceiros", "Outro"];
+// Causas raiz: lista única para pedido e estouro. O admin edita em E-mail → Causas raiz (fica em base.causas).
+export const CAUSAS = ["Pedido conforme budget", "Erro ou omissão de projetos complementares", "Erro ou omissão de arquitetura/produto", "Alteração de premissas",
+  "Solicitação comercial ou de produto", "Alteração por solicitação da obra", "Alteração por solicitação da diretoria", "Informações contratadas insuficientes",
+  "Rescisão de outro projetista", "Exigência legal ou de concessionária", "Retrabalho de terceiros"];
+export const CAUSA_OK = "Pedido conforme budget"; // não vale como causa de estouro
+export const causasDe = base => (base && Array.isArray(base.causas) && base.causas.filter(Boolean).length ? base.causas.filter(Boolean) : CAUSAS);
+const CORPO_V1 = "Solicitação [Nº PEDIDO], referente ao [ADITIVO/PEDIDO] [CAUSA RAIZ DO PEDIDO] - [OBRA].\n\nEMPREENDIMENTO: [OBRA]\nFORNECEDOR: [NOME FORNECEDOR]\nCNPJ: [Nº CNPJ]\nVALOR: [VALOR TOTAL]\nCOMPOSIÇÃO PARCELAS: [Nº DE PARCELAS] parcela(s)\n[PARCELAS]\n[AVISO ESTOURO]";
 export const EMAIL_PADRAO = {
   para: "suprimentos@grupogadens.com.br", cc: "lucas@grupogadens.com.br",
   titulo: "Solicitação [Nº PEDIDO] - [OBRA]",
-  corpo: "Solicitação [Nº PEDIDO], referente ao [ADITIVO/PEDIDO] [CAUSA RAIZ DO PEDIDO] - [OBRA].\n\nEMPREENDIMENTO: [OBRA]\nFORNECEDOR: [NOME FORNECEDOR]\nCNPJ: [Nº CNPJ]\nVALOR: [VALOR TOTAL]\nCOMPOSIÇÃO PARCELAS: [Nº DE PARCELAS] parcela(s)\n[PARCELAS]\n[AVISO ESTOURO]"
+  corpo: "Solicitação [Nº PEDIDO], referente ao [ADITIVO/PEDIDO] [DESCRIÇÃO DO PEDIDO] - [OBRA].\n\nEMPREENDIMENTO: [OBRA]\nFORNECEDOR: [NOME FORNECEDOR]\nCNPJ: [Nº CNPJ]\nVALOR: [VALOR TOTAL]\nCAUSA RAIZ: [CAUSA RAIZ DO PEDIDO]\nCOMPOSIÇÃO PARCELAS: [Nº DE PARCELAS] parcela(s)\n[PARCELAS]\n[AVISO ESTOURO]"
 };
-export const CAMPOS = ["[Nº PEDIDO]", "[PEDIDO ERP]", "[Nº CADASTRO]", "[OBRA]", "[ADITIVO/PEDIDO]", "[CAUSA RAIZ DO PEDIDO]", "[DISCIPLINA]", "[NOME FORNECEDOR]", "[Nº CNPJ]", "[VALOR TOTAL]",
+export const EMAIL_ESTOURO = {
+  para: "lucas@grupogadens.com.br", cc: "",
+  titulo: "Estouro - Solicitação [Nº PEDIDO] - [OBRA] - [DISCIPLINA]",
+  corpo: "Para ciência: a solicitação [Nº PEDIDO] ([ADITIVO/PEDIDO]) excedeu o valor aprovado.\n\nEMPREENDIMENTO: [OBRA]\nDISCIPLINA: [DISCIPLINA]\nFORNECEDOR: [NOME FORNECEDOR]\nVALOR DA SOLICITAÇÃO: [VALOR TOTAL]\nDESCRIÇÃO: [DESCRIÇÃO DO PEDIDO]\n\nEXCESSO:\n[EXCESSO]\n\nCOMPOSIÇÃO DO ESTOURO:\n[COMPOSIÇÃO]\n\nCAUSA RAIZ: [CAUSA RAIZ DO ESTOURO]\nO QUE ACONTECEU: [O QUE ACONTECEU]\nAÇÃO PARA NÃO REPETIR: [AÇÃO]\n\nResponsável: [ANALISTA] · [DATA]"
+};
+export const CAMPOS_EST = ["[Nº PEDIDO]", "[OBRA]", "[DISCIPLINA]", "[NOME FORNECEDOR]", "[ADITIVO/PEDIDO]", "[VALOR TOTAL]", "[DESCRIÇÃO DO PEDIDO]", "[EXCESSO]", "[COMPOSIÇÃO]",
+  "[CAUSA RAIZ DO ESTOURO]", "[O QUE ACONTECEU]", "[AÇÃO]", "[ANALISTA]", "[DATA]", "[SPE]", "[GDS]"];
+export const CAMPOS = ["[Nº PEDIDO]", "[PEDIDO ERP]", "[Nº CADASTRO]", "[OBRA]", "[ADITIVO/PEDIDO]", "[CAUSA RAIZ DO PEDIDO]", "[DESCRIÇÃO DO PEDIDO]", "[DISCIPLINA]", "[NOME FORNECEDOR]", "[Nº CNPJ]", "[VALOR TOTAL]",
   "[VALOR PARCELA]", "[Nº DE PARCELAS]", "[PARCELAS]", "[SPE]", "[CNPJ OBRA]", "[GDS]", "[ANALISTA]", "[DATA]", "[OBSERVAÇÃO]", "[AVISO ESTOURO]"];
 
 const norm = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/ /g, " ")
@@ -118,7 +130,7 @@ export function importarSaidas(wb, bu, baseAtual) {
 // nomes de cadastro conhecidos (planilha × painel)
 const APELIDOS = { "leilao": ["Quadratto"], "alta tensao": ["Aura"], "follador": ["Vert (Follador)"], "core silva": ["Core Silva Jardim", "CORE Silva Jardim"], "padre agostinho": ["Pe. Agostinho", "Pe Agostinho"],
   "joao negrao": ["Core Evo", "Core Evo (João Negrão)"], "core palacio": ["Core Palácio"], "al nasser 1": ["AL NASSER 1"], "al nasser 2": ["AL NASSER 2"] };
-export function baseVazia() { return { versao: 1, obras: [], fornecedores: [], contratos: [], historico: [], vinculos: {}, email: copia(EMAIL_PADRAO), importado: {} }; }
+export function baseVazia() { return { versao: 1, obras: [], fornecedores: [], contratos: [], historico: [], vinculos: {}, email: copia(EMAIL_PADRAO), emailEstouro: copia(EMAIL_ESTOURO), causas: CAUSAS.slice(), importado: {} }; }
 export function achaObra(base, bu, nome) {
   const n = norm(nome); if (!n) return null; const os = base.obras.filter(o => !bu || o.bu === bu);
   return os.find(o => norm(o.nome) === n) || os.find(o => (o.apelidos || []).some(a => norm(a) === n)) ||
@@ -155,15 +167,31 @@ export function montaEmail(base, l, link) {
   const ps = l.parcelas || [], tot = ps.reduce((a, p) => a + (num(p.valor) || 0), 0);
   const est = l.estouro && (l.estouro.contrato > 0 || l.estouro.obra > 0) ? "\nATENÇÃO: este lançamento excede " +
     [l.estouro.contrato > 0 ? "o contrato em " + moeda(l.estouro.contrato) : "", l.estouro.obra > 0 ? "o budget da obra em " + moeda(l.estouro.obra) : ""].filter(Boolean).join(" e ") +
-    ".\nFormulário de composição do estouro: " + link + "\n" : "";
+    (link ? ".\nFormulário de composição do estouro: " + link + "\n" : ".\nA composição do estouro segue em e-mail separado, para ciência.\n") : "";
   const ct = base.contratos.find(x => x.id === l.contratoId) || {};
-  const M = { "[Nº PEDIDO]": l.numero || "XX", "[PEDIDO ERP]": ct.pedido || "", "[Nº CADASTRO]": f.mega || "", "[OBRA]": o.nome || "", "[ADITIVO/PEDIDO]": l.tipo === "Aditivo" ? "ADITIVO" : "PEDIDO", "[CAUSA RAIZ DO PEDIDO]": l.causa || "",
+  const M = { "[Nº PEDIDO]": l.numero || "XX", "[PEDIDO ERP]": ct.pedido || "", "[Nº CADASTRO]": f.mega || "", "[OBRA]": o.nome || "", "[ADITIVO/PEDIDO]": l.tipo === "Aditivo" ? "ADITIVO" : "PEDIDO", "[CAUSA RAIZ DO PEDIDO]": l.causa || "", "[DESCRIÇÃO DO PEDIDO]": l.descricao || "",
     "[DISCIPLINA]": l.disciplina || "", "[NOME FORNECEDOR]": f.nome || "", "[Nº CNPJ]": f.cnpj || "(CNPJ não cadastrado)", "[VALOR TOTAL]": moeda(tot),
     "[VALOR PARCELA]": ps.length === 1 ? moeda(num(ps[0].valor)) : ps.map(p => moeda(num(p.valor))).join(" + "), "[Nº DE PARCELAS]": String(ps.length),
     "[PARCELAS]": ps.map((p, i) => (i + 1) + "ª parcela: " + moeda(num(p.valor)) + " · pagamento em " + br(p.data)).join("\n"),
     "[SPE]": o.spe || "", "[CNPJ OBRA]": o.cnpj || "", "[GDS]": o.gds || "", "[ANALISTA]": l.criadoPor || "", "[DATA]": br(hojeISO()), "[OBSERVAÇÃO]": l.obs || "", "[AVISO ESTOURO]": est };
   const troca = t => CAMPOS.reduce((s, k) => s.split(k).join(M[k] != null ? M[k] : ""), String(t || ""));
   const e = base.email || EMAIL_PADRAO;
+  return { para: troca(e.para), cc: troca(e.cc), titulo: troca(e.titulo), corpo: troca(e.corpo).replace(/\n{3,}/g, "\n\n").trim() };
+}
+export function montaEmailEstouro(base, l, es) {
+  l = l || {}; es = es || {}; const r = es.resposta || {};
+  const o = base.obras.find(x => x.id === (l.obraId || es.obraId)) || {}, f = base.fornecedores.find(x => x.id === (l.fornecedorId || es.fornecedorId)) || {};
+  const ct = base.contratos.find(x => x.id === l.contratoId) || {}, tot = (l.parcelas || []).reduce((a, p) => a + (num(p.valor) || 0), 0);
+  const exc = [es.contrato > 0 ? "Contrato: excedido em " + moeda(es.contrato) + (ct.valor ? " (contratado " + moeda(ct.valor) + ")" : "") : "",
+    es.obra > 0 ? "Budget da obra: excedido em " + moeda(es.obra) + (o.budget ? " (budget " + moeda(o.budget) + ")" : "") : ""].filter(Boolean).join("\n");
+  const cp = (r.composicao || []).filter(x => String(x.item || "").trim() || num(x.valor) != null), soma = cp.reduce((a, x) => a + (num(x.valor) || 0), 0);
+  const M = { "[Nº PEDIDO]": String(l.numero || es.numero || "XX"), "[OBRA]": o.nome || "", "[DISCIPLINA]": l.disciplina || es.disciplina || "", "[NOME FORNECEDOR]": f.nome || "",
+    "[ADITIVO/PEDIDO]": l.tipo === "Aditivo" ? "ADITIVO" : "PEDIDO", "[VALOR TOTAL]": tot ? moeda(tot) : "", "[DESCRIÇÃO DO PEDIDO]": l.descricao || "", "[EXCESSO]": exc || "—",
+    "[COMPOSIÇÃO]": cp.length ? cp.map(x => "- " + (x.item || "item") + ": " + moeda(num(x.valor))).join("\n") + "\nTotal da composição: " + moeda(soma) : "—",
+    "[CAUSA RAIZ DO ESTOURO]": r.causa || "", "[O QUE ACONTECEU]": r.descricao || "", "[AÇÃO]": r.acao || "—", "[ANALISTA]": r.por || es.analista || l.criadoPor || "",
+    "[DATA]": br(r.em || hojeISO()), "[SPE]": o.spe || "", "[GDS]": o.gds || "" };
+  const troca = t => CAMPOS_EST.reduce((x, k) => x.split(k).join(M[k] != null ? M[k] : ""), String(t || ""));
+  const e = base.emailEstouro || EMAIL_ESTOURO;
   return { para: troca(e.para), cc: troca(e.cc), titulo: troca(e.titulo), corpo: troca(e.corpo).replace(/\n{3,}/g, "\n\n").trim() };
 }
 export const mailto = m => "mailto:" + encodeURIComponent(m.para).replace(/%40/g, "@").replace(/%2C/g, ",") + "?" +
@@ -346,7 +374,9 @@ button.fi-bh-l{cursor:pointer}button.fi-bh-l:hover{background:var(--slate-50,#F8
 .fi .fi-op.novo{border-style:dashed}
 .fi-mini-barra{display:block;width:100%;height:6px;border-radius:99px;background:var(--fi-trilho);overflow:hidden}.fi-mini-barra i{display:block;height:100%;border-radius:99px}
 .fi-dividir{display:grid;grid-template-columns:1.3fr .8fr 1.2fr auto;gap:8px;align-items:end;padding:12px;border-radius:14px;background:var(--slate-50,#F8FAFC)}
-.fi-parcelas{display:flex;flex-direction:column;gap:6px}.fi-drawer .fi-parc{grid-template-columns:36px 1fr 1fr 30px}
+.fi-parcelas{display:flex;flex-direction:column;gap:6px}
+.fi-comp{display:grid;grid-template-columns:28px 1fr 130px 30px;gap:6px;align-items:center;margin-top:6px}.fi-comp input{min-width:0}
+@media(max-width:560px){.fi-comp{grid-template-columns:22px 1fr 96px 26px}}.fi-drawer .fi-parc{grid-template-columns:36px 1fr 1fr 30px}
 .fi-resumo{display:grid;grid-template-columns:1fr 1fr;gap:8px}.fi-resumo div{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:12px;background:var(--slate-50,#F8FAFC)}
 .fi-resumo span{font-size:11px;color:var(--slate-500,#64748B)}.fi-resumo b{font-size:13px}
 .fi-imp{display:flex;flex-direction:column;gap:6px;padding:10px 0}.fi-imp-b{position:relative;height:14px;border-radius:99px;background:var(--fi-trilho)}
@@ -369,7 +399,9 @@ export function montar(raiz, opts) {
   const api = opts.api, adm = !!opts.admin;
   const S = { base: opts.dados.base || baseVazia(), lanc: opts.dados.lanc || [], est: opts.dados.est || [], view: "inicio", f: { bu: "", obra: "", forn: "", disc: "" }, busca: "",
     form: null, estForm: null, fornSel: null, msg: opts.msg || "", erro: !!opts.erroMsg, ocupado: false, baseAba: "obras", fpag: "atrasadas", marcados: {} };
-  if (!S.base.email) S.base.email = copia(EMAIL_PADRAO); if (!S.base.vinculos) S.base.vinculos = {};
+  const prep = b => { if (!b.email) b.email = copia(EMAIL_PADRAO); if (b.email.corpo === CORPO_V1) b.email.corpo = EMAIL_PADRAO.corpo;
+    if (!b.emailEstouro) b.emailEstouro = copia(EMAIL_ESTOURO); if (!Array.isArray(b.causas) || !b.causas.length) b.causas = CAUSAS.slice(); if (!b.vinculos) b.vinculos = {}; return b; };
+  prep(S.base); S.aviso = null; S.emailAba = "pedido";
   const O = id => S.base.obras.find(o => o.id === id) || {}, F = id => S.base.fornecedores.find(f => f.id === id) || {};
   const link = id => location.href.split("#")[0] + "#estouro=" + id;
   const abrir = u => (opts.abrirEmail ? opts.abrirEmail(u) : (window.location.href = u));
@@ -386,7 +418,7 @@ export function montar(raiz, opts) {
     Object.keys(S.base.vinculos || {}).forEach(k => { if (S.base.vinculos[k] !== fid) return; const [sg, disc] = k.split("|"); const ob = achaObra(S.base, null, sig[sg] || sg);
       out.push({ sigla: sg, obra: sig[sg] || sg, obraId: ob ? ob.id : null, disciplina: disc }); }); return out; };
 
-  const sincroniza = () => { const n = api.atual && api.atual(); if (n && n.base) S.base = copia(n.base); };
+  const sincroniza = () => { const n = api.atual && api.atual(); if (n && n.base) S.base = prep(copia(n.base)); };
   async function gravaBase(txt) { S.ocupado = true; tudo(); const r = await api.salvarBase(copia(S.base)); sincroniza(); S.ocupado = false; r.ok ? ok(txt || r.msg) : falha(r.msg); tudo(); return r; }
   async function gravaLanc(l) { const r = await api.salvarLanc(copia(l)); const i = S.lanc.findIndex(x => x.id === l.id); if (i >= 0) S.lanc[i] = l; else S.lanc.push(l); return r; }
   async function gravaEst(e) { const r = await api.salvarEst(copia(e)); const i = S.est.findIndex(x => x.id === e.id); if (i >= 0) S.est[i] = e; else S.est.push(e); return r; }
@@ -676,7 +708,7 @@ export function montar(raiz, opts) {
   function novo() {
     const bu = S.f.bu || (S.f.obra ? O(S.f.obra).bu : "Make It");
     S.form = { id: novoId("l"), bu, obraId: S.f.obra || "", tipo: "Pedido", contratoId: "", novoContrato: false, disciplina: "", fornecedorId: S.f.forn || "", valorContrato: null,
-      causa: "", parcelas: [{ valor: null, data: somaMes(hojeISO(), 1), status: "PREVISTO" }], obs: "", status: "rascunho", criadoPor: opts.usuario || "", criadoEm: hojeISO() };
+      causa: "", descricao: "", parcelas: [{ valor: null, data: somaMes(hojeISO(), 1), status: "PREVISTO" }], obs: "", status: "rascunho", criadoPor: opts.usuario || "", criadoEm: hojeISO() };
     S.msg = ""; tudo();
   }
   const totalForm = f => (f.parcelas || []).reduce((a, p) => a + (num(p.valor) || 0), 0);
@@ -687,16 +719,18 @@ export function montar(raiz, opts) {
     const scOk = sc && sc.valor > 0; // contrato com valor zerado na planilha = sem limite cadastrado
     return { so, sc: scOk ? sc : (sc ? Object.assign({}, sc, { valor: null, saldo: null }) : null), contrato: scOk && sc.saldo < -0.005 ? r2(-sc.saldo) : 0, obra: so && so.saldo != null && so.saldo < -0.005 ? r2(-so.saldo) : 0 };
   }
+  const lancDe = es => S.lanc.find(x => x.id === es.lancId) || { numero: es.numero, obraId: es.obraId, fornecedorId: es.fornecedorId, disciplina: es.disciplina };
+  const emailEst = es => abrir(mailto(montaEmailEstouro(S.base, lancDe(es), es)));
+  const estOk = r => !!(r && r.causa && r.causa !== CAUSA_OK && String(r.descricao || "").trim() && (r.composicao || []).some(x => String(x.item || "").trim() && num(x.valor) != null));
   async function finalizar() {
     const f = S.form, faltas = [];
     if (!f.obraId) faltas.push("obra"); if (!f.contratoId && !f.novoContrato) faltas.push("contrato");
     if (f.novoContrato && (!f.disciplina || !f.fornecedorId || num(f.valorContrato) == null)) faltas.push("dados do novo contrato");
-    if (!String(f.causa || "").trim()) faltas.push("causa raiz do pedido");
+    if (!f.causa) faltas.push("causa raiz"); if (!String(f.descricao || "").trim()) faltas.push("descrição do pedido");
     if (!f.parcelas.length || f.parcelas.some(p => num(p.valor) == null || !p.data)) faltas.push("valor e data de todas as parcelas");
     if (faltas.length) { falha("Preencha: " + faltas.join(", ") + "."); tudo(); return; }
-    const e = estouroDe(f);
-    if ((e.contrato || e.obra) && !window.confirm("Este lançamento excede " + [e.contrato ? "o contrato em " + moeda(e.contrato) : "", e.obra ? "o budget da obra em " + moeda(e.obra) : ""].filter(Boolean).join(" e ") +
-      ".\n\nAo finalizar, abre um formulário de composição do estouro para o analista responder. Continuar?")) return;
+    const e = estouroDe(f), temEst = !!(e.contrato || e.obra);
+    if (temEst && !estOk(f.estResp)) { f.passo = 4; falha("Este lançamento estoura o limite: preencha a composição do estouro antes de finalizar."); tudo(); return; }
     S.ocupado = true; tudo();
     try {
       if (f.novoContrato) { const c = { id: novoId("c"), bu: f.bu, obraId: f.obraId, disciplina: f.disciplina, fornecedorId: f.fornecedorId, valor: num(f.valorContrato), pedido: "" };
@@ -704,30 +738,51 @@ export function montar(raiz, opts) {
       const c = S.base.contratos.find(x => x.id === f.contratoId); if (c) { f.disciplina = c.disciplina; f.fornecedorId = c.fornecedorId; }
       if (api.recarregar) { const nv = await api.recarregar(); if (nv) { S.lanc = nv.lanc; S.est = nv.est; } }
       f.numero = S.lanc.reduce((m, x) => Math.max(m, x.numero || 0), 0) + 1;
-      f.status = "finalizado"; f.finalizadoEm = hojeISO(); f.estouro = e.contrato || e.obra ? { contrato: e.contrato, obra: e.obra } : null;
-      if (f.estouro) { const es = { id: novoId("e"), lancId: f.id, numero: f.numero, bu: f.bu, obraId: f.obraId, disciplina: f.disciplina, fornecedorId: f.fornecedorId,
-          contrato: e.contrato, obra: e.obra, analista: f.criadoPor, criadoEm: hojeISO(), status: "pendente" }; f.estouroId = es.id; const r2 = await gravaEst(es); if (!r2.ok) throw new Error(r2.msg); }
+      f.status = "finalizado"; f.finalizadoEm = hojeISO(); f.estouro = temEst ? { contrato: e.contrato, obra: e.obra } : null;
+      let es = null;
+      if (temEst) { const resp = copia(f.estResp); resp.composicao = resp.composicao.filter(x => String(x.item || "").trim() || num(x.valor) != null); resp.em = hojeISO(); resp.por = f.criadoPor || opts.usuario || "";
+        if (f.causa === CAUSA_OK) f.causa = resp.causa;
+        es = { id: novoId("e"), lancId: f.id, numero: f.numero, bu: f.bu, obraId: f.obraId, disciplina: f.disciplina, fornecedorId: f.fornecedorId,
+          contrato: e.contrato, obra: e.obra, analista: f.criadoPor, criadoEm: hojeISO(), status: "respondido", resposta: resp }; f.estouroId = es.id; const r2 = await gravaEst(es); if (!r2.ok) throw new Error(r2.msg); }
+      delete f.estResp; delete f.passo;
       const r = await gravaLanc(f); if (!r.ok) throw new Error(r.msg);
-      const m = montaEmail(S.base, f, f.estouroId ? link(f.estouroId) : "");
-      S.form = null; S.ocupado = false; S.view = "lanc"; ok("Lançamento nº " + f.numero + " finalizado. Abrindo o e-mail do pedido…"); tudo();
-      abrir(mailto(m));
+      const m = montaEmail(S.base, f, "");
+      S.form = null; S.ocupado = false; S.view = "lanc";
+      ok("Lançamento nº " + f.numero + " finalizado. Abrindo o e-mail do pedido…" + (es ? " Depois envie o comunicado de estouro." : ""));
+      if (es) S.aviso = { numero: f.numero, es };
+      tudo(); abrir(mailto(m));
     } catch (err) { S.ocupado = false; falha("Não foi possível finalizar: " + err.message); tudo(); }
+  }
+  function telaAviso() {
+    const md = el("div", "fi-modal"), c = el("div", "fi-card fi"), es = S.aviso.es; c.style.maxWidth = "560px";
+    const fecha = () => { S.aviso = null; tudo(); };
+    c.appendChild(el("h3", null, "Último passo: comunicado de estouro"));
+    c.appendChild(el("p", "fi-aviso", "O e-mail do pedido nº " + S.aviso.numero + " já foi aberto no Outlook. Envie também o comunicado com a composição do estouro, para ciência de " +
+      ((S.base.emailEstouro || EMAIL_ESTOURO).para || "todos") + "."));
+    const l = el("div", "fi-l"); l.style.cssText = "margin-top:12px;justify-content:flex-end";
+    l.append(bt("Depois (fica em Estouros)", fecha), bt("Abrir e-mail de estouro", () => { emailEst(es); fecha(); }, "pri")); c.appendChild(l);
+    md.appendChild(c); md.addEventListener("click", ev => { if (ev.target === md) fecha(); }); return md;
   }
   // ── novo lançamento: painel lateral em 4 passos ──
   function telaForm() {
     const f = S.form; f.passo = f.passo || (f.obraId ? 2 : 1);
+    const LC = causasDe(S.base);
+    if (f.causa && LC.indexOf(f.causa) < 0 && !f.descricao) { f.descricao = f.causa; f.causa = ""; } // rascunho antigo com causa em texto livre
+    const est0 = f.obraId ? estouroDe(f) : { contrato: 0, obra: 0 }, temEst = !!(est0.contrato || est0.obra);
+    if (f.passo === 4 && !temEst) f.passo = 5;
     const ov = el("div", "fi-drawer-bg"), dw = el("div", "fi-drawer fi");
     const fechar = () => { if (f.obraId && !window.confirm("Descartar este lançamento?")) return; S.form = null; tudo(); };
     ov.addEventListener("click", ev => { if (ev.target === ov) fechar(); });
     const cab = el("div", "fi-dw-cab"), l = el("div", "fi-l fi-sb"); l.append(el("h3", null, "Novo lançamento"), bt("✕", fechar, "fi-link")); cab.appendChild(l);
-    const PASSOS = ["Obra", "Contrato", "Pagamento", "Revisão"], st = el("div", "fi-passos");
-    PASSOS.forEach((p, i) => { const b = bt((i + 1) + " " + p, () => { if (podeIr(i + 1)) { f.passo = i + 1; S.msg = ""; tudo(); } }, i + 1 === f.passo ? "on" : i + 1 < f.passo ? "feito" : ""); st.appendChild(b); });
-    cab.appendChild(st); dw.appendChild(cab);
-    const corpo = el("div", "fi-dw-corpo"); dw.appendChild(corpo);
+    const ETAPAS = [[1, "Obra"], [2, "Contrato"], [3, "Pagamento"]].concat(temEst ? [[4, "Estouro"]] : []).concat([[5, "Revisão"]]), st = el("div", "fi-passos");
     const ob = O(f.obraId), ct = S.base.contratos.find(x => x.id === f.contratoId);
     const ok1 = () => !!f.obraId, ok2 = () => !!(f.contratoId || (f.novoContrato && String(f.disciplina || "").trim() && f.fornecedorId && num(f.valorContrato) != null)),
-      ok3 = () => !!(String(f.causa || "").trim() && f.parcelas.length && f.parcelas.every(p => num(p.valor) != null && p.data));
-    const podeIr = n => n <= 1 || (ok1() && (n <= 2 || (ok2() && (n <= 3 || ok3()))));
+      ok3 = () => !!(f.causa && String(f.descricao || "").trim() && f.parcelas.length && f.parcelas.every(p => num(p.valor) != null && p.data));
+    const podeIr = n => n <= 1 || (ok1() && (n <= 2 || (ok2() && (n <= 3 || (ok3() && (n === 4 ? temEst : (!temEst || estOk(f.estResp))))))));
+    const prox = p => p === 3 ? (temEst ? 4 : 5) : p + 1, ant = p => p === 5 ? (temEst ? 4 : 3) : p - 1;
+    ETAPAS.forEach((p, i) => { const b = bt((i + 1) + " " + p[1], () => { if (podeIr(p[0])) { f.passo = p[0]; S.msg = ""; tudo(); } }, p[0] === f.passo ? "on" : p[0] < f.passo ? "feito" : ""); st.appendChild(b); });
+    cab.appendChild(st); dw.appendChild(cab);
+    const corpo = el("div", "fi-dw-corpo"); dw.appendChild(corpo);
     if (f.passo === 1) {
       corpo.appendChild(el("p", "fi-pergunta", "Para qual obra é o lançamento?"));
       const seg = el("div", "fi-seg mini"); BUS.forEach(b => seg.appendChild(bt(b.nome, () => { f.bu = b.bu; f.obraId = ""; f.contratoId = ""; tudo(); }, f.bu === b.bu ? "on" : ""))); corpo.appendChild(seg);
@@ -761,8 +816,11 @@ export function montar(raiz, opts) {
     } else if (f.passo === 3) {
       corpo.appendChild(el("p", "fi-pergunta", "O que está sendo pago?"));
       const seg = el("div", "fi-seg"); [["Pedido", "Pedido"], ["Aditivo", "Aditivo"]].forEach(o => seg.appendChild(bt(o[1], () => { f.tipo = o[0]; tudo(); }, f.tipo === o[0] ? "on" : ""))); corpo.appendChild(seg);
-      const ca = el("textarea"); ca.rows = 2; ca.value = f.causa || ""; ca.placeholder = "Ex.: 2ª etapa do projeto estrutural, revisão de fundação…"; ca.addEventListener("input", () => { f.causa = ca.value; });
-      const lca = campo("Causa raiz do pedido", ca); lca.style.marginTop = "12px"; corpo.appendChild(lca);
+      const cs = sel([["", "Selecione a causa raiz"]].concat(LC.map(x => [x, x])), f.causa, v => { f.causa = v; tudo(); });
+      const lcs = campo("Causa raiz", cs); lcs.style.marginTop = "12px"; corpo.appendChild(lcs);
+      if (f.causa === CAUSA_OK && temEst) corpo.appendChild(el("p", "fi-alerta am", "Este lançamento estoura o limite: \"" + CAUSA_OK + "\" não vale como causa. Escolha a causa real (no passo Estouro ela é confirmada)."));
+      const ca = el("textarea"); ca.rows = 2; ca.value = f.descricao || ""; ca.placeholder = "Ex.: 2ª etapa do projeto estrutural, revisão de fundação…"; ca.addEventListener("input", () => { f.descricao = ca.value; });
+      const lca = campo("Descrição do pedido", ca); lca.style.marginTop = "10px"; corpo.appendChild(lca);
       corpo.appendChild(el("p", "fi-pergunta", "Como vai ser pago?"));
       const dv = el("div", "fi-dividir"), nT = inp("", () => {}, "Valor total R$"), nN = inp("", () => {}, "Parcelas"), d0 = inp((f.parcelas[0] && f.parcelas[0].data) || somaMes(hojeISO(), 1), () => {}, "", "date");
       nT.inputMode = "decimal"; nN.inputMode = "numeric";
@@ -775,11 +833,29 @@ export function montar(raiz, opts) {
       corpo.appendChild(pl);
       corpo.appendChild(bt("+ parcela", () => { const u = f.parcelas[f.parcelas.length - 1]; f.parcelas.push({ valor: null, data: u && u.data ? somaMes(u.data, 1) : hojeISO(), status: "PREVISTO" }); tudo(); }, "fi-link"));
       const obs = el("textarea"); obs.rows = 2; obs.value = f.obs || ""; obs.addEventListener("input", () => { f.obs = obs.value; }); const lo = campo("Observação (opcional)", obs); lo.style.marginTop = "10px"; corpo.appendChild(lo);
+    } else if (f.passo === 4) {
+      const e = est0, ref = Math.max(e.contrato || 0, e.obra || 0);
+      const r = f.estResp = f.estResp || { composicao: [{ item: "", valor: null }], causa: f.causa !== CAUSA_OK ? f.causa : "", descricao: "", acao: "" };
+      corpo.appendChild(el("p", "fi-pergunta", "Este lançamento estoura o limite. Componha o valor excedente"));
+      corpo.appendChild(el("p", "fi-alerta", "Excede " + [e.contrato ? "o contrato em " + moeda(e.contrato) : "", e.obra ? "o budget da obra em " + moeda(e.obra) : ""].filter(Boolean).join(" e ") + "."));
+      const cx = el("div", "fi-card"); cx.style.marginTop = "10px"; cx.appendChild(el("div", "fi-campo", "Composição do estouro"));
+      r.composicao.forEach((x, i) => { const ln = el("div", "fi-comp");
+        const a2 = inp(x.item, v => { x.item = v; }, "Item (ex.: revisão de fundação após sondagem)"); a2.style.flex = "1";
+        const b2 = inp(x.valor == null ? "" : String(x.valor).replace(".", ","), v => { x.valor = num(v); }, "R$"); b2.inputMode = "decimal"; b2.addEventListener("change", tudo);
+        ln.append(el("b", null, (i + 1) + "."), a2, b2, bt("×", () => { r.composicao.splice(i, 1); if (!r.composicao.length) r.composicao.push({ item: "", valor: null }); tudo(); }, "fi-link")); cx.appendChild(ln); });
+      cx.appendChild(bt("+ item", () => { r.composicao.push({ item: "", valor: null }); tudo(); }, "fi-link"));
+      const soma = r.composicao.reduce((a3, x) => a3 + (num(x.valor) || 0), 0);
+      cx.appendChild(el("p", Math.abs(soma - ref) > 1 && soma ? "fi-alerta am" : "fi-aviso", "Soma da composição " + moeda(soma) + " · excesso " + moeda(ref) + (Math.abs(soma - ref) > 1 && soma ? ". A soma não bate com o excesso: confira se está compondo só o valor excedente." : "")));
+      corpo.appendChild(cx);
+      const cs = sel([["", "Selecione"]].concat(LC.filter(x => x !== CAUSA_OK).map(x => [x, x])), r.causa, v => { r.causa = v; }); const lc = campo("Causa raiz do estouro", cs); lc.style.marginTop = "10px"; corpo.appendChild(lc);
+      const ds = el("textarea"); ds.rows = 3; ds.value = r.descricao || ""; ds.addEventListener("input", () => { r.descricao = ds.value; }); const ld = campo("O que aconteceu", ds); ld.style.marginTop = "10px"; corpo.appendChild(ld);
+      const ac = el("textarea"); ac.rows = 2; ac.value = r.acao || ""; ac.addEventListener("input", () => { r.acao = ac.value; }); const la = campo("Ação para não repetir (opcional)", ac); la.style.marginTop = "10px"; corpo.appendChild(la);
+      corpo.appendChild(el("p", "fi-aviso", "Ao finalizar, abre o e-mail do pedido e, em seguida, o comunicado de estouro para " + ((S.base.emailEstouro || EMAIL_ESTOURO).para || "—") + "."));
     } else {
-      const e = estouroDe(f), c2 = ct || { disciplina: f.disciplina, fornecedorId: f.fornecedorId, valor: num(f.valorContrato) }, fo = F(c2.fornecedorId), tot = totalForm(f);
+      const e = est0, c2 = ct || { disciplina: f.disciplina, fornecedorId: f.fornecedorId, valor: num(f.valorContrato) }, fo = F(c2.fornecedorId), tot = totalForm(f);
       corpo.appendChild(el("p", "fi-pergunta", "Confira antes de finalizar"));
       const rs = el("div", "fi-resumo");
-      [["Obra", ob.nome], ["Contrato", c2.disciplina + " · " + (fo.nome || "—")], ["CNPJ", fo.cnpj || "não cadastrado"], ["Tipo", f.tipo], ["Causa raiz", f.causa], ["Total", moeda(tot) + " em " + f.parcelas.length + " parcela(s)"]]
+      [["Obra", ob.nome], ["Contrato", c2.disciplina + " · " + (fo.nome || "—")], ["CNPJ", fo.cnpj || "não cadastrado"], ["Tipo", f.tipo], ["Causa raiz", f.estResp && temEst && f.causa === CAUSA_OK ? f.estResp.causa : f.causa], ["Descrição", f.descricao], ["Total", moeda(tot) + " em " + f.parcelas.length + " parcela(s)"]]
         .forEach(x => { const r = el("div"); r.append(el("span", null, x[0]), el("b", null, x[1] || "—")); rs.appendChild(r); });
       corpo.appendChild(rs);
       const imp = (rot, antes, depois, total) => { const c = el("div", "fi-imp"); c.appendChild(el("span", "fi-campo", rot)); const b = el("div", "fi-imp-b"), a = el("i", "a"), n = el("i", "n");
@@ -790,15 +866,16 @@ export function montar(raiz, opts) {
       if (e.sc && e.sc.valor == null) corpo.appendChild(el("p", "fi-alerta am", "Este contrato está sem valor cadastrado: o controle de estouro do contrato não se aplica. Peça ao administrador para corrigir em Base → Contratos."));
       if (e.so) corpo.appendChild(imp("Budget da obra", e.so.usado - tot, e.so.usado, e.so.budget));
       if (e.contrato || e.obra) corpo.appendChild(el("p", "fi-alerta", "Estouro: " + [e.contrato ? "contrato em " + moeda(e.contrato) : "", e.obra ? "budget da obra em " + moeda(e.obra) : ""].filter(Boolean).join(" · ") +
-        ". Ao finalizar, o e-mail sai com o aviso e o link do formulário de composição, e o coordenador vê o estouro pendente."));
+        ". Composição: " + ((f.estResp && f.estResp.composicao) || []).filter(x => x.item).map(x => x.item + " " + moeda(num(x.valor))).join(" · ") + ". Ao finalizar, sai o e-mail do pedido e depois o comunicado de estouro."));
       else corpo.appendChild(el("p", "fi-msg", "Dentro do contrato e do budget."));
       corpo.appendChild(el("p", "fi-aviso", "Ao finalizar, o Outlook abre com o pedido para " + (S.base.email || EMAIL_PADRAO).para + ". Confira e clique em Enviar."));
     }
     if (S.msg && S.erro) corpo.insertBefore(el("p", "fi-msg err", S.msg), corpo.firstChild);
     const rod = el("div", "fi-dw-rod");
-    rod.appendChild(f.passo > 1 ? bt("← Voltar", () => { f.passo--; S.msg = ""; tudo(); }, "") : el("span"));
+    rod.appendChild(f.passo > 1 ? bt("← Voltar", () => { f.passo = ant(f.passo); S.msg = ""; tudo(); }, "") : el("span"));
     const dir = el("div", "fi-l"); dir.appendChild(bt("Salvar rascunho", async () => { S.ocupado = true; tudo(); const r = await gravaLanc(S.form); S.ocupado = false; r.ok ? ok("Rascunho salvo em Lançamentos.") : falha(r.msg); S.form = null; tudo(); }, ""));
-    if (f.passo < 4) { const nx = bt("Continuar →", () => { if (!podeIr(f.passo + 1)) { falha(["", "Escolha a obra.", "Escolha o contrato ou preencha o novo contrato.", "Preencha a causa raiz e o valor e a data de cada parcela."][f.passo]); tudo(); return; } S.msg = ""; f.passo++; tudo(); }, "pri"); dir.appendChild(nx); }
+    if (f.passo < 5) { const nx = bt("Continuar →", () => { const n = prox(f.passo); if (!podeIr(n)) { falha(["", "Escolha a obra.", "Escolha o contrato ou preencha o novo contrato.", "Escolha a causa raiz, descreva o pedido e preencha valor e data de cada parcela.",
+      "Preencha a composição (item e valor), a causa raiz do estouro (diferente de \"" + CAUSA_OK + "\") e o que aconteceu."][f.passo]); tudo(); return; } S.msg = ""; f.passo = n; tudo(); }, "pri"); dir.appendChild(nx); }
     else { const fz = bt("Finalizar e gerar e-mail", finalizar, "pri"); fz.disabled = S.ocupado; dir.appendChild(fz); }
     rod.appendChild(dir); dw.appendChild(rod);
     ov.appendChild(dw); return ov;
@@ -809,19 +886,20 @@ export function montar(raiz, opts) {
     const box = el("div", "fi-tab"); box.style.marginTop = "10px"; c.appendChild(box);
     function desenha() {
       const q = norm(S.busca), ls = S.lanc.filter(x => x.status !== "excluido" && passa(x))
-        .filter(x => !q || norm([x.numero, discDe(x), F(x.fornecedorId).nome, O(x.obraId).nome, x.causa].join(" ")).indexOf(q) >= 0).sort((a, b) => (b.numero || 1e9) - (a.numero || 1e9));
+        .filter(x => !q || norm([x.numero, discDe(x), F(x.fornecedorId).nome, O(x.obraId).nome, x.causa, x.descricao].join(" ")).indexOf(q) >= 0).sort((a, b) => (b.numero || 1e9) - (a.numero || 1e9));
       box.textContent = "";
       if (!ls.length) { box.appendChild(el("p", "fi-aviso", "Nenhum lançamento neste filtro. O histórico importado da planilha está em Todos os pagamentos.")); return; }
       box.appendChild(tabela(["Nº", "Obra", "Disciplina", "Fornecedor", "Tipo", "Causa raiz", "Total", "Parcelas", "Situação", ""], ls.map(x => {
         const r = el("tr"), tot = (x.parcelas || []).reduce((a, p) => a + (num(p.valor) || 0), 0), pg = (x.parcelas || []).filter(p => p.status === "PAGO").length;
-        td(r, x.numero || "—"); td(r, O(x.obraId).nome); td(r, discDe(x) || "—"); td(r, F(x.fornecedorId).nome || "—"); td(r, x.tipo); td(r, x.causa || "—"); td(r, moeda(tot), "n"); td(r, pg + "/" + (x.parcelas || []).length + " pagas");
+        td(r, x.numero || "—"); td(r, O(x.obraId).nome); td(r, discDe(x) || "—"); td(r, F(x.fornecedorId).nome || "—"); td(r, x.tipo); td(r, (x.causa || "—") + (x.descricao ? " · " + x.descricao : "")); td(r, moeda(tot), "n"); td(r, pg + "/" + (x.parcelas || []).length + " pagas");
         const st = el("td"); st.appendChild(el("span", "fi-pill " + (x.status === "finalizado" ? (x.estouro ? "fi-no" : "fi-ok") : x.status === "cancelado" ? "fi-ci" : "fi-am"),
           x.status === "finalizado" ? (x.estouro ? "Finalizado · estouro" : "Finalizado") : x.status === "cancelado" ? "Cancelado" : "Rascunho")); r.appendChild(st);
         const ac = el("td"); ac.style.whiteSpace = "nowrap";
         if (x.status === "rascunho") { ac.appendChild(bt("Editar", () => { S.form = copia(x); tudo(); }, "mini"));
           ac.appendChild(bt("Excluir", async () => { if (!window.confirm("Excluir este rascunho?")) return; x.status = "excluido"; await gravaLanc(x); tudo(); }, "mini per")); }
         else if (x.status === "finalizado") { ac.appendChild(bt("Reenviar e-mail", () => abrir(mailto(montaEmail(S.base, x, x.estouroId ? link(x.estouroId) : ""))), "mini"));
-          if (x.estouroId) { const es = S.est.find(e => e.id === x.estouroId); if (es) ac.appendChild(bt(es.status === "pendente" ? "Responder estouro" : "Ver estouro", () => { S.estForm = es; tudo(); }, "mini")); }
+          if (x.estouroId) { const es = S.est.find(e => e.id === x.estouroId); if (es) { ac.appendChild(bt(es.status === "pendente" ? "Responder estouro" : "Ver estouro", () => { S.estForm = es; tudo(); }, "mini"));
+            if (es.status !== "pendente") ac.appendChild(bt("E-mail estouro", () => emailEst(es), "mini")); } }
           if (adm) ac.appendChild(bt("Cancelar", async () => { if (!window.confirm("Cancelar o lançamento nº " + x.numero + "? Ele sai do utilizado e das parcelas.")) return; x.status = "cancelado"; await gravaLanc(x); tudo(); }, "mini per")); }
         r.appendChild(ac); return r; })));
     }
@@ -840,7 +918,8 @@ export function montar(raiz, opts) {
       td(r, [e.contrato ? "contrato " + moeda(e.contrato) : "", e.obra ? "obra " + moeda(e.obra) : ""].filter(Boolean).join(" · ") || "—", "n"); td(r, e.analista || "—"); td(r, (e.resposta && e.resposta.causa) || "—");
       const st = el("td"); st.appendChild(el("span", "fi-pill " + (e.status === "pendente" ? "fi-no" : "fi-ok"), e.status === "pendente" ? "Aguardando analista" : "Respondido")); r.appendChild(st);
       const ac = el("td"); ac.style.whiteSpace = "nowrap"; ac.appendChild(bt(e.status === "pendente" ? "Responder" : "Ver", () => { S.estForm = e; tudo(); }, "mini"));
-      ac.appendChild(bt("Copiar link", async () => { try { await navigator.clipboard.writeText(link(e.id)); ok("Link do formulário copiado."); } catch (x) { window.prompt("Copie o link:", link(e.id)); } tudo(); }, "mini"));
+      if (e.status !== "pendente") ac.appendChild(bt("E-mail", () => emailEst(e), "mini"));
+      else ac.appendChild(bt("Copiar link", async () => { try { await navigator.clipboard.writeText(link(e.id)); ok("Link do formulário copiado."); } catch (x) { window.prompt("Copie o link:", link(e.id)); } tudo(); }, "mini"));
       r.appendChild(ac); return r; }));
     t.style.marginTop = "12px"; c.appendChild(es.length ? t : el("p", "fi-aviso", "Nenhum estouro neste filtro.")); return c;
   }
@@ -860,12 +939,14 @@ export function montar(raiz, opts) {
       const b = inp(x.valor == null ? "" : String(x.valor).replace(".", ","), v => { x.valor = num(v); }, "R$"); b.style.width = "130px"; b.inputMode = "decimal"; b.disabled = resp;
       l.append(a, b); if (!resp) l.appendChild(bt("×", () => { r.composicao.splice(i, 1); tudo(); }, "mini")); c.appendChild(l); });
     if (!resp) c.appendChild(bt("+ item", () => { r.composicao.push({ item: "", valor: null }); tudo(); }, "mini"));
-    const cs = sel([["", "Selecione"]].concat(CAUSAS.map(x => [x, x])), r.causa, v => { r.causa = v; }); cs.disabled = resp; c.appendChild(campo("Causa raiz", cs));
+    const lc0 = causasDe(S.base).filter(x => x !== CAUSA_OK); if (r.causa && lc0.indexOf(r.causa) < 0) lc0.push(r.causa);
+    const cs = sel([["", "Selecione"]].concat(lc0.map(x => [x, x])), r.causa, v => { r.causa = v; }); cs.disabled = resp; c.appendChild(campo("Causa raiz", cs));
     const ds = el("textarea"); ds.rows = 3; ds.value = r.descricao || ""; ds.disabled = resp; ds.addEventListener("input", () => { r.descricao = ds.value; }); c.appendChild(campo("O que aconteceu", ds));
     const ac = el("textarea"); ac.rows = 2; ac.value = r.acao || ""; ac.disabled = resp; ac.addEventListener("input", () => { r.acao = ac.value; }); c.appendChild(campo("Ação para não repetir", ac));
     if (!resp) { const l = el("div", "fi-l"); l.style.justifyContent = "flex-end"; l.appendChild(bt("Enviar resposta", async () => {
         if (!r.causa || !String(r.descricao || "").trim() || !r.composicao.some(x => x.item && num(x.valor) != null)) { alert("Preencha a composição, a causa raiz e o que aconteceu."); return; }
-        e.status = "respondido"; r.em = hojeISO(); r.por = opts.usuario || ""; const x = await gravaEst(e); x.ok ? ok("Resposta registrada na base de motivos de estouro.") : falha(x.msg); fecha(); }, "pri")); c.appendChild(l); }
+        e.status = "respondido"; r.em = hojeISO(); r.por = opts.usuario || ""; const x = await gravaEst(e); x.ok ? ok("Resposta registrada na base de motivos de estouro. Abrindo o comunicado de estouro…") : falha(x.msg); fecha(); if (x.ok) emailEst(e); }, "pri")); c.appendChild(l); }
+    else { const l = el("div", "fi-l"); l.style.justifyContent = "flex-end"; l.appendChild(bt("Abrir e-mail de estouro", () => emailEst(e), "pri")); c.appendChild(l); }
     md.appendChild(c); md.addEventListener("click", ev => { if (ev.target === md) fecha(); }); return md;
   }
 
@@ -902,7 +983,7 @@ export function montar(raiz, opts) {
       Object.keys(S.base.importado || {}).forEach(k => box.appendChild(el("p", "fi-aviso", "Última importação " + ((BUS.find(b => b.bu === k) || {}).nome || k) + ": " + br(S.base.importado[k]))));
       const bi = bt("Importar", async () => { const f = fi.files && fi.files[0]; if (!f) { alert("Escolha o arquivo .xlsx."); return; } const ub = S.impBu;
         if (S.base.obras.some(o => o.bu === ub) && !window.confirm("Substituir obras, contratos e histórico de " + ub + " pelos da planilha?")) return;
-        try { S.ocupado = true; tudo(); const wb = await lerPlanilha(f); const r = importarSaidas(wb, ub, S.base); S.base = r.base;
+        try { S.ocupado = true; ok("Lendo a planilha… pode levar alguns segundos."); tudo(); await new Promise(r => setTimeout(r, 30)); const wb = await lerPlanilha(f); const r = importarSaidas(wb, ub, S.base); S.base = r.base; ok("Gravando a base no servidor…"); tudo();
           await gravaBase("Importado (" + ub + "): " + r.n.obras + " obras, " + r.n.contratos + " contratos e " + r.n.historico + " pagamentos." + (r.avisos.length ? " " + r.avisos.join(" ") : "")); }
         catch (e) { S.ocupado = false; falha("Não foi possível importar: " + e.message); tudo(); } }, "pri"); bi.style.marginTop = "8px"; box.appendChild(bi);
     }
@@ -910,19 +991,45 @@ export function montar(raiz, opts) {
     return c;
   }
   function modeloEmail() {
-    const c = el("div", "fi-card"), e = S.base.email;
-    c.appendChild(el("h3", null, "Modelo do e-mail de pedido"));
-    c.appendChild(el("p", "fi-aviso", "Clique em um campo para inserir no corpo. [Nº PEDIDO] é o número sequencial do lançamento; [PEDIDO ERP] é o Nº de pedido do contrato na planilha."));
+    const c = el("div", "fi-card"), ab = el("div", "fi-seg mini");
+    [["pedido", "E-mail do pedido"], ["estouro", "E-mail de estouro"], ["causas", "Causas raiz"]].forEach(x => ab.appendChild(bt(x[1], () => { S.emailAba = x[0]; tudo(); }, S.emailAba === x[0] ? "on" : "")));
+    c.appendChild(ab);
+    if (S.emailAba === "causas") return causasEditor(c);
+    const est = S.emailAba === "estouro", k = est ? "emailEstouro" : "email", PAD = est ? EMAIL_ESTOURO : EMAIL_PADRAO, CPS = est ? CAMPOS_EST : CAMPOS;
+    if (!S.base[k]) S.base[k] = copia(PAD); const e = S.base[k];
+    const h = el("h3", null, est ? "Modelo do comunicado de estouro (para ciência)" : "Modelo do e-mail de pedido"); h.style.marginTop = "12px"; c.appendChild(h);
+    c.appendChild(el("p", "fi-aviso", est ? "Sai depois do e-mail do pedido, quando o lançamento estoura contrato ou budget. Separe vários destinatários com vírgula." :
+      "Clique em um campo para inserir no corpo. [Nº PEDIDO] é o número sequencial do lançamento; [PEDIDO ERP] é o Nº de pedido do contrato na planilha."));
     const g = el("div", "fi-grade"); g.style.marginTop = "10px"; g.append(campo("Para", inp(e.para, v => { e.para = v; })), campo("Cc", inp(e.cc, v => { e.cc = v; }))); c.appendChild(g);
     const ti = inp(e.titulo, v => { e.titulo = v; }); const lt = campo("Título", ti); lt.style.marginTop = "10px"; c.appendChild(lt);
-    const co = el("textarea"); co.rows = 12; co.value = e.corpo; co.addEventListener("input", () => { e.corpo = co.value; }); const lc = campo("Corpo", co); lc.style.marginTop = "10px"; c.appendChild(lc);
+    const co = el("textarea"); co.rows = 14; co.value = e.corpo; co.addEventListener("input", () => { e.corpo = co.value; }); const lc = campo("Corpo", co); lc.style.marginTop = "10px"; c.appendChild(lc);
     const ch = el("div", "fi-l"); ch.style.marginTop = "8px";
-    CAMPOS.forEach(k => ch.appendChild(bt(k, () => { const p = co.selectionStart || co.value.length; co.value = co.value.slice(0, p) + k + co.value.slice(co.selectionEnd || p); e.corpo = co.value; co.focus(); }, "fi-chip"))); c.appendChild(ch);
-    const ex = S.lanc.filter(x => x.status === "finalizado").slice(-1)[0];
-    if (ex) { const pv = montaEmail(S.base, ex, ex.estouroId ? link(ex.estouroId) : ""), p = el("pre"); p.style.cssText = "white-space:pre-wrap;font-size:12px;background:var(--slate-50,#F8FAFC);padding:12px;border-radius:10px;margin-top:12px";
-      p.textContent = "Prévia com o lançamento nº " + ex.numero + "\nPara: " + pv.para + "\nCc: " + pv.cc + "\nTítulo: " + pv.titulo + "\n\n" + pv.corpo; c.appendChild(p); }
+    CPS.forEach(x => ch.appendChild(bt(x, () => { const p = co.selectionStart || co.value.length; co.value = co.value.slice(0, p) + x + co.value.slice(co.selectionEnd || p); e.corpo = co.value; co.focus(); }, "fi-chip"))); c.appendChild(ch);
+    let pv = null, rot = "";
+    if (est) { const x = S.est.filter(y => y.status !== "pendente").slice(-1)[0]; if (x) { pv = montaEmailEstouro(S.base, lancDe(x), x); rot = "estouro do lançamento nº " + x.numero; } }
+    else { const x = S.lanc.filter(y => y.status === "finalizado").slice(-1)[0]; if (x) { pv = montaEmail(S.base, x, x.estouroId && (S.est.find(y => y.id === x.estouroId) || {}).status === "pendente" ? link(x.estouroId) : ""); rot = "lançamento nº " + x.numero; } }
+    if (pv) { const p = el("pre"); p.style.cssText = "white-space:pre-wrap;font-size:12px;background:var(--slate-50,#F8FAFC);padding:12px;border-radius:10px;margin-top:12px";
+      p.textContent = "Prévia com o " + rot + "\nPara: " + pv.para + "\nCc: " + pv.cc + "\nTítulo: " + pv.titulo + "\n\n" + pv.corpo; c.appendChild(p); }
     const a = el("div", "fi-l"); a.style.cssText = "margin-top:12px;justify-content:flex-end";
-    a.append(bt("Restaurar padrão", () => { S.base.email = copia(EMAIL_PADRAO); tudo(); }), bt("Salvar modelo", () => gravaBase("Modelo de e-mail salvo."), "pri")); c.appendChild(a); return c;
+    a.append(bt("Restaurar padrão", () => { S.base[k] = copia(PAD); tudo(); }), bt("Salvar modelo", () => gravaBase("Modelo de e-mail salvo."), "pri")); c.appendChild(a); return c;
+  }
+  function causasEditor(c) {
+    const ls = S.base.causas = Array.isArray(S.base.causas) && S.base.causas.length ? S.base.causas : CAUSAS.slice();
+    const h = el("h3", null, "Causas raiz (lista do pedido e do estouro)"); h.style.marginTop = "12px"; c.appendChild(h);
+    c.appendChild(el("p", "fi-aviso", "A ordem aqui é a ordem do formulário. \"" + CAUSA_OK + "\" não pode ser usada como causa de estouro. Renomear não altera lançamentos já feitos: eles mantêm o nome antigo."));
+    const uso = {}; S.lanc.forEach(x => { if (x.causa) uso[x.causa] = (uso[x.causa] || 0) + 1; }); S.est.forEach(x => { const q = x.resposta && x.resposta.causa; if (q) uso[q] = (uso[q] || 0) + 1; });
+    const box = el("div"); box.style.cssText = "display:flex;flex-direction:column;gap:6px;margin-top:10px";
+    ls.forEach((x, i) => { const ln = el("div", "fi-l"); const t = inp(x, v => { ls[i] = v; }); t.style.flex = "1";
+      ln.append(el("b", null, String(i + 1).padStart(2, "0")), t, el("span", "fi-aviso", (uso[x] || 0) + " uso(s)"),
+        bt("↑", () => { if (!i) return; ls.splice(i - 1, 0, ls.splice(i, 1)[0]); tudo(); }, "mini"), bt("↓", () => { if (i === ls.length - 1) return; ls.splice(i + 1, 0, ls.splice(i, 1)[0]); tudo(); }, "mini"),
+        bt("Excluir", () => { if (uso[x] && !window.confirm("\"" + x + "\" já foi usada " + uso[x] + " vez(es). Os registros antigos mantêm o nome. Excluir da lista?")) return; ls.splice(i, 1); tudo(); }, "mini per"));
+      box.appendChild(ln); });
+    c.appendChild(box);
+    const a = el("div", "fi-l"); a.style.cssText = "margin-top:12px;justify-content:space-between";
+    a.append(bt("+ Nova causa", () => { const n = window.prompt("Nome da nova causa raiz:"); if (n && n.trim()) { ls.push(n.trim()); tudo(); } }),
+      el("span"), bt("Restaurar padrão", () => { if (window.confirm("Voltar para a lista padrão?")) { S.base.causas = CAUSAS.slice(); tudo(); } }),
+      bt("Salvar lista", () => { S.base.causas = ls.map(x => String(x || "").trim()).filter((x, i, v) => x && v.indexOf(x) === i); gravaBase("Lista de causas raiz salva. Já vale para todos."); }, "pri"));
+    c.appendChild(a); return c;
   }
   function exportarBloco() {
     const c = el("div", "fi-l"); c.style.justifyContent = "flex-end";
@@ -942,6 +1049,7 @@ export function montar(raiz, opts) {
     if (S.form) { const y = window.scrollY; wrap.appendChild(telaForm()); window.scrollTo(0, y); }
     if (S.fornSel) wrap.appendChild(fichaFornecedor());
     if (S.estForm) wrap.appendChild(telaEstouro());
+    if (S.aviso && !S.form && !S.estForm) wrap.appendChild(telaAviso());
   }
   const hs = location.hash.match(/^#estouro=([\w-]+)/);
   if (hs) { const e = S.est.find(x => x.id === hs[1]); if (e) { S.estForm = e; S.view = "est"; } else falha("Formulário de estouro não encontrado. Confira o link ou peça um novo ao coordenador."); }
