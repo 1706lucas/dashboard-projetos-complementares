@@ -7,7 +7,7 @@
 (function(){var box;function mostra(t){if(!box){box=document.createElement("pre");box.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;max-height:40vh;overflow:auto;z-index:99999;margin:0;padding:12px 14px;border-radius:10px;background:#7F1D1D;color:#fff;font:12px/1.4 monospace;white-space:pre-wrap;user-select:text";(document.body||document.documentElement).appendChild(box);box.textContent="ERRO NA VERSÃO DE TESTE. Mande print deste quadro:\n";}box.textContent+="\n"+t;}
 var ce=console.error;console.error=function(){var t=[].map.call(arguments,function(x){return x&&x.stack?x.stack:String(x)}).join(" ");if(!/attribute|Failed to load resource/.test(t))mostra(t.slice(0,1500));return ce.apply(console,arguments)};
 addEventListener("error",function(e){mostra(String(e.message))});addEventListener("unhandledrejection",function(e){mostra(String(e.reason&&e.reason.stack||e.reason))});
-addEventListener("load",function(){var b=document.createElement("div");b.textContent="VERSÃO DE TESTE · 05/11";b.style.cssText="position:fixed;top:8px;right:8px;z-index:99999;padding:4px 10px;border-radius:99px;background:#F59E0B;color:#111;font:800 11px sans-serif;pointer-events:none";document.body.appendChild(b)});})();
+addEventListener("load",function(){var b=document.createElement("div");b.textContent="VERSÃO DE TESTE · 08/11 R12";b.style.cssText="position:fixed;top:8px;right:8px;z-index:99999;padding:4px 10px;border-radius:99px;background:#F59E0B;color:#111;font:800 11px sans-serif;pointer-events:none";document.body.appendChild(b)});})();
 </script>
 <script src="./support.js"></script>
 </head>
@@ -4227,7 +4227,9 @@ class Component extends DCLogic {
   sbOk(c) { return !!(c && c.url && c.anon && c.chave); }
   sbFetch(c, path, opt) { opt = opt || {};
     const base = String(c.url).trim().replace(/\/+$/, "").replace(/\/rest\/v1$/i, "").replace(/\/+$/, "");
-    return fetch(base + "/rest/v1/" + path, Object.assign({}, opt, { headers: Object.assign({ apikey: c.anon, Authorization: "Bearer " + c.anon,
+    // tempo-limite de 45 s: o painel nunca fica esperando o servidor para sempre
+    const ctl = typeof AbortController !== "undefined" ? new AbortController() : null; if (ctl) setTimeout(() => ctl.abort(), 45000);
+    return fetch(base + "/rest/v1/" + path, Object.assign({}, ctl ? { signal: ctl.signal } : {}, opt, { headers: Object.assign({ apikey: c.anon, Authorization: "Bearer " + c.anon,
       "x-tap-chave": c.chave, "Content-Type": "application/json" }, opt.headers || {}) })); }
   async orgCarregar(c) {
     if (!this.sbOk(c)) return;
