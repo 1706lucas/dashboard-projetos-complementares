@@ -676,6 +676,7 @@ a:hover{color:var(--blue-700)}
                     <span style="{{ c.pillStyle }}">{{ c.kicker }}</span>
                     <h3 style="font-size:17px;margin:9px 0 3px">{{ c.title }}</h3>
                     <p style="margin:0;font-size:12px;color:var(--slate-400)">{{ c.sub }}</p>
+                    <sc-if value="{{ c.temUlt }}" hint-placeholder-val="{{ false }}"><p style="margin:6px 0 0;font-size:11.5px;font-weight:700;color:var(--slate-500)">{{ c.ult }}</p></sc-if>
                   </div>
                   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
                     <span style="{{ c.valueStyle }}">{{ c.value }}</span>
@@ -699,6 +700,7 @@ a:hover{color:var(--blue-700)}
             </button>
           </sc-for>
         </section>
+        <div id="ind-fechamento" style="margin-top:22px"></div>
       </sc-if>
 
       <!-- ══════════ RISCOS ══════════ -->
@@ -1492,6 +1494,10 @@ a:hover{color:var(--blue-700)}
       </sc-if>
 
       <!-- ══════════ PROCESSOS (em construção) ══════════ -->
+      <sc-if value="{{ isLanc }}" hint-placeholder-val="{{ false }}">
+        <div id="fin-lanc" style="min-height:300px"></div>
+      </sc-if>
+
       <sc-if value="{{ isProc }}" hint-placeholder-val="{{ false }}">
         <div id="proc-canvas" style="min-height:300px"></div>
       </sc-if>
@@ -1909,7 +1915,7 @@ a:hover{color:var(--blue-700)}
         <section style="display:flex;flex-direction:column;gap:18px">
           <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
             <h3 style="font-size:15px">Fornecedores cadastrados</h3>
-            <p style="margin:3px 0 14px;font-size:12px;color:var(--slate-400)">Cadastre os projetistas que atendem as obras e vincule cada linha da tabela abaixo. Os vínculos ficam salvos neste navegador.</p>
+            <p style="margin:3px 0 14px;font-size:12px;color:var(--slate-400)">Cadastre os projetistas que atendem as obras e vincule cada linha da tabela abaixo. Cadastro único com o Lançamento Financeiro: fornecedores e vínculos valem para todos os usuários. CNPJ e contatos ficam em Lançamento Financeiro → Fornecedores.</p>
             <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
               <sc-for list="{{ fnChips }}" as="f" hint-placeholder-count="8">
                 <span style="display:inline-flex;align-items:center;gap:8px;background:var(--blue-50);color:var(--blue-700);border-radius:99px;padding:5px 6px 5px 13px;font-size:12.5px;font-weight:700;white-space:nowrap;max-width:100%">
@@ -2434,11 +2440,14 @@ class Component extends DCLogic {
     ler("data/fornecedores.json").then(d => {
       let s = null;
       try { const raw = localStorage.getItem(this.FKEY); if (raw) s = JSON.parse(raw); } catch (e) { s = null; }
-      this.setState({ fdata: d, fstate: s && s.fornecedores ? s : { fornecedores: d.seed.fornecedores.slice(), vinculos: Object.assign({}, d.seed.vinculos) } });
+      const fs0 = s && s.fornecedores ? s : { fornecedores: d.seed.fornecedores.slice(), vinculos: Object.assign({}, d.seed.vinculos) };
+      this._fornLocal = JSON.parse(JSON.stringify(fs0));
+      this.setState({ fdata: d, fstate: fs0 }, () => { if (this.state.fin) this.finAplicar(this.state.fin); });
     }).catch(falha);
     const ss = this.state.sessao;
     if (C && ss && ss.perfil === "admin") C.listaUsuarios().then(u => this.setState({ usuarios: u }));
-    if (C) C.carregar("data/config.json").then(c => { this.setState({ cfg: Object.assign({ url: "", anon: "", chave: "", fontes: null }, c) }); this.orgCarregar(c); }).catch(() => {});
+    if (C) C.carregar("data/config.json").then(c => { this.setState({ cfg: Object.assign({ url: "", anon: "", chave: "", fontes: null }, c) }); this.orgCarregar(c); this.finCarregar(c); }).catch(() => { this.finCarregar(null); });
+    else this.finCarregar(null);
   }
   async entrar(e) {
     if (e && e.preventDefault) e.preventDefault();
@@ -2562,6 +2571,7 @@ class Component extends DCLogic {
     };
   }
   componentDidMount() {
+    if (/^#estouro=/.test(location.hash)) this.setState({ page: "Lançamento Financeiro" });
     this.iniciar();
     try { const raw = localStorage.getItem(this.SKEY); if (raw) this.setState({ semanal: JSON.parse(raw) }); } catch (e) { /* ignora */ }
     try { const raw = localStorage.getItem(this.UKEY); if (raw) this.setState({ uploads: JSON.parse(raw) }); } catch (e) { /* ignora */ }
@@ -2572,8 +2582,19 @@ class Component extends DCLogic {
     this.aplicaTema(tema);
   }
   saveF(fstate) {
+    this._fornLocal = JSON.parse(JSON.stringify(fstate)); this._fornLocalEditado = true;
     this.setState({ fstate });
     try { localStorage.setItem(this.FKEY, JSON.stringify(fstate)); } catch (e) { /* sessão apenas */ }
+    // cadastro único: a Gestão de Fornecedores grava na mesma base do Lançamento Financeiro
+    const F = this.state.fin;
+    if (F && F.base) {
+      const b = JSON.parse(JSON.stringify(F.base)); b.fornecedores = b.fornecedores || [];
+      fstate.fornecedores.forEach(f => { if (!b.fornecedores.some(x => x.id === f.id)) b.fornecedores.push({ id: f.id, nome: f.nome, razao: "", fantasia: "", cnpj: "", mega: "", contato: "", telefone: "", email: "" }); });
+      const emUso = id => (b.contratos || []).some(c => c.fornecedorId === id) || (b.historico || []).some(h => h.fornecedorId === id) || (F.lanc || []).some(l => l.fornecedorId === id);
+      b.fornecedores = b.fornecedores.filter(x => fstate.fornecedores.some(f => f.id === x.id) || emUso(x.id) || x.cnpj);
+      b.vinculos = Object.assign({}, fstate.vinculos);
+      this.finGrava("fin_base", 1, b);
+    }
   }
   setSemanal(obra, data) {
     const s = Object.assign({}, this.state.semanal);
@@ -2590,7 +2611,177 @@ class Component extends DCLogic {
     this.aplicaTema(t);
     try { localStorage.setItem(this.TKEY, t); } catch (e) { /* sessão apenas */ }
   }
-  componentDidUpdate() { this.aplicaTema(this.state.tema); this.procMontar(); }
+  componentDidUpdate() { this.aplicaTema(this.state.tema); this.procMontar(); this.fechMontar(); this.finMontar(); }
+  // ── Lançamento Financeiro: dados no Supabase (fin_base, fin_lancamentos, fin_estouros) ──
+  FINKEY = "gadens.fin.v1";
+  async finLer(c) {
+    const vazio = { base: null, lanc: [], est: [] };
+    if (this.sbOk(c)) {
+      const g = async p => { const r = await this.sbFetch(c, p); if (!r.ok) throw new Error("HTTP " + r.status + (r.status === 404 ? " · rode supabase-financeiro.sql" : "")); return r.json(); };
+      const [b, l, e] = await Promise.all([g("fin_base?id=eq.1&select=dados"), g("fin_lancamentos?select=id,dados"), g("fin_estouros?select=id,dados")]);
+      return { base: b[0] ? b[0].dados : null, lanc: l.map(x => x.dados), est: e.map(x => x.dados), fonte: "supabase" };
+    }
+    try { return Object.assign(vazio, JSON.parse(localStorage.getItem(this.FINKEY) || "null") || {}, { fonte: "local" }); } catch (x) { return Object.assign(vazio, { fonte: "local" }); }
+  }
+  async finCarregar(c) {
+    try { const X = await this.carregaModulo("./data/financeiro.js"); this._finX = X; const d = await this.finLer(c); this.finAplicar(d); }
+    catch (e) { this.setState({ finErro: e.message }); console.error("[gadens] Lançamento Financeiro:", e && e.message); }
+  }
+  // Une o cadastro local da Gestão de Fornecedores à base única (uma vez por sessão) e devolve a Gestão já pela base única.
+  fornUnificar(d) {
+    const B = d.base, S = this._fornLocal, adm = !!(this.state.sessao && this.state.sessao.perfil === "admin");
+    if (!B || !S) return;
+    const nrm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    let mudou = false; const mapa = {};
+    B.fornecedores = B.fornecedores || []; B.vinculos = B.vinculos || {};
+    (S.fornecedores || []).forEach(f => { const t0 = nrm(f.nome).split(" ")[0];
+      let x = B.fornecedores.find(y => y.id === f.id) || B.fornecedores.find(y => nrm(y.nome) === nrm(f.nome) || nrm(y.fantasia) === nrm(f.nome)) ||
+        (t0.length > 3 ? B.fornecedores.find(y => nrm(y.nome).split(" ")[0] === t0) : null);
+      if (!x) { x = { id: f.id, nome: f.nome, razao: "", fantasia: "", cnpj: "", mega: "", contato: "", telefone: "", email: "" }; B.fornecedores.push(x); mudou = true; }
+      mapa[f.id] = x.id; });
+    Object.keys(S.vinculos || {}).forEach(k => { const v = mapa[S.vinculos[k]] || S.vinculos[k]; if (B.vinculos[k] !== v) { B.vinculos[k] = v; mudou = true; } });
+    Object.keys(B.vinculos).forEach(k => { if (!(k in (S.vinculos || {})) && this._fornLocalEditado) { delete B.vinculos[k]; mudou = true; } });
+    if (mudou && adm && this.sbOk(this.state.cfg)) this.sbFetch(this.state.cfg, "fin_base", { method: "POST", headers: { Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ id: 1, dados: B, atualizado: new Date().toISOString() }) }).catch(() => {});
+    if (mudou && !this.sbOk(this.state.cfg)) { try { localStorage.setItem(this.FINKEY, JSON.stringify({ base: B, lanc: d.lanc, est: d.est })); } catch (e) {} }
+    // a Gestão passa a usar os ids da base única
+    const fs = { fornecedores: B.fornecedores.map(f => ({ id: f.id, nome: f.nome })).sort((a, b) => a.nome.localeCompare(b.nome)), vinculos: Object.assign({}, B.vinculos) };
+    this._fornLocal = JSON.parse(JSON.stringify(fs));
+    this.setState({ fstate: fs });
+  }
+  finAplicar(d) {
+    const X = this._finX; if (!X) return;
+    try { this.fornUnificar(d); } catch (e) { console.error("[gadens] cadastro único:", e && e.message); }
+    this._finUlt = d;
+    const r = d.base ? X.resumo(d.base, d.lanc, d.est) : { atrasadas: 0, estPend: 0 };
+    const adm = !!(this.state.sessao && this.state.sessao.perfil === "admin"), n = r.atrasadas + (adm ? r.estPend : 0);
+    this.setState({ fin: d, finMark: n ? String(n) : "" });
+  }
+  async finGrava(tabela, id, dados) {
+    const c = this.state.cfg, fin = Object.assign({}, this.state.fin || { lanc: [], est: [] });
+    if (tabela === "fin_base") fin.base = dados;
+    else { const k = tabela === "fin_lancamentos" ? "lanc" : "est"; const l = (fin[k] || []).slice(), i = l.findIndex(x => x.id === id); if (i >= 0) l[i] = dados; else l.push(dados); fin[k] = l; }
+    if (this.sbOk(c)) {
+      try { const r = await this.sbFetch(c, tabela, { method: "POST", headers: { Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ id, dados, atualizado: new Date().toISOString() }) });
+        if (!r.ok) return { ok: false, msg: "Não gravou no Supabase (HTTP " + r.status + (r.status === 404 ? " · rode supabase-financeiro.sql" : "") + ")." }; }
+      catch (e) { return { ok: false, msg: "Não gravou no Supabase: " + e.message }; }
+      this.finAplicar(fin); return { ok: true, msg: "Salvo. Já vale para todos os usuários." };
+    }
+    try { localStorage.setItem(this.FINKEY, JSON.stringify({ base: fin.base, lanc: fin.lanc, est: fin.est })); } catch (e) {}
+    this.finAplicar(fin); return { ok: true, msg: "Salvo só neste navegador: Supabase não configurado." };
+  }
+  async finMontar() {
+    const raiz = document.getElementById("fin-lanc");
+    if (!raiz || raiz.dataset.pronto) return;
+    if (!this.state.fin) { raiz.textContent = this.state.finErro ? "Não foi possível abrir o Lançamento Financeiro: " + this.state.finErro : "Carregando lançamentos…"; return; }
+    raiz.dataset.pronto = "1";
+    try {
+      const X = this._finX, adm = !!(this.state.sessao && this.state.sessao.perfil === "admin"), d = this.state.fin;
+      const siglas = {}; ((this.state.data && this.state.data.obras) || []).forEach(o => { siglas[o.sigla] = o.nome; }); ((this.state.fdata && this.state.fdata.grupos) || []).forEach(g => { siglas[g.sigla] = siglas[g.sigla] || g.obra; });
+      X.montar(raiz, { dados: d, admin: adm, usuario: (this.state.sessao && this.state.sessao.nome) || "", siglas,
+        msg: d.fonte === "local" && this.state.sessao ? "Supabase não configurado: os lançamentos ficam só neste navegador." : "", erroMsg: d.fonte === "local" && !!this.state.sessao,
+        onDados: () => {}, abrirEmail: u => (window.__abrirEmail || (x => { window.location.href = x; }))(u),
+        api: { salvarBase: b => this.finGrava("fin_base", 1, b), salvarLanc: l => this.finGrava("fin_lancamentos", l.id, l), salvarEst: e => this.finGrava("fin_estouros", e.id, e),
+          atual: () => this._finUlt,
+          recarregar: async () => { try { const n = await this.finLer(this.state.cfg); this.finAplicar(n); return n; } catch (e) { return null; } } } });
+    } catch (e) { console.error("[gadens] Lançamento Financeiro:", e && e.message); raiz.textContent = "Não foi possível abrir o Lançamento Financeiro: " + (e && e.message); }
+  }
+  // Financeiro do painel passa a ler o Lançamento Financeiro nas unidades já importadas.
+  finNaBase(d) {
+    const F = this.state.fin, X = this._finX; if (!F || !F.base || !X || !(F.base.obras || []).length) return d;
+    const B = F.base, bus = [...new Set(B.obras.map(o => o.bu))], O = id => B.obras.find(o => o.id === id) || {}, N = id => (B.fornecedores.find(f => f.id === id) || {}).nome || "—";
+    const L = X.linhas(B, F.lanc.filter(l => l.status === "finalizado"));
+    const usado = id => L.filter(x => x.obraId === id).reduce((a, x) => a + x.valor, 0);
+    const fora = arr => (arr || []).filter(x => bus.indexOf(x.bu) < 0);
+    const fin = Object.assign({}, d.financeiro, {
+      contratado: fora(d.financeiro.contratado).concat(B.contratos.map(c => ({ empreendimento: O(c.obraId).nome, projeto: c.disciplina, contratado: N(c.fornecedorId), valor: c.valor, bu: c.bu }))),
+      nf: fora(d.financeiro.nf).concat(L.map(x => ({ empreendimento: O(x.obraId).nome, disciplina: x.disciplina, contratado: N(x.fornecedorId), valor: x.valor, status: x.status,
+        mes: x.data ? +x.data.slice(5, 7) : null, ano: x.data ? +x.data.slice(0, 4) : null, bu: x.bu }))) });
+    const bench = fora(d.benchmark).concat(B.obras.filter(o => o.uh || o.m2).map(o => { const u = usado(o.id);
+      return { obra: o.nome, unidades: o.uh, m2: o.m2, budget: o.budget, utilizado: u, vgv: o.vgv, rM2: o.m2 && u ? u / o.m2 : null, rUH: o.uh && u ? u / o.uh : null,
+        refM2: o.m2 && o.budget ? o.budget / o.m2 : null, refUH: o.uh && o.budget ? o.budget / o.uh : null, bu: o.bu }; }).filter(x => x.rM2 != null || x.rUH != null));
+    return Object.assign({}, d, { financeiro: fin, benchmark: bench });
+  }
+  // Indicadores no modelo Projeto Next: nota por empreendimento e resultado = média dos empreendimentos.
+  // filtro(nomeDaObra, item) decide o que entra (filtro da tela ou unidade de negócio).
+  indCalc(filtro) {
+    const d = this.dados(); if (!d) return {};
+    const I = d.indicadores || {}, lst = k => (I[k] || []).filter(x => x && filtro(x.obra || x.empreendimento, x));
+    const nomeDe = n => { const m = this.matchObra(n); return m ? m.nome : String(n || "—"); };
+    const media = a => a.length ? Math.round(a.reduce((x, y) => x + y, 0) / a.length * 100) / 100 : null;
+    const enc = s => /conclu|tratado|cancelad/i.test(String(s || ""));
+    const fasePE = obra => { const n = this.norm(obra);
+      const lb = (I.linhaBase || []).find(x => this.norm(x.obra) === n || this.norm(x.empreendimento) === n);
+      if (lb) return /pr[eé]\s*-?\s*executivo/i.test(lb.status || "") || /ex\.|obra/i.test(lb.status || "");
+      const m = this.matchObra(obra); return !!(m && m.pePlus); };
+    // 1 · riscos
+    const gR = {}; lst("riscos").forEach(r => { if (enc(r.status) || !fasePE(r.obra)) return; const s = this.riscoScore(r); const k = nomeDe(r.obra);
+      gR[k] = gR[k] || { n: 0, crit: 0 }; if (s != null) { gR[k].n++; if (s > 12) gR[k].crit++; } });
+    const pR = Object.keys(gR).filter(k => gR[k].n).map(k => { const c = gR[k].crit; return { e: k, v: c <= 1 ? 100 : c <= 3 ? 50 : c === 4 ? 10 : 0 }; });
+    // 2 · linha de base de PE
+    const notaDesv = x => x <= 30 ? 100 : x <= 70 ? 100 - 2.25 * (x - 30) : Math.max(0, 10 - 2.25 * (x - 70));
+    const regs = (I.desvioRegistros || []).filter(x => x && filtro(x.obra, x)), vistos = {};
+    const pD = lst("desvioPE").filter(x => /pr[eé]\s*-?\s*executivo/i.test(String(x.status || ""))).map(x => {
+      const ob = this.matchObra(x.obra), k = nomeDe(x.obra); if (vistos[k]) return null; vistos[k] = 1;
+      const dias = regs.filter(r => this.norm(r.obra) === this.norm(x.obra)).reduce((a, r) => a + (r.dias || 0), 0);
+      const pe = ob && ob.pe ? ob.pe.dias : null; return pe ? { e: k, v: this.nota(notaDesv(dias / pe * 100)) } : null; }).filter(Boolean);
+    // 3 · alterações (regra atual do painel)
+    const notaAlt = x => x <= 10 ? 100 - 2 * x : x <= 20 ? 80 - 3 * (x - 10) : x <= 30 ? 50 - 4 * (x - 20) : Math.max(0, 10 - 4 * (x - 30));
+    const alt = lst("alteracoes").filter(x => { const m = this.matchObra(x.obra); return m && m.inicioObra; });
+    const pA = this.group(alt, x => nomeDe(x.obra)).map(p => ({ e: p[0], v: this.nota(notaAlt(p[1])) }));
+    // 5 · qualidade
+    const gQ = {}; lst("qualidade").forEach(x => { if (x.media == null) return; const k = nomeDe(x.empreendimento || x.obra); (gQ[k] = gQ[k] || []).push(x.media); });
+    const pQ = Object.keys(gQ).map(k => ({ e: k, v: media(gQ[k]) })).sort((a, b) => b.v - a.v);
+    const res = (arr, vazio) => ({ resultado: arr.length ? media(arr.map(x => x.v)) : vazio, porObra: arr });
+    const semScore = Object.keys(gR).length > 0; // há risco ativo, mas nenhum com impacto e probabilidade
+    return { 1: res(pR, semScore ? null : 100), 2: res(pD, null), 3: res(pA, 100), 5: res(pQ, null) };
+  }
+  indCalcBu(bu) {
+    const QB = { "make it": "Make It", "make.it": "Make It", "gadens incorporadora": "Gadens Inc", "gadens inc": "Gadens Inc" };
+    return this.indCalc((nome, x) => { const m = this.matchObra(nome); if (m) return m.bu === bu; return QB[String(x.bu || "").toLowerCase()] === bu; });
+  }
+  FKEY2 = "gadens.fechamento.v1";
+  async fechMontar() {
+    const raiz = document.getElementById("ind-fechamento");
+    if (!raiz || raiz.dataset.pronto || !this.dados()) return;
+    const adm = !!(this.state.sessao && this.state.sessao.perfil === "admin"), cfg = this.state.cfg;
+    raiz.dataset.pronto = "1"; raiz.textContent = "Carregando fechamento mensal…";
+    try {
+      const X = await this.carregaModulo("./data/fechamento.js");
+      let dados = null, aviso = "";
+      if (this.sbOk(cfg)) {
+        try { const r = await this.sbFetch(cfg, "dash_indicadores?id=eq.1&select=dados");
+          if (r.ok) { const l = await r.json(); dados = l[0] && l[0].dados; } else if (adm) aviso = "Tabela dash_indicadores indisponível (HTTP " + r.status + "). Rode supabase-indicadores.sql."; }
+        catch (e) { aviso = "Não foi possível ler os fechamentos publicados: " + e.message; }
+      }
+      if (!dados || !dados.meses) { try { dados = JSON.parse(localStorage.getItem(this.FKEY2) || "null") || dados; } catch (e) {} }
+      if (!raiz.isConnected) return;
+      X.montar(raiz, { dados, admin: adm, msg: aviso, erroMsg: !!aviso, modelo: "data/modelo-indicadores.xlsx",
+        usuario: (this.state.sessao && this.state.sessao.nome) || "",
+        calcular: bu => this.indCalcBu(bu),
+        rascunho: () => this._fechRasc, setRascunho: d => { this._fechRasc = d; },
+        mes: () => this._fechMes, setMes: m => { this._fechMes = m; },
+        onDados: d => { this._fech = d; this.setState({ fechV: Date.now() }); },
+        salvar: d => this.fechGravar(d) });
+    } catch (e) { console.error("[gadens] Fechamento:", e && e.message); raiz.textContent = "Não foi possível abrir o fechamento mensal: " + (e && e.message); }
+  }
+  async fechGravar(d) {
+    try { localStorage.setItem(this.FKEY2, JSON.stringify(d)); } catch (e) {}
+    const c = this.state.cfg; let msg = "Supabase não configurado";
+    if (this.sbOk(c)) {
+      try { const r = await this.sbFetch(c, "dash_indicadores", { method: "POST", headers: { Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ id: 1, dados: d, atualizado: new Date().toISOString() }) });
+        if (r.ok) return { ok: true, msg: "Fechamento salvo. Já vale para todos os usuários." };
+        msg = "HTTP " + r.status + (r.status === 404 ? " · tabela dash_indicadores não existe" : ""); } catch (e) { msg = e.message; }
+    }
+    return { ok: false, msg: "Salvo só neste navegador (" + msg + "). Rode supabase-indicadores.sql no Supabase e salve de novo." };
+  }
+  // Último mês fechado, para o rodapé dos cartões
+  fechUltimo(n) {
+    const D = this._fech; if (!D || !D.meses) return "";
+    const ks = Object.keys(D.meses).filter(k => D.meses[k].status === "fechado").sort(); if (!ks.length) return "";
+    const k = ks[ks.length - 1], M = D.meses[k], MES = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+    const v = p => { const it = M.proc && M.proc[p] && M.proc[p].itens[n]; return it && it.resultado != null ? String(it.resultado).replace(".", ",") : "—"; };
+    return "Fechado em " + MES[+k.slice(5, 7) - 1] + "/" + k.slice(0, 4) + ": Make It " + v("Incorporação Make It") + " · Gadens " + v("Incorporação Gadens");
+  }
   // Aba Processos: módulo à parte, montado fora do render. Se falhar, só esta aba mostra o erro.
   PKEY = "gadens.processos.v1";
   async procMontar() {
@@ -2752,14 +2943,15 @@ class Component extends DCLogic {
   }
   dados() {
     // Cache pela origem (base, uploads, config). dadosBase() gera objeto novo quando há upload no navegador.
-    const m = this._vig, cfg = this.state.cfg, base = this.state.data, u = this.state.uploads;
-    if (m && m.base === base && m.cfg === cfg && m.u === u) return m.out;
-    const b = this.dadosBase(); if (!b) return null;
+    const m = this._vig, cfg = this.state.cfg, base = this.state.data, u = this.state.uploads, fin = this.state.fin;
+    if (m && m.base === base && m.cfg === cfg && m.u === u && m.fin === fin) return m.out;
+    let b = this.dadosBase(); if (!b) return null;
+    try { b = this.finNaBase(b); } catch (e) { console.error("[gadens] financeiro do painel:", e && e.message); }
     // Falha ou lista vazia nunca derruba o painel: mostra a base completa e registra o motivo.
     let out = b;
     try { const v = this.obrasVigentes(b); if (v.obras.length) out = v; else console.error("[gadens] Mapa das fontes não casou com nenhuma obra da base"); }
     catch (e) { console.error("[gadens] obrasVigentes:", e && e.message); }
-    this._vig = { base, cfg, u, out };
+    this._vig = { base, cfg, u, fin, out };
     return out;
   }
   // base efetiva: original + uploads aplicados
@@ -4441,7 +4633,7 @@ class Component extends DCLogic {
       "Dados e publicação": [["Base de dados", "Base de dados"], ["Exportação de dados", "Exportação"]].concat(isAdm ? [["Usuários e publicação", "Usuários e publicação"]] : []) };
     const grupoDe = p => Object.keys(GRUPOS).find(g => GRUPOS[g].some(s => s[0] === p));
     const pages = [["Geral", ""], ["Prazos", ""], ["Financeiro", ""], ["Indicadores", ""], ["Riscos de Engenharia", ""], ["Reuniões", ""],
-      ["Gestão de Fornecedores", fnMark], ["Equipe", anMark], ["Processos", ""], ["Dados e publicação", upMark], ["Termos de Abertura de Projeto (TAP)", "↗"]];
+      ["Gestão de Fornecedores", fnMark], ["Equipe", anMark], ["Processos", ""], ["Dados e publicação", upMark], ["Termos de Abertura de Projeto (TAP)", "↗"], ["Lançamento Financeiro", this.state.finMark || ""]];
     const gAtual = grupoDe(page);
     const subTabs = gAtual ? GRUPOS[gAtual].map(s => ({ label: s[1], go: this.go(s[0]),
       style: "padding:8px 16px;border:0;border-radius:9px;cursor:pointer;font-family:var(--font-body);font-size:12.5px;font-weight:" + (s[0] === page ? "800" : "600") +
@@ -4464,6 +4656,7 @@ class Component extends DCLogic {
       "Gestão de Analistas": "Atividades por analista, agrupadas por obra · projetos complementares",
       "Organograma do Setor": "Organograma do setor · obras por analista, UH e área construída",
       "Processos": "Fluxo de projetos por fase, com documentos, formulários e indicadores",
+      "Lançamento Financeiro": "Pedidos e aditivos por obra, controle de budget e contrato, pagamentos e estouros",
       "Base de dados": "Arquivos que alimentam o painel e atualização por upload",
       "Usuários e publicação": "Acessos ao painel e pacote criptografado para o GitHub",
       "Exportação de dados": "Apresentação do setor e planilha de indicadores da empresa",
@@ -4471,7 +4664,7 @@ class Component extends DCLogic {
       "Reunião Follow-up": "Apresentação de cada analista · linha axial, atividades críticas, em andamento e riscos das obras dele"
     };
     const base = {
-      nav, pageTitle: gAtual || page, pageSub: subs[page], subTabs, temSubTabs: subTabs.length > 1,
+      nav, pageTitle: gAtual || page, pageSub: page === "Financeiro" && this.state.fin && this.state.fin.base && (this.state.fin.base.obras || []).length ? subs[page] + " · fonte: Lançamento Financeiro" : subs[page], subTabs, temSubTabs: subTabs.length > 1,
       geradoEm: d ? d.geradoEm.split("-").reverse().join("/") : "—",
       versao: "v1.9",
       logo: React.createElement("img", { src: "data/logo-gadens.png", alt: "Grupo Gadens",
@@ -4479,11 +4672,11 @@ class Component extends DCLogic {
       isGeral: page === "Geral", isPrazos: page === "Prazos", isIndicadores: page === "Indicadores",
       isRiscos: page === "Riscos de Engenharia", isFinanceiro: page === "Financeiro",
       isAnalistas: page === "Gestão de Analistas", isOrg: page === "Organograma do Setor",
-      orgBotaoEditar: page === "Organograma do Setor" && !!(this.state.sessao && this.state.sessao.perfil === "admin") && !this.state.orgDraft, isProc: page === "Processos",
+      orgBotaoEditar: page === "Organograma do Setor" && !!(this.state.sessao && this.state.sessao.perfil === "admin") && !this.state.orgDraft, isProc: page === "Processos", isLanc: page === "Lançamento Financeiro",
       procBlocos: [["Processos mapeados", "Fluxos do setor, etapa a etapa"], ["POPs e ITs", "Procedimentos operacionais e instruções de trabalho"], ["Diretrizes de projeto", "Diretrizes vigentes por disciplina"]].map(b => ({ t: b[0], s: b[1] })), isFornecedores: page === "Gestão de Fornecedores",
       isBase: page === "Base de dados", isExport: page === "Exportação de dados", isReuniao: page === "Reunião Diretoria", isFollow: page === "Reunião Follow-up",
       isAdmin: page === "Usuários e publicação" && !!(this.state.sessao && this.state.sessao.perfil === "admin"),
-      showFilters: page.indexOf("Gestão") !== 0 && page !== "Reunião Follow-up" && page !== "Base de dados" && page !== "Exportação de dados" && page !== "Usuários e publicação" && page !== "Organograma do Setor" && page !== "Processos",
+      showFilters: page !== "Lançamento Financeiro" && page.indexOf("Gestão") !== 0 && page !== "Reunião Follow-up" && page !== "Base de dados" && page !== "Exportação de dados" && page !== "Usuários e publicação" && page !== "Organograma do Setor" && page !== "Processos",
       ...this.authVals(), ...this.orgVals(), ...this.alt7Vals(d),
       stop: e => e.stopPropagation(), closeModal: () => this.setState({ modal: null, taskModal: null }),
       modalPill: this.state.taskModal ? "Atividades" : "Indicador",
@@ -4626,9 +4819,9 @@ class Component extends DCLogic {
     const semProb = riscosF.filter(r => r.probabilidade == null || r.probabilidade === "").length;
     const nCrit = criticosPE.length;
     const semScoreAtivos = riscosAtivos.filter(r => this.riscoScore(r) == null).length;
-    const notaRisco = riscosAtivos.length === 0 ? 100 :
-      riscosAtivos.length === semScoreAtivos ? null :
-      nCrit <= 1 ? 100 : nCrit <= 3 ? 50 : nCrit === 4 ? 10 : 0;
+    const IC = this.indCalc(n => this.inFilter(n));
+    const notaRisco = riscosAtivos.length === 0 ? 100 : IC[1].resultado == null ? null : this.nota(IC[1].resultado);
+    const mediaQualObra = IC[5].resultado;
 
 
     // radar (teia) da composição das notas
@@ -4724,7 +4917,7 @@ class Component extends DCLogic {
 
     const cardDefs = [
       { key: "risco", kicker: "Riscos", title: "Riscos por Empreendimento", sub: comScore === 0 ? "Sem impacto (1-5) preenchido na base — meta: zero riscos > 12 em obras de PE em diante" :
-          "Riscos em aberto em obras de PE em diante · " + criticosPE.length + " com score > 12 — meta: zero", color: "#EF4444",
+          "Riscos em aberto em obras de PE em diante · " + criticosPE.length + " com score > 12 · nota = média por empreendimento", color: "#EF4444",
         value: String(riscosAtivos.length), nota: notaRisco, bars: this.bars(this.group(riscosAtivos, x => x.obra), "#EF4444") },
       { key: "desvio", kicker: "Prazo", title: "Desvio de LB de PE", sub: "Somatório dos atrasos registrados · " + desvioRows.length + " obra(s) em PE sob análise, " + isentas.length + " isenta(s) · meta: até 30% da fase", color: "#F59E0B",
         value: String(desvioRows.length), nota: notaDesvio, bars: this.bars(desvioRows.filter(x => x.perc != null && x.perc > 0).map(x => [x.obra, Math.round(x.perc)]), "#F59E0B", v => v + "%") },
@@ -4734,11 +4927,12 @@ class Component extends DCLogic {
         value: "—", nota: null, bars: [] },
       { key: "econ", kicker: "Custo", title: "Economia por Projetos", sub: "Economia gerada por otimizações de projeto", color: "#10B981",
         value: this.short(totEcon), nota: null, bars: this.bars(this.group(econF, x => x.obra, x => x.valor || 0), "#10B981", v => this.short(v)) },
-      { key: "qual", kicker: "Qualidade", title: "Qualidade de Entrega", sub: "Média das notas de clareza, compatibilização, solução otimizada, conformidade técnica e confiabilidade na entrega", color: "#2563EB",
-        value: mediaQual == null ? "—" : mediaQual.toFixed(1).replace(".", ","), nota: mediaQual == null ? null : this.nota((mediaQual / 5) * 100),
+      { key: "qual", kicker: "Qualidade", title: "Qualidade de Entrega", sub: "Média do checklist por empreendimento, depois média dos empreendimentos (1 a 5) · meta 4", color: "#2563EB",
+        value: mediaQualObra == null ? "—" : mediaQualObra.toFixed(2).replace(".", ","), nota: mediaQualObra == null ? null : this.nota((mediaQualObra / 5) * 100),
         bars: this.bars(mediaPorChave(qualF, x => x.disciplina), "#2563EB", v => String(v).replace(".", ",")) }
     ];
-    const indCards = cardDefs.map(c => ({
+    const NUMS = { risco: 1, desvio: 2, alt: 3, qual: 5 };
+    const indCards = cardDefs.map(c => ({ ult: NUMS[c.key] ? this.fechUltimo(NUMS[c.key]) : "", temUlt: !!(NUMS[c.key] && this.fechUltimo(NUMS[c.key])),
       kicker: c.kicker, title: c.title, sub: c.sub, value: c.value, bars: c.bars, vazio: c.bars.length === 0,
       vazioTxt: c.key === "estouro"
         ? "Dados em apuração: os valores de estouro só serão publicados após a conclusão da auditoria de custos."
