@@ -4221,7 +4221,9 @@ class Component extends DCLogic {
   sbOk(c) { return !!(c && c.url && c.anon && c.chave); }
   sbFetch(c, path, opt) { opt = opt || {};
     const base = String(c.url).trim().replace(/\/+$/, "").replace(/\/rest\/v1$/i, "").replace(/\/+$/, "");
-    return fetch(base + "/rest/v1/" + path, Object.assign({}, opt, { headers: Object.assign({ apikey: c.anon, Authorization: "Bearer " + c.anon,
+    // tempo-limite de 45 s: o painel nunca fica esperando o servidor para sempre
+    const ctl = typeof AbortController !== "undefined" ? new AbortController() : null; if (ctl) setTimeout(() => ctl.abort(), 45000);
+    return fetch(base + "/rest/v1/" + path, Object.assign({}, ctl ? { signal: ctl.signal } : {}, opt, { headers: Object.assign({ apikey: c.anon, Authorization: "Bearer " + c.anon,
       "x-tap-chave": c.chave, "Content-Type": "application/json" }, opt.headers || {}) })); }
   async orgCarregar(c) {
     if (!this.sbOk(c)) return;
