@@ -73,6 +73,7 @@ a{color:var(--color-accent)}a:hover{color:var(--blue-700)}
     </div>
   </aside>
   <main data-scroll="1" style="flex:1;min-width:0;overflow-y:auto">
+  <sc-if value="{{ avisoConexao }}" hint-placeholder-val="{{ false }}"><div style="margin:16px 28px 0;padding:12px 16px;border-radius:12px;background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;font-weight:700;font-size:13px">{{ avisoTxt }}</div></sc-if>
 
   <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
     <div style="padding:26px 28px 64px;max-width:1280px;width:100%;display:flex;flex-direction:column;gap:22px">
@@ -978,7 +979,9 @@ class Component extends DCLogic {
   }
   sb(path, opt) {
     const c = this.sbCfg; opt = opt || {};
-    return fetch(c.url.replace(/\/$/, '') + '/rest/v1/' + path, Object.assign({}, opt, {
+    // aceita a URL do projeto com ou sem /rest/v1 no final (com /rest/v1 dava 404 e o TAP caía para o navegador)
+    const base = String(c.url || '').trim().replace(/\/+$/, '').replace(/\/rest\/v1$/i, '').replace(/\/+$/, '');
+    return fetch(base + '/rest/v1/' + path, Object.assign({}, opt, {
       headers: Object.assign({ apikey: c.anon, Authorization: 'Bearer ' + c.anon, 'x-tap-chave': c.chave,
         'Content-Type': 'application/json' }, opt.headers || {}) }));
   }
@@ -994,10 +997,16 @@ class Component extends DCLogic {
           if (!rb.ok || !rt.ok) throw new Error('Supabase ' + rb.status + '/' + rt.status);
           const b = (await rb.json())[0], ts = await rt.json();
           const s0 = seed();
-          const db = Object.assign({}, s0, b && b.dados ? b.dados : {}, { taps: ts.map(x => x.tap) });
+          const db = Object.assign({}, s0, b && b.dados ? b.dados : {}, { taps: ts.map(x => x.tap).filter(Boolean) });
+          if (!b || !b.dados || !b.dados.emps) db.emps = [];
+          if (!db.drafts) db.drafts = {};
+          // revisão sem empreendimento na base (gravações concorrentes antigas): recria o empreendimento a partir do TAP
+          db.taps.forEach(t => { if (t && t.empId && !db.emps.some(e => e.id === t.empId)) db.emps.push({ id:t.empId, nome:(t.data && t.data.ident && t.data.ident.nome) || 'Sem nome', sigla:(t.data && t.data.ident && t.data.ident.sigla) || '' }); });
+          this.lastBase = clone(this.base(db));
           this.mode = 'supabase'; return db;
-        } catch (e) { console.warn('TAP: Supabase indisponível', e); }
+        } catch (e) { console.warn('TAP: Supabase indisponível', e); this.mode = 'erro'; this.erroTxt = String(e && e.message || e); return { designers:[], emps:[], drafts:{}, taps:[] }; }
       }
+      if (C && (await C.modo()) === 'protegido') { this.mode = 'erro'; this.erroTxt = 'configuração do Supabase ausente no pacote publicado'; return { designers:[], emps:[], drafts:{}, taps:[] }; }
     }
     try {
       const r = await fetch(API + '/db', { cache:'no-store' });
@@ -1008,15 +1017,39 @@ class Component extends DCLogic {
     let db = null; try { db = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
     return db && db.taps ? db : seed();
   }
+  // mescla em 3 vias: o que mudou localmente desde a última leitura vai por cima do servidor; o resto vem do servidor
+  mesclar(b0, loc, srv) {
+    const J = x => JSON.stringify(x === undefined ? null : x), out = {};
+    const lista = (k, idk) => { const B = b0[k] || [], L = loc[k] || [], S = (srv[k] || []).slice(), id = x => idk ? x && x[idk] : x;
+      L.forEach(x => { const bx = B.find(y => id(y) === id(x)); if (!bx || J(bx) !== J(x)) { const i = S.findIndex(y => id(y) === id(x)); if (i >= 0) S[i] = x; else S.push(x); } });
+      B.forEach(x => { if (!L.some(y => id(y) === id(x))) { const i = S.findIndex(y => id(y) === id(x)); if (i >= 0) S.splice(i, 1); } });
+      return S; };
+    out.emps = lista('emps', 'id'); out.designers = lista('designers', 'id'); out.ztCustom = lista('ztCustom', 'k'); out.discCustom = lista('discCustom', null);
+    const B = b0.drafts || {}, L = loc.drafts || {}, D = Object.assign({}, srv.drafts || {});
+    Object.keys(L).forEach(k => { if (J(B[k]) !== J(L[k])) D[k] = L[k]; });
+    Object.keys(B).forEach(k => { if (!(k in L)) delete D[k]; });
+    out.drafts = D; return out;
+  }
   base(db) { const o = {}; ['emps','designers','drafts','ztCustom','discCustom'].forEach(k => { if (db[k] !== undefined) o[k] = db[k]; }); return o; }
   pushBase(db) {
     clearTimeout(this.tSave); this.setState({ sync:'Salvando…' });
     this.tSave = setTimeout(async () => {
       if (this.mode === 'supabase') {
-        try { const r = await this.sb('tap_base', { method:'POST', headers:{ Prefer:'resolution=merge-duplicates' },
-            body: JSON.stringify({ id:1, dados: this.base(this.pending || this.state.db), atualizado: new Date().toISOString() }) });
-          this.setState({ sync: r.ok ? 'Salvo no Supabase' : 'Falha ao salvar (' + r.status + ')' }); }
-        catch (e) { this.setState({ sync:'Supabase indisponível' }); }
+        try {
+          const loc = this.base(this.pending || this.state.db);
+          const rg = await this.sb('tap_base?id=eq.1&select=dados', { cache:'no-store' });
+          if (!rg.ok) throw new Error('leitura ' + rg.status);
+          const srv = ((await rg.json())[0] || {}).dados || {};
+          const dados = this.mesclar(this.lastBase || {}, loc, srv);
+          const r = await this.sb('tap_base', { method:'POST', headers:{ Prefer:'resolution=merge-duplicates' },
+            body: JSON.stringify({ id:1, dados, atualizado: new Date().toISOString() }) });
+          if (!r.ok) throw new Error('gravação ' + r.status);
+          this.lastBase = clone(dados);
+          // traz para a tela o que outros analistas gravaram, sem mexer no rascunho em edição
+          const cur = clone(this.state.db); ['emps','designers','ztCustom','discCustom'].forEach(k => { if (dados[k] !== undefined) cur[k] = dados[k]; });
+          cur.drafts = Object.assign({}, dados.drafts || {}, this.state.empId && cur.drafts[this.state.empId] ? { [this.state.empId]: cur.drafts[this.state.empId] } : {});
+          this.setState({ db:cur, sync:'Salvo no Supabase' });
+        } catch (e) { this.setState({ sync:'FALHA AO SALVAR (' + (e && e.message || e) + ')' }); alert('O TAP não foi salvo no servidor (' + (e && e.message || e) + '). Não feche a página e avise o coordenador.'); }
         return;
       }
       try { const r = await fetch(API + '/base', { method:'PUT', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(this.base(this.pending || this.state.db)) });
@@ -1052,7 +1085,7 @@ class Component extends DCLogic {
     const db = await this.loadDb();
     let tema = 'claro'; try { tema = localStorage.getItem(TEMA_KEY) || 'claro'; } catch (e) {}
     document.documentElement.setAttribute('data-tema', tema);
-    this.setState({ db, tema, sync: this.mode === 'supabase' ? 'Conectado ao Supabase' : this.mode === 'server' ? 'Conectado ao servidor' : 'Modo local (navegador)' });
+    this.setState({ db, tema, sync: this.mode === 'supabase' ? 'Conectado ao Supabase' : this.mode === 'server' ? 'Conectado ao servidor' : this.mode === 'erro' ? 'SEM CONEXÃO' : 'Modo local (navegador)' });
     this.onAlt = e => { this.altKey = e.altKey; }; window.addEventListener('keyup', this.onAlt);
     this.onEsc = e => { this.altKey = e.altKey; const s = this.state; const tag = (e.target.tagName || '').toLowerCase(); if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
       if (e.key === 'Escape') { this.setState({ zTipo:null, drag:null, poly:null, hover:null }); return; }
@@ -1063,7 +1096,8 @@ class Component extends DCLogic {
   componentWillUnmount() { window.removeEventListener('keydown', this.onEsc);
   }
   setTema(x) { try { localStorage.setItem(TEMA_KEY, x); } catch (e) {} document.documentElement.setAttribute('data-tema', x); this.setState({ tema:x }); }
-  save(db) { this.setState({ db }); if (this.mode === 'server' || this.mode === 'supabase') { this.pending = db; this.pushBase(db); return; } try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} }
+  save(db) { if (this.mode === 'erro') { alert('Sem conexão com o servidor: nada foi salvo. Recarregue a página (Ctrl+F5) e, se continuar, avise o coordenador.'); return; }
+    this.setState({ db }); if (this.mode === 'server' || this.mode === 'supabase') { this.pending = db; this.pushBase(db); return; } try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} }
   setD(fn) { const db = clone(this.state.db); fn(db.drafts[this.state.empId], db); this.save(db); }
   isAdm() { const C = window.Cofre, s = C && C.sessao && C.sessao(); return !!(s && s.perfil === 'admin'); }
   async gravarTapAdm(acao, t, sigla) {
@@ -1375,6 +1409,9 @@ class Component extends DCLogic {
     v.nav = nav;
     v.temaOpts = [['claro','Claro'],['escuro','Escuro']].map(o => ({ label:o[1], on: s.tema === o[0], off: s.tema !== o[0], go: () => this.setTema(o[0]) }));
     v.totTaps = db ? (s.sync || '') + ' · ' + db.taps.length + ' revisões' : '';
+    v.avisoConexao = this.mode === 'erro' || this.mode === 'local';
+    v.avisoTxt = this.mode === 'erro' ? 'Sem conexão com o servidor (' + (this.erroTxt || 'erro') + '). Nada será salvo. Recarregue com Ctrl+F5; se continuar, avise o coordenador e não preencha o TAP agora.'
+      : 'Modo local: os dados ficam só neste navegador. Não use para TAPs oficiais.';
     return v;
   }
   rv0() {
@@ -1597,6 +1634,7 @@ class Component extends DCLogic {
         can: !why, cannot: !!why, why };
       v.preview = () => this.setState({ view:'doc', docId:null, docBackTo:'edit' });
       v.generate = () => {
+        if (this.mode !== 'supabase' && this.mode !== 'server') { alert('Sem conexão com o servidor: o TAP não pode ser emitido agora. Recarregue a página e, se continuar, avise o coordenador.'); return; }
         const db2 = clone(db); const data = clone(d); const autor = data.autor, motivo = data.motivo || 'Emissão inicial';
         data.autor = ''; data.motivo = '';
         if (tEdit && this.isAdm()) {
