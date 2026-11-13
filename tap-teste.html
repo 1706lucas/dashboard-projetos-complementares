@@ -979,7 +979,9 @@ class Component extends DCLogic {
   }
   sb(path, opt) {
     const c = this.sbCfg; opt = opt || {};
-    return fetch(c.url.replace(/\/$/, '') + '/rest/v1/' + path, Object.assign({}, opt, {
+    // aceita a URL do projeto com ou sem /rest/v1 no final (com /rest/v1 dava 404 e o TAP caía para o navegador)
+    const base = String(c.url || '').trim().replace(/\/+$/, '').replace(/\/rest\/v1$/i, '').replace(/\/+$/, '');
+    return fetch(base + '/rest/v1/' + path, Object.assign({}, opt, {
       headers: Object.assign({ apikey: c.anon, Authorization: 'Bearer ' + c.anon, 'x-tap-chave': c.chave,
         'Content-Type': 'application/json' }, opt.headers || {}) }));
   }
