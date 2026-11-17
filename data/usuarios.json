@@ -1,6 +1,6 @@
 {
  "versao": 1,
- "atualizado": "2026-10-15",
+ "atualizado": "2026-11-17",
  "usuarios": [
   {
    "login": "admin",
@@ -118,6 +118,32 @@
     "ct": "xdVoMzkFGP6xxGUqpE0HpN7RsMH3B9HPfsTsdpLCztCTNif5yjSuVLCRBr6Lscf2"
    },
    "criado": "2026-10-14"
+  },
+  {
+   "login": "giovane.castro@grupogadens.com.br",
+   "nome": "Giovane Castro",
+   "perfil": "leitura",
+   "salt": "jW9DkcXfglH4VKgZ2rTWDg==",
+   "iter": 600000,
+   "chave": {
+    "v": 1,
+    "iv": "5sUo/C3JWuXRdLSy",
+    "ct": "yrVJ02f9G2g5qmWBFDcwgHICqrUSDkRwzyreHIU7wCDO3sUtjhTjt4GH1LH2bNWs"
+   },
+   "criado": "2026-11-17"
+  },
+  {
+   "login": "leticia.bacchi@grupogadens.com.br",
+   "nome": "Leticia Bacchi",
+   "perfil": "leitura",
+   "salt": "qaiaMFaFEZF35yOa7j2wow==",
+   "iter": 600000,
+   "chave": {
+    "v": 1,
+    "iv": "qYkqrouF52R4sJ48",
+    "ct": "cT2U4igxC358QcUr/8KGyQyRjnDeQiNO9af7BNhQXi6XSdB4dfEuVtKlnFYaQtA/"
+   },
+   "criado": "2026-11-17"
   }
  ]
 }
