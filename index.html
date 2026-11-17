@@ -130,6 +130,12 @@ a:hover{color:var(--blue-700)}
 
   <main style="flex:1;min-width:0;overflow-y:auto">
     <div style="padding:26px 28px 64px;display:flex;flex-direction:column;gap:22px;max-width:1560px">
+      <sc-if value="{{ baseVelha }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 16px;border-radius:12px;background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;font-size:13px;font-weight:700">
+          <span>{{ baseVelhaTxt }}</span>
+          <sc-if value="{{ baseVelhaAdm }}"><a href="https://github.com/1706lucas/dashboard-projetos-complementares/actions/workflows/publicar.yml" target="_blank" rel="noopener" style="padding:7px 14px;border-radius:10px;background:#B91C1C;color:#fff;text-decoration:none;font-size:12.5px;white-space:nowrap">Atualizar agora no GitHub →</a></sc-if>
+        </div>
+      </sc-if>
 
       <header style="position:relative">
         <sc-if value="{{ orgBotaoEditar }}" hint-placeholder-val="{{ false }}">
@@ -307,19 +313,55 @@ a:hover{color:var(--blue-700)}
 
         <sc-if value="{{ geralObra }}" hint-placeholder-val="{{ true }}">
           <div style="display:flex;flex-direction:column;gap:22px">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px">
-            <sc-for list="{{ geralKpis }}" as="k" hint-placeholder-count="4">
-              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:18px 20px;box-shadow:var(--card-shadow);display:flex;gap:14px;align-items:flex-start">
-                <div style="{{ k.iconStyle }}">{{ k.icon }}</div>
-                <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
-                  <span style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">{{ k.label }}</span>
-                  <span style="{{ k.valueStyle }}">{{ k.value }}</span>
-                  <span style="font-size:12px;color:var(--slate-400)">{{ k.sub }}</span>
-                  <span style="{{ k.flagStyle }}">{{ k.flag }}</span>
+          <sc-for list="{{ geralResumo }}" as="r" hint-placeholder-count="1">
+            <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:14px">
+              <span style="{{ r.tituloStyle }}"><span class="mono" style="color:var(--blue-600)">{{ r.sigla }}</span> {{ r.nome }}</span>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px">
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <div style="display:flex;align-items:flex-end;gap:12px">
+                    <span style="font-family:var(--font-heading);font-weight:900;font-size:40px;line-height:.9;color:var(--blue-600)">{{ r.pct }}</span>
+                    <span style="font-size:12px;color:var(--slate-500);padding-bottom:3px">concluído em projetos complementares<br>{{ r.pctSub }}</span>
+                  </div>
+                  <div style="height:8px;border-radius:99px;background:var(--slate-100);overflow:hidden"><div style="{{ r.pctBar }}"></div></div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--slate-400);margin-bottom:6px">Duração das fases · {{ r.fasesTotal }}</div>
+                    <div style="display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--slate-100)">
+                      <sc-for list="{{ r.fases }}" as="s" hint-placeholder-count="4"><div style="{{ s.style }}" title="{{ s.title }}"></div></sc-for>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px">
+                      <sc-for list="{{ r.fases }}" as="s" hint-placeholder-count="4">
+                        <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--slate-600);white-space:nowrap"><span style="{{ s.dot }}"></span>{{ s.label }} <b class="mono">{{ s.valor }}</b></span>
+                      </sc-for>
+                    </div>
+                    <sc-if value="{{ r.semFases }}"><p style="margin:0;font-size:11.5px;color:var(--slate-400)">Sem fases cadastradas na linha axial.</p></sc-if>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+                    <sc-for list="{{ r.budget }}" as="b" hint-placeholder-count="3">
+                      <div style="{{ b.style }}">
+                        <span style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">{{ b.label }}</span>
+                        <span style="{{ b.valorStyle }}">{{ b.valor }}</span>
+                        <span style="font-size:10.5px;color:var(--slate-400)">{{ b.sub }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--slate-400);margin-bottom:6px">Composição do budget utilizado por disciplina</div>
+                    <div style="display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--slate-100)">
+                      <sc-for list="{{ r.disc }}" as="s" hint-placeholder-count="4"><div style="{{ s.style }}" title="{{ s.title }}"></div></sc-for>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px">
+                      <sc-for list="{{ r.disc }}" as="s" hint-placeholder-count="4">
+                        <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--slate-600);white-space:nowrap"><span style="{{ s.dot }}"></span>{{ s.label }} <b class="mono">{{ s.valor }}</b></span>
+                      </sc-for>
+                    </div>
+                    <sc-if value="{{ r.semDisc }}"><p style="margin:0;font-size:11.5px;color:var(--slate-400)">Sem contratos lançados na planilha de saídas.</p></sc-if>
+                  </div>
                 </div>
               </div>
-            </sc-for>
-          </div>
+            </div>
+          </sc-for>
 
           <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
@@ -346,6 +388,37 @@ a:hover{color:var(--blue-700)}
               <p style="font-size:13px;color:var(--slate-400);margin:14px 0 0">Sem marcos axiais cadastrados para esta obra.</p>
             </sc-if>
           </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:18px;align-items:start">
+            <sc-for list="{{ geralPrazos }}" as="c" hint-placeholder-count="2">
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                  <div>
+                    <h3 style="font-size:15px">{{ c.titulo }}</h3>
+                    <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">{{ c.sub }}</p>
+                  </div>
+                  <span style="{{ c.nStyle }}">{{ c.n }}</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ c.resumo }}" as="x" hint-placeholder-count="2"><span style="{{ x.style }}">{{ x.t }}</span></sc-for>
+                </div>
+                <sc-if value="{{ c.vazio }}"><p style="margin:0;font-size:12.5px;color:var(--slate-400)">{{ c.vazioTxt }}</p></sc-if>
+                <div style="display:flex;flex-direction:column;gap:7px;max-height:420px;overflow-y:auto">
+                  <sc-for list="{{ c.itens }}" as="t" hint-placeholder-count="4">
+                    <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:var(--slate-50)">
+                      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                        <a href="{{ t.url }}" target="_blank" rel="noopener" style="font-size:12.5px;font-weight:700;text-decoration:none;color:var(--color-text)">{{ t.n }}</a>
+                        <span style="font-size:11px;color:var(--slate-400)">{{ t.resp }}</span>
+                      </div>
+                      <span style="{{ t.tagStyle }}">{{ t.tag }}</span>
+                      <span class="mono" style="font-size:10.5px;color:var(--slate-500);white-space:nowrap">{{ t.info }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
 
           <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
@@ -3708,6 +3781,81 @@ class Component extends DCLogic {
     try { localStorage.setItem(this.FUKEY, JSON.stringify(s)); } catch (e) { /* sessão apenas */ }
     this.forceUpdate();
   }
+  // resumo da obra (percentual, fases, budget e disciplinas) · usado no Geral e no follow-up
+  resumoObra(o, multi) {
+    const dd = this.dados();
+    const segs = (lista, total, cores, fmt) => lista.map((x, i) => ({ label: x[0], valor: fmt(x[1]), title: x[0] + " · " + fmt(x[1]),
+      style: "height:100%;background:" + cores[i % cores.length] + ";width:" + (total ? (x[1] / total * 100).toFixed(2) : 0) + "%",
+      dot: "width:9px;height:9px;border-radius:3px;flex-shrink:0;background:" + cores[i % cores.length] }));
+    const CF = { "Estudo Preliminar": ["EP", "#10B981"], "Anteprojeto": ["AP", "#06B6D4"], "Pré-executivo": ["PE", "#8B5CF6"], "Executivo": ["EX", "#2563EB"] };
+    const CD = ["#2563EB", "#8B5CF6", "#06B6D4", "#10B981", "#F59E0B", "#EF4444", "#94A3B8"];
+      const fl = (o.fasesLinha || []).filter(f => f.dias > 0);
+      const tf = fl.reduce((a, f) => a + f.dias, 0);
+      const ct = dd.financeiro.contratado.filter(c => { const m = this.matchObra(c.empreendimento); return m && m.sigla === o.sigla; });
+      const usado = ct.reduce((a, c) => a + (c.valor || 0), 0), viab = o.econ && o.econ.budgetDisp;
+      const g = this.group(ct, c => c.projeto || "Outros", c => c.valor || 0);
+      const top = g.slice(0, 6), resto = g.slice(6).reduce((a, x) => a + x[1], 0); if (resto) top.push(["Outras", resto]);
+      const est = viab ? (usado - viab) / viab * 100 : null;
+      const pctF = v => (usado ? Math.round(v / usado * 100) : 0) + "%";
+      const cardB = cor => "display:flex;flex-direction:column;gap:4px;padding:11px 13px;border-radius:12px;background:var(--slate-50);border-left:4px solid " + cor;
+      return { sigla: o.sigla, nome: o.nome, tituloStyle: multi ? "font-size:13px;font-weight:800" : "display:none",
+        pct: (o.pct || 0) + "%", pctSub: (o.doneCompl || 0) + " de " + (o.totalCompl || 0) + " tarefas",
+        pctBar: "height:100%;border-radius:99px;background:var(--blue-600);width:" + (o.pct || 0) + "%",
+        fases: segs(fl.map(f => [(CF[f.fase] || [f.fase])[0], f.dias]), tf, fl.map(f => (CF[f.fase] || [0, "#94A3B8"])[1]), v => v + " d"),
+        fasesTotal: tf ? tf + " dias" : "—", semFases: !fl.length,
+        budget: [
+          { label: "Viabilidade", valor: viab ? this.short(viab) : "—", sub: "budget disponível", style: cardB("#2563EB"), valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px" },
+          { label: "Utilizado", valor: this.short(usado), sub: ct.length + " contrato(s)", style: cardB("#8B5CF6"), valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px" },
+          { label: est != null && est > 0 ? "Estouro" : "Saldo", valor: est == null ? "—" : (est > 0 ? "+" : "") + est.toFixed(1).replace(".", ",") + "%",
+            sub: est == null ? "sem viabilidade" : est > 0 ? "acima do budget" : "dentro do budget", style: cardB(est != null && est > 0 ? "#EF4444" : "#10B981"),
+            valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px;color:" + (est != null && est > 0 ? "#B91C1C" : "#047857") }
+        ],
+        disc: segs(top, usado, CD, pctF), semDisc: !top.length };
+  }
+  // prazos das subatividades com tag (eng -) complementares: curto prazo/atrasadas e médio prazo
+  prazosObra(o) {
+    const hoje = this.fuHoje(), dia = n => new Date(Date.parse(hoje) + n * 864e5).toISOString().slice(0, 10);
+    const d7 = dia(7), d30 = dia(30);
+    const todas = (o && o.tarefasCompl) || [];
+    const temSub = todas.some(t => t.mae === false);
+    const aberta = t => !/CONCLU|COMPLETE|CANCEL|TRATADO/i.test(String(t.status || ""));
+    const naoIni = t => /EM ABERTO|TO DO|SEM IN[IÍ]CIO|N[AÃ]O INICIAD/i.test(String(t.status || ""));
+    const subs = todas.filter(t => (!temSub || t.mae === false) && aberta(t));
+    const tg = (bg, fg) => "font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0;background:" + bg + ";color:" + fg;
+    const dif = x => Math.round((Date.parse(x) - Date.parse(hoje)) / 864e5);
+    const nome = t => String(t.n || "").replace(/^[A-Z0-9]{2,4}\s*[-|]\s*/, "");
+    const item = (t, tag, bg, fg, info) => ({ n: nome(t), url: t.url || "#", resp: (t.ass || []).join(", ") || "sem responsável", tag, tagStyle: tg(bg, fg), info });
+    // atraso = somente o status "Em atraso". "Concluído com atraso" é concluído (já sai em aberta) e "Em progresso fora do prazo" é em progresso
+    const emAtraso = t => /EM ATRASO/i.test(String(t.status || ""));
+    const atras = subs.filter(emAtraso).sort((a, b) => String(a.d || "9").localeCompare(String(b.d || "9")));
+    const naJanela = x => x && x >= hoje && x <= d7;
+    // em aberto (não iniciada) com o prazo já correndo (início passou) ou vencido
+    const correndo = subs.filter(t => !emAtraso(t) && naoIni(t) && ((t.s && t.s < hoje) || (t.d && t.d < hoje)))
+      .sort((a, b) => String(a.d || a.s).localeCompare(String(b.d || b.s)));
+    const semana = subs.filter(t => !emAtraso(t) && !correndo.includes(t) && (naJanela(t.d) || naJanela(t.s)))
+      .sort((a, b) => String(naJanela(a.d) ? a.d : a.s).localeCompare(String(naJanela(b.d) ? b.d : b.s)));
+    const medio = subs.filter(t => !emAtraso(t) && !correndo.includes(t) && !semana.includes(t) && t.s && t.s > d7 && t.s <= d30)
+      .sort((a, b) => a.s.localeCompare(b.s));
+    const pill = (t, bg, fg) => ({ t, style: tg(bg, fg) });
+    const nSt = c => "font-family:var(--font-heading);font-weight:900;font-size:26px;line-height:1;color:" + c;
+    const fora = t => /FORA DO PRAZO/i.test(String(t.status || ""));
+    const curtoItens = atras.map(t => item(t, "Em atraso" + (t.d && t.d < hoje ? " +" + (-dif(t.d)) + " d" : ""), "#FEE2E2", "#991B1B", t.d ? "prazo " + this.br(t.d) : "sem prazo"))
+      .concat(correndo.map(t => t.d && t.d < hoje ? item(t, "Em aberto · vencida +" + (-dif(t.d)) + " d", "#FFEDD5", "#9A3412", "prazo " + this.br(t.d))
+        : item(t, "Em aberto · prazo correndo", "#FFEDD5", "#9A3412", "início " + this.br(t.s) + (t.d ? " · prazo " + this.br(t.d) : ""))))
+      .concat(semana.map(t => naJanela(t.d) ? item(t, (fora(t) ? "Em progresso · vence em " : "Vence em ") + dif(t.d) + " d", "#FEF3C7", "#92400E", "prazo " + this.br(t.d))
+        : item(t, "Inicia em " + dif(t.s) + " d", "#DBEAFE", "#1E40AF", "início " + this.br(t.s))));
+    return [
+      { titulo: "Curto prazo e atrasadas", sub: "Em atraso, em aberto com prazo correndo ou vencido, e início/prazo até " + this.br(d7),
+        n: String(curtoItens.length), nStyle: nSt(atras.length ? "#B91C1C" : "var(--slate-700)"),
+        resumo: [pill(atras.length + " em atraso", "#FEE2E2", "#991B1B"), pill(correndo.length + " em aberto com prazo correndo", "#FFEDD5", "#9A3412"), pill(semana.length + " na próxima semana", "#FEF3C7", "#92400E")],
+        itens: curtoItens, vazio: !curtoItens.length, vazioTxt: "Nenhuma subatividade atrasada ou para a próxima semana." },
+      { titulo: "Médio prazo · próximas a iniciar", sub: "Subatividades complementares com início entre " + this.br(dia(8)) + " e " + this.br(d30),
+        n: String(medio.length), nStyle: nSt("var(--slate-700)"),
+        resumo: [pill(medio.length + " a iniciar em até 30 dias", "#DBEAFE", "#1E40AF")],
+        itens: medio.map(t => item(t, "Inicia em " + dif(t.s) + " d", "#DBEAFE", "#1E40AF", "início " + this.br(t.s) + (t.d ? " · prazo " + this.br(t.d) : ""))),
+        vazio: !medio.length, vazioTxt: "Nenhuma subatividade iniciando nos próximos 30 dias." }
+    ];
+  }
   fuHoje() { const t = new Date(Date.now() - 3 * 3600e3); return t.toISOString().slice(0, 10); }
   fuDados(nome, sigla) {
     const d = this.dados(), hoje = this.fuHoje();
@@ -3808,31 +3956,9 @@ class Component extends DCLogic {
       dot: "width:9px;height:9px;border-radius:3px;flex-shrink:0;background:" + cores[i % cores.length] }));
     const CF = { "Estudo Preliminar": ["EP", "#10B981"], "Anteprojeto": ["AP", "#06B6D4"], "Pré-executivo": ["PE", "#8B5CF6"], "Executivo": ["EX", "#2563EB"] };
     const CD = ["#2563EB", "#8B5CF6", "#06B6D4", "#10B981", "#F59E0B", "#EF4444", "#94A3B8"];
-    const fuResumo = D.obras.map(o => {
-      const fl = (o.fasesLinha || []).filter(f => f.dias > 0);
-      const tf = fl.reduce((a, f) => a + f.dias, 0);
-      const ct = dd.financeiro.contratado.filter(c => { const m = this.matchObra(c.empreendimento); return m && m.sigla === o.sigla; });
-      const usado = ct.reduce((a, c) => a + (c.valor || 0), 0), viab = o.econ && o.econ.budgetDisp;
-      const g = this.group(ct, c => c.projeto || "Outros", c => c.valor || 0);
-      const top = g.slice(0, 6), resto = g.slice(6).reduce((a, x) => a + x[1], 0); if (resto) top.push(["Outras", resto]);
-      const est = viab ? (usado - viab) / viab * 100 : null;
-      const pctF = v => (usado ? Math.round(v / usado * 100) : 0) + "%";
-      const cardB = cor => "display:flex;flex-direction:column;gap:4px;padding:11px 13px;border-radius:12px;background:var(--slate-50);border-left:4px solid " + cor;
-      return { sigla: o.sigla, nome: o.nome, tituloStyle: D.obras.length > 1 ? "font-size:13px;font-weight:800" : "display:none",
-        pct: (o.pct || 0) + "%", pctSub: (o.doneCompl || 0) + " de " + (o.totalCompl || 0) + " tarefas",
-        pctBar: "height:100%;border-radius:99px;background:var(--blue-600);width:" + (o.pct || 0) + "%",
-        fases: segs(fl.map(f => [(CF[f.fase] || [f.fase])[0], f.dias]), tf, fl.map(f => (CF[f.fase] || [0, "#94A3B8"])[1]), v => v + " d"),
-        fasesTotal: tf ? tf + " dias" : "—", semFases: !fl.length,
-        budget: [
-          { label: "Viabilidade", valor: viab ? this.short(viab) : "—", sub: "budget disponível", style: cardB("#2563EB"), valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px" },
-          { label: "Utilizado", valor: this.short(usado), sub: ct.length + " contrato(s)", style: cardB("#8B5CF6"), valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px" },
-          { label: est != null && est > 0 ? "Estouro" : "Saldo", valor: est == null ? "—" : (est > 0 ? "+" : "") + est.toFixed(1).replace(".", ",") + "%",
-            sub: est == null ? "sem viabilidade" : est > 0 ? "acima do budget" : "dentro do budget", style: cardB(est != null && est > 0 ? "#EF4444" : "#10B981"),
-            valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px;color:" + (est != null && est > 0 ? "#B91C1C" : "#047857") }
-        ],
-        disc: segs(top, usado, CD, pctF), semDisc: !top.length };
-    });
+    const fuResumo = D.obras.map(o => this.resumoObra(o, D.obras.length > 1));
     const linhaT = (t, tag, bg, fg, info) => ({ sigla: t.sigla, n: t.n, url: t.url, tag, tagStyle: tagSt(bg, fg), info });
+
     const atrasadas = D.criticas.filter(t => t.tipo === "Atrasada").length;
     const contM = {}; D.riscos.forEach(r => { if (r.impacto && r.probabilidade) { const k = r.impacto + "-" + r.probabilidade; contM[k] = (contM[k] || 0) + 1; } });
     const fuMatriz = [];
@@ -4624,17 +4750,17 @@ class Component extends DCLogic {
 
   renderVals() {
     const d = this.dados();
-    const page = this.state.page || this.props.paginaInicial || "Geral";
+    let page = this.state.page || this.props.paginaInicial || "Geral";
+    if (page === "Reunião Diretoria" || page === "Reunião Follow-up") page = "Geral"; // aba Reuniões removida
     const anMark = this.state.adata ? String(this.state.adata.analistas.reduce((s, a) => s + a.atrasada + a.semInicioVencido, 0)) : "";
     const fnMark = this.state.fstate && this.state.fstate.fornecedores.length ?
       String(this.state.fstate.fornecedores.filter(f => Object.keys(this.state.fstate.vinculos).some(k => this.state.fstate.vinculos[k] === f.id)).length) : "";
     const upMark = Object.keys(this.state.uploads || {}).length ? String(Object.keys(this.state.uploads).length) : "";
     const isAdm = !!(this.state.sessao && this.state.sessao.perfil === "admin");
-    const GRUPOS = { "Reuniões": [["Reunião Diretoria", "Diretoria"], ["Reunião Follow-up", "Follow-up"]],
-      "Equipe": [["Organograma do Setor", "Organograma do Setor"], ["Gestão de Analistas", "Atividades por analista"]],
+    const GRUPOS = { "Equipe": [["Organograma do Setor", "Organograma do Setor"], ["Gestão de Analistas", "Atividades por analista"]],
       "Dados e publicação": [["Base de dados", "Base de dados"], ["Exportação de dados", "Exportação"]].concat(isAdm ? [["Usuários e publicação", "Usuários e publicação"]] : []) };
     const grupoDe = p => Object.keys(GRUPOS).find(g => GRUPOS[g].some(s => s[0] === p));
-    const pages = [["Geral", ""], ["Prazos", ""], ["Financeiro", ""], ["Indicadores", ""], ["Riscos de Engenharia", ""], ["Reuniões", ""],
+    const pages = [["Geral", ""], ["Prazos", ""], ["Financeiro", ""], ["Indicadores", ""], ["Riscos de Engenharia", ""],
       ["Gestão de Fornecedores", fnMark], ["Equipe", anMark], ["Processos", ""], ["Dados e publicação", upMark], ["Termos de Abertura de Projeto (TAP)", "↗"], ["Lançamento Financeiro", this.state.finMark || ""]];
     const gAtual = grupoDe(page);
     const subTabs = gAtual ? GRUPOS[gAtual].map(s => ({ label: s[1], go: this.go(s[0]),
@@ -4668,6 +4794,13 @@ class Component extends DCLogic {
     const base = {
       nav, pageTitle: gAtual || page, pageSub: page === "Financeiro" && this.state.fin && this.state.fin.base && (this.state.fin.base.obras || []).length ? subs[page] + " · fonte: Lançamento Financeiro" : subs[page], subTabs, temSubTabs: subTabs.length > 1,
       geradoEm: d ? d.geradoEm.split("-").reverse().join("/") : "—",
+      ...(() => { // aviso de base desatualizada: última atualização automática (ou data da base) com mais de 26 h
+        const q = d && d.automatico && d.automatico.quando ? Date.parse(d.automatico.quando) : d && d.geradoEm ? Date.parse(d.geradoEm + "T10:00:00Z") : NaN;
+        const h = isNaN(q) ? null : (Date.now() - q) / 36e5;
+        const velha = h != null && h > 26;
+        const quando = isNaN(q) ? "" : new Date(q).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+        return { baseVelha: velha, baseVelhaAdm: velha && !!(this.state.sessao && this.state.sessao.perfil === "admin"),
+          baseVelhaTxt: "Dados do ClickUp desatualizados: última atualização em " + quando + " (" + Math.floor((h || 0) / 24) + " dia(s)). Status e prazos podem não refletir o ClickUp." }; })(),
       versao: "v1.9",
       logo: React.createElement("img", { src: "data/logo-gadens.png", alt: "Grupo Gadens",
         style: { width: "40px", height: "auto", flexShrink: 0, display: "block" } }),
@@ -5202,6 +5335,7 @@ class Component extends DCLogic {
     ];
 
     return Object.assign(base, {
+      geralResumo: o ? [this.resumoObra(o, false)] : [], geralPrazos: o ? this.prazosObra(o) : [],
       buOpts,
       obraOpts: [{ sigla: "", label: "Todas as obras" }].concat(list.map(x => ({ sigla: x.sigla, label: x.sigla + " · " + x.nome }))),
       sigla: this.state.sigla || "", setObra: e => this.setState({ sigla: e.target.value }),
