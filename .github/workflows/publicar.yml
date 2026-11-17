@@ -4,7 +4,8 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: "0 10 * * *"   # 07:00 de Brasília
+    - cron: "0 10-22/2 * * 1-5"   # dias úteis: 07h, 09h, 11h, 13h, 15h, 17h e 19h de Brasília
+    - cron: "0 10 * * 0,6"        # sábado e domingo: 07h de Brasília
   workflow_dispatch:
 
 permissions:
@@ -19,6 +20,7 @@ concurrency:
 jobs:
   publicar:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
@@ -43,7 +45,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/dashboard.json.enc data/historico.json.enc
-          git diff --cached --quiet || (git commit -m "Dados do ClickUp $(date -u +%F)" && git push)
+          if git diff --cached --quiet; then echo "Sem mudanças nos dados."; exit 0; fi
+          git commit -m "Dados do ClickUp $(date -u +'%F %H:%M')"
+          # se alguém subiu arquivos enquanto o robô rodava, junta antes de enviar (antes isso derrubava a atualização)
+          for i in 1 2 3; do
+            git pull --rebase -X theirs origin main && git push && exit 0
+            echo "Tentativa $i falhou, tentando de novo em 20 s"; sleep 20
+          done
+          exit 1
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
