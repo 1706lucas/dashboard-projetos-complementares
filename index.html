@@ -740,8 +740,55 @@ a:hover{color:var(--blue-700)}
           </div>
           </sc-if>
 
+          <sc-if value="{{ prazosCal }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap">
+              <div>
+                <h3 style="font-size:15px">Calendário de marcos axiais</h3>
+                <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">{{ calSub }}</p>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <button onClick="{{ calAnoAnt }}" title="Ano anterior" style="cursor:pointer;border:1px solid var(--slate-200);background:var(--card);border-radius:9px;padding:6px 10px;font-weight:800;color:var(--slate-600)">«</button>
+                <button onClick="{{ calMesAnt }}" title="Mês anterior" style="cursor:pointer;border:1px solid var(--slate-200);background:var(--card);border-radius:9px;padding:6px 12px;font-weight:800;color:var(--slate-600)">‹</button>
+                <span style="min-width:150px;text-align:center;font-family:var(--font-heading);font-weight:800;font-size:15px">{{ calTitulo }}</span>
+                <button onClick="{{ calMesProx }}" title="Próximo mês" style="cursor:pointer;border:1px solid var(--slate-200);background:var(--card);border-radius:9px;padding:6px 12px;font-weight:800;color:var(--slate-600)">›</button>
+                <button onClick="{{ calAnoProx }}" title="Próximo ano" style="cursor:pointer;border:1px solid var(--slate-200);background:var(--card);border-radius:9px;padding:6px 10px;font-weight:800;color:var(--slate-600)">»</button>
+                <button onClick="{{ calHoje }}" style="cursor:pointer;border:1px solid var(--blue-500);background:var(--blue-50);color:var(--blue-700);border-radius:9px;padding:6px 12px;font-weight:700;font-size:12px">Hoje</button>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--slate-100);border:1px solid var(--slate-100);border-radius:12px;overflow:hidden">
+              <sc-for list="{{ calSemana }}" as="w" hint-placeholder-count="7">
+                <div style="background:var(--slate-50);padding:7px 8px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:var(--slate-400)">{{ w }}</div>
+              </sc-for>
+              <sc-for list="{{ calDias }}" as="c" hint-placeholder-count="35">
+                <div style="{{ c.style }}" title="{{ c.title }}">
+                  <span style="{{ c.numStyle }}">{{ c.num }}</span>
+                  <sc-for list="{{ c.ev }}" as="e" hint-placeholder-count="2">
+                    <span style="{{ e.style }}">{{ e.t }}</span>
+                  </sc-for>
+                  <span style="{{ c.maisStyle }}">{{ c.mais }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11.5px;color:var(--slate-500)">
+              <sc-for list="{{ calLegenda }}" as="l" hint-placeholder-count="4"><span style="display:inline-flex;align-items:center;gap:6px"><span style="{{ l.dot }}"></span>{{ l.t }}</span></sc-for>
+            </div>
+            <div style="{{ calListaStyle }}">
+              <table class="table" style="font-size:12px">
+                <thead><tr><th style="padding:7px 8px">Data</th><th style="padding:7px 8px">Obra</th><th style="padding:7px 8px">Marco axial</th><th style="padding:7px 8px">Situação</th></tr></thead>
+                <tbody>
+                  <sc-for list="{{ calLista }}" as="x" hint-placeholder-count="6">
+                    <tr><td class="mono" style="padding:6px 8px;white-space:nowrap">{{ x.data }}</td><td style="padding:6px 8px;white-space:nowrap"><span class="mono" style="color:var(--blue-600);font-weight:700;margin-right:6px">{{ x.sigla }}</span>{{ x.obra }}</td><td style="padding:6px 8px">{{ x.marco }}</td><td style="padding:6px 8px"><span style="{{ x.stStyle }}">{{ x.st }}</span></td></tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+            <p style="{{ calVazioStyle }}">{{ calVazio }}</p>
+          </div>
+          </sc-if>
+
           <sc-if value="{{ prazosSemObra }}" hint-placeholder-val="{{ false }}">
-            <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:44px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+            <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:18px 24px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:10px;align-items:flex-start">
               <span style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:var(--slate-400);background:var(--slate-100);padding:5px 11px;border-radius:99px">Nenhuma obra selecionada</span>
               <h3 style="font-size:18px;margin-top:8px">Selecione uma obra da {{ buAtual }}</h3>
               <p style="margin:0;font-size:13px;color:var(--slate-400);max-width:62ch">Percentual, fase do projeto, linha axial e cronograma são indicadores por empreendimento. Escolha uma obra no filtro acima, ou use a unidade de negócio <b>Todos</b> para a visão consolidada de prazos.</p>
@@ -759,6 +806,10 @@ a:hover{color:var(--blue-700)}
                 <span style="{{ ganttForaStyle }}">hoje fora do período</span>
                 <span class="mono" style="font-size:12px;color:var(--slate-400)">{{ ganttRange }}</span>
               </span>
+            </div>
+            <div style="{{ ganttTagsStyle }}">
+              <span style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:var(--slate-400);margin-right:4px">Área</span>
+              <sc-for list="{{ ganttTags }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
             </div>
             <p style="{{ ganttVazioStyle }}">{{ ganttVazio }}</p>
             <div style="{{ ganttWrapStyle }}" ref="{{ ganttRef }}">
@@ -996,7 +1047,7 @@ a:hover{color:var(--blue-700)}
                     <h3 style="font-size:15px">{{ bc.title }}</h3>
                     <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">{{ bc.sub }}</p>
                   </div>
-                  <span style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--slate-400);background:var(--slate-100);padding:4px 9px;border-radius:99px;white-space:nowrap">Todas as obras</span>
+                  <span style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--slate-400);background:var(--slate-100);padding:4px 9px;border-radius:99px;white-space:nowrap">{{ finEscopo }}</span>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
                   <sc-for list="{{ bc.rows }}" as="r" hint-placeholder-count="10">
@@ -3169,7 +3220,7 @@ class Component extends DCLogic {
       const bd = done ? "var(--blue-600)" : active ? "var(--blue-500)" : "var(--slate-200)";
       const fg = done ? "#fff" : active ? "var(--blue-600)" : "var(--slate-400)";
       return {
-        label: a.label, date: this.mesAno(a.end || a.start), pinText: done ? "✓" : String(i + 1),
+        label: a.label, date: this.br(a.end || a.start), pinText: done ? "✓" : String(i + 1),
         pinStyle: "width:38px;height:38px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:800;font-size:14px;background:" +
           bg + ";border:2px solid " + bd + ";color:" + fg + (active ? ";box-shadow:0 0 0 4px var(--blue-50)" : ""),
         labelStyle: "font-size:12px;font-weight:" + (done || active ? "800" : "600") + ";text-align:center;line-height:1.25;color:" +
@@ -4365,6 +4416,44 @@ class Component extends DCLogic {
     return "R$ " + Math.round(v);
   }
   br(d) { return d ? d.slice(8, 10) + "/" + d.slice(5, 7) + "/" + d.slice(2, 4) : "—"; }
+  // calendário com os marcos axiais de todas as obras do filtro (unidade de negócio ou todas)
+  calVals() {
+    const vz = { prazosCal: false, calDias: [], calSemana: [], calLegenda: [], calLista: [], calTitulo: "", calSub: "", calListaStyle: "display:none", calVazio: "", calVazioStyle: "display:none",
+      calMesAnt: () => {}, calMesProx: () => {}, calAnoAnt: () => {}, calAnoProx: () => {}, calHoje: () => {} };
+    if (this.state.sigla) return vz;
+    const list = this.obras(), hoje = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10);
+    const ref = /^\d{4}-\d{2}$/.test(this.state.calMes || "") ? this.state.calMes : hoje.slice(0, 7);
+    const y = +ref.slice(0, 4), m = +ref.slice(5, 7);
+    const ir = (dy, dm) => { const t = new Date(Date.UTC(y + dy, m - 1 + dm, 1)); this.setState({ calMes: t.toISOString().slice(0, 7) }); };
+    const MN = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const COR = { done: ["#D1FAE5", "#065F46", "Concluído"], prog: ["#FEF3C7", "#92400E", "Em andamento"], late: ["#FEE2E2", "#991B1B", "Em atraso"], todo: ["var(--slate-100)", "var(--slate-600)", "Previsto"] };
+    const ev = [];
+    list.forEach(o => (o.axial || []).forEach(a => { const dt = a.end || a.start; if (!dt || dt.slice(0, 7) !== ref) return;
+      let k = this.statusKind(a.status, a.kind); if (k === "cancel") return; if (k !== "done" && k !== "late" && dt < hoje) k = "late";
+      ev.push({ dt, sigla: o.sigla, obra: o.nome, marco: a.label || "Marco", k }); }));
+    ev.sort((a, b) => a.dt.localeCompare(b.dt) || a.sigla.localeCompare(b.sigla));
+    const primeiro = new Date(Date.UTC(y, m - 1, 1)), ini = (primeiro.getUTCDay() + 6) % 7; // semana começa na segunda
+    const nd = new Date(Date.UTC(y, m, 0)).getUTCDate(), tot = Math.ceil((ini + nd) / 7) * 7;
+    const curto = t => String(t).replace(/^[A-Z]{2,4}\s*·\s*/, "");
+    const calDias = [];
+    for (let i = 0; i < tot; i++) { const dn = i - ini + 1, dentro = dn >= 1 && dn <= nd;
+      const iso = dentro ? ref + "-" + String(dn).padStart(2, "0") : "", es = dentro ? ev.filter(e => e.dt === iso) : [], fds = i % 7 >= 5;
+      calDias.push({ num: dentro ? String(dn) : "", title: es.map(e => e.sigla + " · " + e.marco + " (" + COR[e.k][2] + ")").join("\n"),
+        style: "min-height:92px;padding:6px 7px;display:flex;flex-direction:column;gap:3px;background:" + (!dentro ? "var(--slate-50)" : fds ? "var(--slate-50)" : "var(--card)") + (iso === hoje ? ";box-shadow:inset 0 0 0 2px var(--blue-500)" : ""),
+        numStyle: "font-size:11px;font-weight:800;color:" + (iso === hoje ? "var(--blue-600)" : "var(--slate-400)"),
+        ev: es.slice(0, 3).map(e => ({ t: e.sigla + " · " + curto(e.marco), style: (es.length > 2 ? "display:block;white-space:nowrap;text-overflow:ellipsis;" : "display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:" + (es.length > 1 ? 2 : 4) + ";white-space:normal;overflow-wrap:anywhere;") + "font-size:10.5px;font-weight:700;line-height:1.25;padding:2px 6px;border-radius:6px;overflow:hidden;background:" + COR[e.k][0] + ";color:" + COR[e.k][1] })),
+        mais: es.length > 3 ? "+" + (es.length - 3) + " marco(s)" : "", maisStyle: es.length > 3 ? "font-size:10px;font-weight:700;color:var(--blue-600)" : "display:none" }); }
+    const bu = this.state.bu === "Todos" ? "todas as unidades" : this.state.bu;
+    return { prazosCal: true, calDias, calSemana: ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"], calTitulo: MN[m - 1] + " " + y,
+      calSub: ev.length + " marco(s) axial(is) no mês · " + list.length + " obra(s) de " + bu + " · passe o mouse no dia para ver todos",
+      calLegenda: ["done", "prog", "late", "todo"].map(k => ({ t: COR[k][2], dot: "width:10px;height:10px;border-radius:3px;background:" + COR[k][0] + ";border:1px solid " + COR[k][1] })),
+      calLista: ev.map(e => ({ data: this.br(e.dt), sigla: e.sigla, obra: e.obra, marco: e.marco, st: COR[e.k][2],
+        stStyle: "font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;background:" + COR[e.k][0] + ";color:" + COR[e.k][1] })),
+      calListaStyle: ev.length ? "max-height:260px;overflow:auto;border-top:1px solid var(--slate-100)" : "display:none",
+      calVazio: ev.length ? "" : "Nenhum marco axial em " + MN[m - 1].toLowerCase() + " de " + y + ". Use as setas para navegar entre os meses.",
+      calVazioStyle: ev.length ? "display:none" : "margin:0;font-size:12.5px;color:var(--slate-400)",
+      calMesAnt: () => ir(0, -1), calMesProx: () => ir(0, 1), calAnoAnt: () => ir(-1, 0), calAnoProx: () => ir(1, 0), calHoje: () => this.setState({ calMes: hoje.slice(0, 7) }) };
+  }
   mesAno(d) {
     if (typeof d !== "string" || !d) return "—";
     const mn = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
@@ -5059,6 +5148,7 @@ class Component extends DCLogic {
       atrasoNota: "", atrasoNotaStyle: "display:none",
       ganttHojeStyle: "display:none", ganttHojeTagStyle: "display:none", ganttHojeLegendaStyle: "display:none", ganttForaStyle: "display:none",
       ganttVazio: "", ganttVazioStyle: "display:none",
+      ganttTags: [], ganttTagsStyle: "display:none", prazosCal: false, calDias: [], calSemana: [], calLegenda: [], calLista: [], calTitulo: "", calSub: "", calListaStyle: "display:none", calVazio: "", calVazioStyle: "display:none",
       ganttWrapStyle: "border:1px solid var(--slate-100);border-radius:12px;overflow-x:auto",
       ganttLegendaWrapStyle: "display:flex;gap:18px;margin-top:14px;flex-wrap:wrap;align-items:center"
     }, this.anVals(), this.fnVals(), this.baseVals(), this.mfVals(), this.exVals(), this.consVals(null, [], []), this.rdVals(), this.fuSeguro());
@@ -5078,7 +5168,14 @@ class Component extends DCLogic {
 
     // ── gantt ──
     const okDate = s => typeof s === "string" && s.length === 10 && s >= "2015-01-01" && s <= "2040-12-31";
-    const g = (o ? o.gantt : []).filter(x => okDate(x.start) && okDate(x.end) && x.start <= x.end);
+    const g0 = (o ? o.gantt : []).filter(x => okDate(x.start) && okDate(x.end) && x.start <= x.end);
+    const tagsDe = x => String(x.tag || "").split(",").map(t => t.trim()).filter(Boolean);
+    const tagCont = {}; g0.forEach(x => tagsDe(x).forEach(t => { tagCont[t] = (tagCont[t] || 0) + 1; }));
+    const tagSel = this.state.ganttTag && tagCont[this.state.ganttTag] ? this.state.ganttTag : "";
+    const g = tagSel ? g0.filter(x => tagsDe(x).indexOf(tagSel) >= 0) : g0;
+    const chipT = on => "cursor:pointer;padding:5px 11px;border-radius:99px;font-family:var(--font-body);font-size:11.5px;font-weight:700;border:1px solid " + (on ? "var(--blue-500)" : "var(--slate-200)") + ";background:" + (on ? "var(--blue-50)" : "var(--card)") + ";color:" + (on ? "var(--blue-700)" : "var(--slate-600)");
+    const ganttTags = [{ label: "Todas (" + g0.length + ")", go: () => this.setState({ ganttTag: "" }), style: chipT(!tagSel) }]
+      .concat(Object.keys(tagCont).sort((a, b) => tagCont[b] - tagCont[a] || a.localeCompare(b)).map(t => ({ label: t + " (" + tagCont[t] + ")", go: () => this.setState({ ganttTag: t }), style: chipT(t === tagSel) })));
     let months = [], gantt = [], ganttMinStyle = "min-width:900px", ganttRange = "—", hojePctPz = null, hojeVis = false;
     if (g.length) {
       const min = g.reduce((a, x) => x.start < a ? x.start : a, g[0].start);
@@ -5388,15 +5485,16 @@ class Component extends DCLogic {
       return { x: X(i).toFixed(1), label: mn2[(p.k % 100) - 1] + " " + String(Math.floor(p.k / 100)).slice(2) };
     });
 
-    const bench = (d.benchmark || []);
+    const bench = (d.benchmark || []).filter(x => this.inFilter(x.obra));
+    const fonteB = this.state.bu === "Make It" ? "CNPJ MAKE IT" : /gadens/i.test(this.state.bu) ? "ORÇAMENTOS Gadens" : "CNPJ MAKE IT + ORÇAMENTOS Gadens";
     const benchCharts = [
-      { title: "Budget por m² construído", sub: "R$ utilizado em projetos por m² — CNPJ MAKE IT + ORÇAMENTOS Gadens", kind: "rM2", ref: "refM2", fmt: v => "R$ " + v.toFixed(2).replace(".", ",") },
-      { title: "Budget por unidade (UH)", sub: "R$ utilizado por unidade habitacional — CNPJ MAKE IT + ORÇAMENTOS Gadens", kind: "rUH", ref: "refUH", fmt: v => "R$ " + Math.round(v).toLocaleString("pt-BR") }
+      { title: "Budget por m² construído", sub: "R$ utilizado em projetos por m² — " + fonteB, kind: "rM2", ref: "refM2", fmt: v => "R$ " + v.toFixed(2).replace(".", ",") },
+      { title: "Budget por unidade (UH)", sub: "R$ utilizado por unidade habitacional — " + fonteB, kind: "rUH", ref: "refUH", fmt: v => "R$ " + Math.round(v).toLocaleString("pt-BR") }
     ].map(c => {
       const rs = bench.filter(x => x[c.kind] != null).sort((a, b) => b[c.kind] - a[c.kind]);
       const max = rs.reduce((m, x) => Math.max(m, x[c.kind], x[c.ref] || 0), 0) || 1;
       const media = rs.length ? rs.reduce((a, x) => a + x[c.kind], 0) / rs.length : null;
-      return { title: c.title, sub: c.sub, media: media == null ? "—" : c.fmt(media),
+      return { title: c.title, sub: c.sub + " · " + rs.length + " obra(s)", media: media == null ? "—" : c.fmt(media),
         rows: rs.map(x => {
           const acima = x[c.ref] != null && x[c.kind] > x[c.ref];
           return { obra: x.obra, value: c.fmt(x[c.kind]), color: acima ? "#EF4444" : "#10B981",
@@ -5589,7 +5687,9 @@ class Component extends DCLogic {
       axialInnerStyle: axV.innerStyle, axialTrackStyle: axV.trackStyle, axialFillStyle: axV.fillStyle,
       gantt, months, ganttMinStyle, ganttRange,
       ganttLegend,
-      ganttVazio: g.length ? "" : "Sem marcos de cronograma cadastrados para esta obra.",
+      ganttVazio: g.length ? "" : tagSel ? "Nenhuma atividade com a tag " + tagSel + " nesta obra." : "Sem marcos de cronograma cadastrados para esta obra.",
+      ganttTags, ganttTagsStyle: Object.keys(tagCont).length ? "display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:-4px 0 14px" : "display:none",
+      ...this.calVals(),
       ganttVazioStyle: g.length ? "display:none" : "margin:0;font-size:12.5px;color:var(--slate-400)",
       ganttWrapStyle: g.length ? "border:1px solid var(--slate-100);border-radius:12px;overflow-x:auto" : "display:none",
       ganttLegendaWrapStyle: g.length ? "display:flex;gap:18px;margin-top:14px;flex-wrap:wrap;align-items:center" : "display:none",
