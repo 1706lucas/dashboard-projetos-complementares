@@ -438,7 +438,7 @@ export function montar(raiz, opts) {
     const fl = el("div", "fi-fil");
     const setF = (k, v) => { S.f[k] = v; if (k === "bu") S.f.obra = ""; S.marcados = {}; tudo(); };
     const seg = el("div", "fi-seg mini"); [["", "Todas"]].concat(BUS.map(b => [b.bu, b.nome])).forEach(o => seg.appendChild(bt(o[1], () => setF("bu", o[0]), S.f.bu === o[0] ? "on" : ""))); fl.appendChild(seg);
-    const so = sel([["", "Todas as obras"]].concat(S.base.obras.filter(o => !S.f.bu || o.bu === S.f.bu).sort((a, b) => a.nome.localeCompare(b.nome)).map(o => [o.id, o.nome])), S.f.obra, v => setF("obra", v));
+    const so = sel([["", "Todas as obras"]].concat(S.base.obras.filter(o => (!S.f.bu || o.bu === S.f.bu) && !o.inativa).sort((a, b) => a.nome.localeCompare(b.nome)).map(o => [o.id, o.nome])), S.f.obra, v => setF("obra", v));
     const sf = sel([["", "Todos os fornecedores"]].concat(S.base.fornecedores.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(f => [f.id, f.nome])), S.f.forn, v => setF("forn", v));
     const ds = {}; S.base.contratos.concat(S.base.historico).forEach(x => { if (x.disciplina) ds[norm(x.disciplina)] = ds[norm(x.disciplina)] || x.disciplina; });
     const sd = sel([["", "Todas as disciplinas"]].concat(Object.keys(ds).sort().map(k => [k, ds[k]])), S.f.disc, v => setF("disc", v));
@@ -789,7 +789,7 @@ export function montar(raiz, opts) {
       const seg = el("div", "fi-seg mini"); BUS.forEach(b => seg.appendChild(bt(b.nome, () => { f.bu = b.bu; f.obraId = ""; f.contratoId = ""; tudo(); }, f.bu === b.bu ? "on" : ""))); corpo.appendChild(seg);
       const q = inp(S.buscaObra || "", v => { S.buscaObra = v; desenha(); }, "Buscar obra"); q.style.margin = "10px 0"; q.style.width = "100%"; corpo.appendChild(q);
       const g = el("div", "fi-opcoes"); corpo.appendChild(g);
-      const desenha = () => { g.textContent = ""; S.base.obras.filter(o => o.bu === f.bu && (!S.buscaObra || norm(o.nome).indexOf(norm(S.buscaObra)) >= 0)).sort((a, b) => a.nome.localeCompare(b.nome)).forEach(o => {
+      const desenha = () => { g.textContent = ""; S.base.obras.filter(o => o.bu === f.bu && !o.inativa && (!S.buscaObra || norm(o.nome).indexOf(norm(S.buscaObra)) >= 0)).sort((a, b) => a.nome.localeCompare(b.nome)).forEach(o => {
         const so = situacaoObra(S.base, S.lanc, o.id), p = o.budget ? so.usado / o.budget : null, b = el("button", "fi-op" + (f.obraId === o.id ? " on" : "")); b.type = "button";
         b.addEventListener("click", () => { f.obraId = o.id; f.contratoId = ""; f.novoContrato = false; f.passo = 2; S.msg = ""; tudo(); });
         b.appendChild(el("b", null, o.nome)); const br2 = el("span", "fi-mini-barra"), i = el("i"); i.style.width = Math.min(100, (p || 0) * 100) + "%"; i.style.background = p == null ? "var(--fi-neutro)" : corConsumo(p); br2.appendChild(i); b.appendChild(br2);
@@ -969,7 +969,13 @@ export function montar(raiz, opts) {
     const nIn = (o, k, w) => { const i = inp(o[k] == null ? "" : String(o[k]).replace(".", ","), v => { o[k] = num(v); }); i.inputMode = "decimal"; i.style.width = (w || 120) + "px"; return i; };
     const tIn = (o, k, w) => { const i = inp(o[k], v => { o[k] = v; }); i.style.width = (w || 160) + "px"; return i; };
     const cel = (r, ctrl) => { const t = el("td"); t.appendChild(ctrl); r.appendChild(t); };
-    if (S.baseAba === "obras") {
+    if (S.baseAba === "obras" && opts.cadastroObras) {
+      const av = el("p", "fi-alerta am", "Os dados das obras (nome, UH, m², VGV, budget, endereço) agora vêm do Cadastro de Obras. Edite lá: o que mudar vale aqui na hora.");
+      box.appendChild(av); if (opts.irCadastro) box.appendChild(bt("Abrir o Cadastro de Obras →", opts.irCadastro, "pri"));
+      box.appendChild(tabela(["Unidade", "Sigla", "Obra", "UH", "m²", "VGV", "Budget disp.", "Utilizado", "No painel"], obrasF().map(o => { const r = el("tr"), so = situacaoObra(S.base, S.lanc, o.id);
+        td(r, (BUS.find(b => b.bu === o.bu) || {}).nome); td(r, o.sigla || "—"); td(r, o.nomeCad || o.nome); td(r, o.uh, "n"); td(r, o.m2, "n"); td(r, moeda(o.vgv), "n"); td(r, moeda(o.budget), "n"); td(r, moeda(so.usado), "n");
+        td(r, o.inativa ? "desabilitada" : o.sigla ? "ativa" : "fora do cadastro"); return r; })));
+    } else if (S.baseAba === "obras") {
       box.appendChild(tabela(["Unidade", "Obra", "GDS", "SPE", "CNPJ da obra", "UH", "m²", "VGV", "Budget disp.", "Utilizado", "Apelidos (outros nomes)", ""], obrasF().map(o => { const r = el("tr"), so = situacaoObra(S.base, S.lanc, o.id);
         td(r, (BUS.find(b => b.bu === o.bu) || {}).nome); cel(r, tIn(o, "nome", 140)); cel(r, tIn(o, "gds", 70)); cel(r, tIn(o, "spe", 200)); cel(r, tIn(o, "cnpj", 150)); cel(r, nIn(o, "uh", 70)); cel(r, nIn(o, "m2", 90)); cel(r, nIn(o, "vgv", 120)); cel(r, nIn(o, "budget", 110));
         td(r, moeda(so.usado), "n");
