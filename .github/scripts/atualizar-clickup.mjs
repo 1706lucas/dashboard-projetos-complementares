@@ -125,6 +125,23 @@ try { CFG = await abrir("data/config.json.enc"); if (CFG && Array.isArray(CFG.fo
     if (!CFG.fontes.some(f => f.sigla)) FONTES = FONTES.concat(PADRAO.filter(p => p.sigla && !FONTES.some(f => f.view === p.view)));
     if (!CFG.fontes.some(f => /^li:|^f:/.test(f.view || "") && f.tipo === "indicadores")) FONTES = FONTES.concat(PADRAO.filter(p => p.tipo === "indicadores" && /^li:/.test(p.view) && !FONTES.some(f => f.view === p.view))); } }
 catch (e) { /* sem config: usa o padrão */ }
+// Cadastro de Obras do dashboard (Supabase dash_obras): quando existir, é ele que define as obras do cronograma.
+// Obra habilitada + link do ClickUp = entra na leitura. Desabilitada ou sem link = fica de fora.
+const viewDoLink = link => { const t = String(link || "").trim(); if (/^(li|f):\d+$/.test(t)) return t;
+  const li = t.match(/\/v\/li\/(\d+)/), fo = t.match(/\/v\/f\/(\d+)/), m = t.match(/(8[a-z0-9]{5,}-\d{3,})/i);
+  return li ? "li:" + li[1] : fo ? "f:" + fo[1] : m ? m[1] : ""; };
+if (CFG && CFG.url && CFG.anon) {
+  try {
+    const base = String(CFG.url).trim().replace(/\/+$/, "").replace(/\/rest\/v1$/i, "");
+    const r = await fetch(base + "/rest/v1/dash_obras?select=dados", { headers: { apikey: CFG.anon, Authorization: "Bearer " + CFG.anon, "x-tap-chave": CFG.chave || "" } });
+    if (r.ok) {
+      const cad = (await r.json()).map(x => x.dados).filter(o => o && o.sigla && o.ativa !== false);
+      const cron = cad.map(o => ({ tipo: "cronograma", nome: o.nome, sigla: String(o.sigla).toUpperCase(), bu: o.bu, view: viewDoLink(o.clickup) })).filter(f => f.view);
+      if (cron.length) { FONTES = FONTES.filter(f => f.tipo !== "cronograma").concat(cron); log.push("cadastro de obras: " + cron.length + " obra(s) com ClickUp de " + cad.length + " habilitada(s)"); }
+      else log.push("cadastro de obras: vazio ou sem links do ClickUp (usando o Mapa das fontes)");
+    } else log.push("cadastro de obras: Supabase respondeu " + r.status + " (usando o Mapa das fontes)");
+  } catch (e) { log.push("cadastro de obras: sem resposta (" + String(e.message).slice(0, 80) + ")"); }
+}
 const leitura = []; // status por fonte, exibido no Mapa das fontes
 async function ler(f) {
   try { const t = await tarefasDaView(f.view); if (f.sigla) t.forEach(x => { x.__sigla = String(f.sigla).toUpperCase(); }); leitura.push({ view: f.view, nome: f.nome, tipo: f.tipo, n: t.length, erro: null }); return t; }
@@ -194,3 +211,4 @@ d.fontesUltima = Object.assign({}, d.fontesUltima);
 leitura.forEach(l => { if (!l.erro && l.n) d.fontesUltima[l.view] = hoje; });
 d.automatico = { quando: new Date().toISOString(), log, leitura };
 await fechar("data/dashboard.json.enc", d);
+
