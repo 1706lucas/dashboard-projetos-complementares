@@ -3284,7 +3284,10 @@ class Component extends DCLogic {
   // base efetiva: original + uploads aplicados
   dadosBase() {
     const d = this.state.data; if (!d) return null;
-    const u = this.state.uploads || {};
+    const u0 = this.state.uploads || {};
+    // upload de cronograma feito no navegador só vale se for mais novo que a última leitura automática do ClickUp
+    const robo = String((d.automatico && d.automatico.quando) || d.geradoEm || "").slice(0, 10);
+    const u = Object.assign({}, u0); if (u.cronograma && robo && String(u.cronograma.quando || "") < robo) delete u.cronograma;
     if (!Object.keys(u).length) return d;
     const out = Object.assign({}, d);
     if (u.siglas) {
@@ -4094,42 +4097,44 @@ class Component extends DCLogic {
     obras.forEach(o => (o.tarefasCompl || []).forEach(t => todas.push(Object.assign({ sigla: o.sigla }, t))));
     // por obra: se a obra tem subtarefas, só elas entram; se o export da obra não traz a tarefa-mãe, entram todas
     const comSub = {}; todas.forEach(t => { if (t.mae === false) comSub[t.sigla] = 1; });
-    const aberta = t => !/CONCLU|COMPLETE|CANCEL|TRATADO/i.test(String(t.status || ""));
-    const naoIni = t => /EM ABERTO|TO DO|SEM IN[IÍ]CIO|N[AÃ]O INICIAD/i.test(String(t.status || ""));
-    const subs = todas.filter(t => (!comSub[t.sigla] || t.mae === false) && aberta(t));
+    // regra de status (definida pelo Lucas em 19/11/2026) — normaliza acentos e caixa
+    const N = t => String(t.status || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase().trim();
+    const ignora = t => /CONCLU|COMPLETE|CANCEL|TRATADO/.test(N(t));
+    const subs = todas.filter(t => (!comSub[t.sigla] || t.mae === false) && !ignora(t));
+    const d15 = dia(15);
     const tg = (bg, fg) => "font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0;background:" + bg + ";color:" + fg;
     const dif = x => Math.round((Date.parse(x) - Date.parse(hoje)) / 864e5);
     const nome = t => String(t.n || "").replace(/^[A-Z0-9]{2,4}\s*[-|]\s*/, "");
-    const item = (t, tag, bg, fg, info) => ({ sigla: multi ? t.sigla : "", n: nome(t), url: t.url || "#", resp: (t.ass || []).join(", ") || "sem responsável", tag, tagStyle: tg(bg, fg), info });
-    // atraso = somente o status "Em atraso". "Concluído com atraso" é concluído (já sai em aberta) e "Em progresso fora do prazo" é em progresso
-    const emAtraso = t => /EM ATRASO/i.test(String(t.status || ""));
-    const atras = subs.filter(emAtraso).sort((a, b) => String(a.d || "9").localeCompare(String(b.d || "9")));
-    const naJanela = x => x && x >= hoje && x <= d7;
-    // em aberto (não iniciada) com o prazo já correndo (início passou) ou vencido
-    const correndo = subs.filter(t => !emAtraso(t) && naoIni(t) && ((t.s && t.s < hoje) || (t.d && t.d < hoje)))
-      .sort((a, b) => String(a.d || a.s).localeCompare(String(b.d || b.s)));
-    const semana = subs.filter(t => !emAtraso(t) && !correndo.includes(t) && (naJanela(t.d) || naJanela(t.s)))
-      .sort((a, b) => String(naJanela(a.d) ? a.d : a.s).localeCompare(String(naJanela(b.d) ? b.d : b.s)));
-    const medio = subs.filter(t => !emAtraso(t) && !correndo.includes(t) && !semana.includes(t) && t.s && t.s > d7 && t.s <= d30)
-      .sort((a, b) => a.s.localeCompare(b.s));
+    const stTxt = t => String(t.status || "sem status").toUpperCase();
+    const datas = t => [t.s ? "início " + this.br(t.s) : "", t.d ? "prazo " + this.br(t.d) : "sem prazo"].filter(Boolean).join(" · ");
+    const item = (t, tag, bg, fg) => ({ sigla: multi ? t.sigla : "", n: nome(t), url: t.url || "#", resp: (t.ass || []).join(", ") || "sem responsável",
+      tag, tagStyle: tg(bg, fg), info: "ClickUp: " + stTxt(t) + " · " + datas(t) });
+    const ord = (a, b) => String(a.d || a.s || "9").localeCompare(String(b.d || b.s || "9"));
+    const curto = [], medio = [];
+    let nAtraso = 0, nAberto = 0, nProg = 0, nIni = 0;
+    subs.forEach(t => {
+      const st = N(t);
+      if (/EM ATRASO/.test(st)) { nAtraso++; curto.push([t, item(t, "Em atraso" + (t.d && t.d < hoje ? " +" + (-dif(t.d)) + " d" : ""), "#FEE2E2", "#991B1B")]); return; }
+      if (/PROGRESSO/.test(st)) { nProg++; medio.push([t, item(t, /FORA DO PRAZO/.test(st) ? "Em progresso · fora do prazo" : "Em progresso", "#FEF3C7", "#92400E")]); return; }
+      // em aberto (e qualquer outro status não concluído)
+      if (t.d && t.d < hoje) { nAberto++; curto.push([t, item(t, "Em aberto · vencida +" + (-dif(t.d)) + " d", "#FFEDD5", "#9A3412")]); return; }
+      if (t.s && t.s <= hoje) { nAberto++; curto.push([t, item(t, "Em aberto · prazo correndo", "#FFEDD5", "#9A3412")]); return; }
+      if (t.s && t.s <= d15) { nIni++; medio.push([t, item(t, "Inicia em " + dif(t.s) + " d", "#DBEAFE", "#1E40AF")]); return; }
+      if (!t.s && t.d && t.d <= d15) { nIni++; medio.push([t, item(t, "Sem início · vence em " + dif(t.d) + " d", "#DBEAFE", "#1E40AF")]); }
+      // início a mais de 15 dias ou sem datas: não relaciona
+    });
+    curto.sort((a, b) => ord(a[0], b[0])); medio.sort((a, b) => ord(a[0], b[0]));
     const pill = (t, bg, fg) => ({ t, style: tg(bg, fg) });
     const nSt = c => "font-family:var(--font-heading);font-weight:900;font-size:26px;line-height:1;color:" + c;
-    const fora = t => /FORA DO PRAZO/i.test(String(t.status || ""));
-    const curtoItens = atras.map(t => item(t, "Em atraso" + (t.d && t.d < hoje ? " +" + (-dif(t.d)) + " d" : ""), "#FEE2E2", "#991B1B", t.d ? "prazo " + this.br(t.d) : "sem prazo"))
-      .concat(correndo.map(t => t.d && t.d < hoje ? item(t, "Em aberto · vencida +" + (-dif(t.d)) + " d", "#FFEDD5", "#9A3412", "prazo " + this.br(t.d))
-        : item(t, "Em aberto · prazo correndo", "#FFEDD5", "#9A3412", "início " + this.br(t.s) + (t.d ? " · prazo " + this.br(t.d) : ""))))
-      .concat(semana.map(t => naJanela(t.d) ? item(t, (fora(t) ? "Em progresso · vence em " : "Vence em ") + dif(t.d) + " d", "#FEF3C7", "#92400E", "prazo " + this.br(t.d))
-        : item(t, "Inicia em " + dif(t.s) + " d", "#DBEAFE", "#1E40AF", "início " + this.br(t.s))));
     return [
-      { titulo: "Curto prazo e atrasadas", sub: "Em atraso, em aberto com prazo correndo ou vencido, e início/prazo até " + this.br(d7),
-        n: String(curtoItens.length), nStyle: nSt(atras.length ? "#B91C1C" : "var(--slate-700)"),
-        resumo: [pill(atras.length + " em atraso", "#FEE2E2", "#991B1B"), pill(correndo.length + " em aberto com prazo correndo", "#FFEDD5", "#9A3412"), pill(semana.length + " na próxima semana", "#FEF3C7", "#92400E")],
-        itens: curtoItens, vazio: !curtoItens.length, vazioTxt: "Nenhuma subatividade atrasada ou para a próxima semana." },
-      { titulo: "Médio prazo · próximas a iniciar", sub: "Subatividades complementares com início entre " + this.br(dia(8)) + " e " + this.br(d30),
+      { titulo: "Curto prazo e atrasadas", sub: "Em atraso (sempre) e em aberto com início já passado ou prazo vencido",
+        n: String(curto.length), nStyle: nSt(nAtraso ? "#B91C1C" : "var(--slate-700)"),
+        resumo: [pill(nAtraso + " em atraso", "#FEE2E2", "#991B1B"), pill(nAberto + " em aberto com prazo correndo/vencido", "#FFEDD5", "#9A3412")],
+        itens: curto.map(x => x[1]), vazio: !curto.length, vazioTxt: "Nenhuma subatividade em atraso ou em aberto com prazo correndo." },
+      { titulo: "Médio prazo · em progresso e próximas a iniciar", sub: "Em progresso (no prazo ou fora) e em aberto com início até " + this.br(d15) + " (15 dias)",
         n: String(medio.length), nStyle: nSt("var(--slate-700)"),
-        resumo: [pill(medio.length + " a iniciar em até 30 dias", "#DBEAFE", "#1E40AF")],
-        itens: medio.map(t => item(t, "Inicia em " + dif(t.s) + " d", "#DBEAFE", "#1E40AF", "início " + this.br(t.s) + (t.d ? " · prazo " + this.br(t.d) : ""))),
-        vazio: !medio.length, vazioTxt: "Nenhuma subatividade iniciando nos próximos 30 dias." }
+        resumo: [pill(nProg + " em progresso", "#FEF3C7", "#92400E"), pill(nIni + " a iniciar em até 15 dias", "#DBEAFE", "#1E40AF")],
+        itens: medio.map(x => x[1]), vazio: !medio.length, vazioTxt: "Nenhuma subatividade em progresso ou iniciando nos próximos 15 dias." }
     ];
   }
   fuHoje() { const t = new Date(Date.now() - 3 * 3600e3); return t.toISOString().slice(0, 10); }
