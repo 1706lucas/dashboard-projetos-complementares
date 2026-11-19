@@ -135,9 +135,17 @@ if (CFG && CFG.url && CFG.anon) {
     const base = String(CFG.url).trim().replace(/\/+$/, "").replace(/\/rest\/v1$/i, "");
     const r = await fetch(base + "/rest/v1/dash_obras?select=dados", { headers: { apikey: CFG.anon, Authorization: "Bearer " + CFG.anon, "x-tap-chave": CFG.chave || "" } });
     if (r.ok) {
-      const cad = (await r.json()).map(x => x.dados).filter(o => o && o.sigla && o.ativa !== false);
+      const todos = (await r.json()).map(x => x.dados).filter(o => o && o.sigla);
+      var DESAB = {}; todos.filter(o => o.ativa === false || o.excluida).forEach(o => { DESAB[String(o.sigla).toUpperCase()] = 1; });
+      const cad = todos.filter(o => o.ativa !== false && !o.excluida);
       const cron = cad.map(o => ({ tipo: "cronograma", nome: o.nome, sigla: String(o.sigla).toUpperCase(), bu: o.bu, view: viewDoLink(o.clickup) })).filter(f => f.view);
-      if (cron.length) { FONTES = FONTES.filter(f => f.tipo !== "cronograma").concat(cron); log.push("cadastro de obras: " + cron.length + " obra(s) com ClickUp de " + cad.length + " habilitada(s)"); }
+      if (cron.length) {
+        const sigCad = {}; cron.forEach(f => { sigCad[f.sigla] = 1; });
+        const semLink = cad.filter(o => !viewDoLink(o.clickup)).map(o => String(o.sigla).toUpperCase());
+        // fallback: fonte antiga (Mapa das fontes) para obra habilitada sem link no cadastro ou que ainda não está no cadastro
+        const antigas = FONTES.filter(f => f.tipo === "cronograma" && !(f.sigla && sigCad[String(f.sigla).toUpperCase()]) && !(f.sigla && DESAB[String(f.sigla).toUpperCase()]));
+        FONTES = FONTES.filter(f => f.tipo !== "cronograma").concat(cron, antigas);
+        log.push("cadastro de obras: " + cron.length + " obra(s) com ClickUp de " + cad.length + " habilitada(s)" + (antigas.length ? " · " + antigas.length + " fonte(s) do Mapa das fontes mantida(s)" : "") + (semLink.length ? " · sem link no cadastro: " + semLink.join(", ") : "")); }
       else log.push("cadastro de obras: vazio ou sem links do ClickUp (usando o Mapa das fontes)");
     } else log.push("cadastro de obras: Supabase respondeu " + r.status + " (usando o Mapa das fontes)");
   } catch (e) { log.push("cadastro de obras: sem resposta (" + String(e.message).slice(0, 80) + ")"); }
