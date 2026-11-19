@@ -171,6 +171,10 @@ try {
     else if (f.bu && !o.bu) o.bu = f.bu;
   });
   d.obras = X.mapCronograma(wb, d.obras, hoje);
+  // marca a data da última leitura de cada obra; obra sem tarefas nesta execução mantém dados antigos (aviso no dashboard)
+  d.obras.forEach(o => { if (o.temDados && !o.foraDoExport) o.lidoEm = hoje; });
+  { const fora = d.obras.filter(o => o.foraDoExport).map(o => o.sigla + (o.lidoEm ? " (" + o.lidoEm + ")" : ""));
+    if (fora.length) log.push("ATENÇÃO obras SEM leitura nesta execução (dados antigos mantidos): " + fora.join(", ")); }
   let hist = []; try { hist = await abrir("data/historico.json.enc"); } catch (e) { hist = []; }
   hist = hist.filter(h => h.quando !== hoje).sort((a, b) => a.quando.localeCompare(b.quando));
   const snap = X.snapshotCompl(wb);
