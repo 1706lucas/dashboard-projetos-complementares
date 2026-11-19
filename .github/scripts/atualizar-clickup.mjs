@@ -211,4 +211,3 @@ d.fontesUltima = Object.assign({}, d.fontesUltima);
 leitura.forEach(l => { if (!l.erro && l.n) d.fontesUltima[l.view] = hoje; });
 d.automatico = { quando: new Date().toISOString(), log, leitura };
 await fechar("data/dashboard.json.enc", d);
-
