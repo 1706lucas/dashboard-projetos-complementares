@@ -2800,7 +2800,37 @@ class Component extends DCLogic {
     this.aplicaTema(t);
     try { localStorage.setItem(this.TKEY, t); } catch (e) { /* sessão apenas */ }
   }
-  componentDidUpdate() { this.aplicaTema(this.state.tema); this.procMontar(); this.fechMontar(); this.finMontar(); this.obrasMontar(); }
+  componentDidUpdate() { this.aplicaTema(this.state.tema); this.procMontar(); this.fechMontar(); this.finMontar(); this.obrasSincroniza(); this.obrasMontar(); }
+  // Cadastro de Obras sempre completo: quando um admin abre o painel, toda obra existente (Mapa das fontes/ClickUp,
+  // Lançamento Financeiro e TAP) que ainda não está no cadastro é incluída, e campos vazios (link do ClickUp, endereço,
+  // UH, m², VGV, budget, SPE…) são preenchidos. Nunca sobrescreve o que alguém já digitou, nem recria obra excluída.
+  async obrasSincroniza() {
+    const adm = !!(this.state.sessao && this.state.sessao.perfil === "admin"), c = this.state.cfg;
+    if (this._obSync || !adm || !this.sbOk(c) || !this.state.obrasCad || !this._obX || !this.state.data || this.state.fin === undefined) return;
+    this._obSync = true;
+    try {
+      if (!this._tapsDados) { try { const r = await this.sbFetch(c, "taps?select=sigla,rev,ident:tap->data->ident,produto:tap->data->produto&order=rev.desc");
+        const j = r.ok ? await r.json() : [], ult = {}; j.forEach(t => { const k = String(t.sigla || "").trim(); if (!ult[k]) ult[k] = t; }); this._tapsDados = Object.values(ult); } catch (e) {} }
+      const sem = this.obrasSemente(), cad = (this.state.obrasCad || []).slice(), excl = this._obExcl || [], agora = new Date().toISOString();
+      const vazio = v => v == null || v === "" || (Array.isArray(v) && !v.length);
+      const grava = [];
+      sem.forEach(n => {
+        if (excl.indexOf(n.sigla) >= 0) return;
+        const o = cad.find(x => x.sigla === n.sigla) || cad.find(x => x.id === n.id);
+        if (!o) { const novo = Object.assign({}, n, { criadoPor: "Sincronização automática", criadoEm: agora, atualizadoEm: agora }); cad.push(novo); grava.push(novo); return; }
+        let mud = false;
+        Object.keys(n).forEach(k => { if (k === "id" || k === "sigla" || k === "ativa" || k === "apelidos") return; if (vazio(o[k]) && !vazio(n[k])) { o[k] = n[k]; mud = true; } });
+        (n.apelidos || []).forEach(a => { o.apelidos = o.apelidos || []; if (o.apelidos.indexOf(a) < 0 && a !== o.nome) { o.apelidos.push(a); mud = true; } });
+        if (mud) { o.atualizadoEm = agora; grava.push(o); }
+      });
+      if (!grava.length) return;
+      const r = await this.sbFetch(c, "dash_obras", { method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
+        body: JSON.stringify(grava.map(o => ({ id: o.id, dados: o, atualizado: agora }))) });
+      if (!r.ok) { console.error("[gadens] sincronização do cadastro: HTTP " + r.status); return; }
+      const raiz = document.getElementById("obras-cad"); if (raiz) delete raiz.dataset.pronto;
+      this.setState({ obrasCad: cad, obrasSyncMsg: grava.length + " obra(s) incluída(s) ou completada(s) automaticamente no cadastro." });
+    } catch (e) { console.error("[gadens] sincronização do cadastro:", e && e.message); }
+  }
   // ── Cadastro de Obras: Supabase dash_obras (id, dados, atualizado) · fonte única das obras do painel ──
   OBKEY = "gadens.obras.v1";
   async obrasCarregar(c) {
@@ -2811,6 +2841,7 @@ class Component extends DCLogic {
         const r = await this.sbFetch(c, "dash_obras?select=dados");
         if (!r.ok) throw new Error("HTTP " + r.status + (r.status === 404 ? " · rode supabase-obras.sql" : ""));
         lista = (await r.json()).map(x => x.dados).filter(Boolean); fonte = "supabase";
+        this._obExcl = lista.filter(o => o.excluida).map(o => o.sigla); lista = lista.filter(o => !o.excluida);
         try { const t = await this.sbFetch(c, "taps?select=sigla,rev,criado_em"); if (t.ok) this.setState({ tapsLista: await t.json() }); } catch (e) {}
       } else { try { lista = JSON.parse(localStorage.getItem(this.OBKEY) || "null") || []; } catch (e) { lista = []; } }
       this.setState({ obrasCad: lista, obrasFonte: fonte, obrasErro: "" });
@@ -2830,9 +2861,12 @@ class Component extends DCLogic {
   async obrasExclui(id) {
     const c = this.state.cfg, lista = (this.state.obrasCad || []).filter(x => x.id !== id);
     if (this.sbOk(c)) {
-      try { const r = await this.sbFetch(c, "dash_obras?id=eq." + encodeURIComponent(id), { method: "DELETE" });
+      const ant = (this.state.obrasCad || []).find(x => x.id === id) || { id };
+      const marca = { id, sigla: ant.sigla, nome: ant.nome, excluida: true, excluidaPor: (this.state.sessao && this.state.sessao.nome) || "", excluidaEm: new Date().toISOString() };
+      try { const r = await this.sbFetch(c, "dash_obras", { method: "POST", headers: { Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ id, dados: marca, atualizado: marca.excluidaEm }) });
         if (!r.ok) return { ok: false, msg: "Não excluiu no Supabase (HTTP " + r.status + ")." }; }
       catch (e) { return { ok: false, msg: "Não excluiu no Supabase: " + e.message }; }
+      this._obExcl = (this._obExcl || []).concat([ant.sigla]);
     } else { try { localStorage.setItem(this.OBKEY, JSON.stringify(lista)); } catch (e) {} }
     this.setState({ obrasCad: lista }); return { ok: true };
   }
@@ -2907,7 +2941,7 @@ class Component extends DCLogic {
         const ult = {}; (j || []).forEach(t => { const k = String(t.sigla || "").trim(); if (!ult[k]) ult[k] = t; }); this._tapsDados = Object.values(ult); }).catch(() => {}); }
     try {
       this._obUI = this._obX.montar(raiz, { obras: this.state.obrasCad, admin: adm, usuario: (this.state.sessao && this.state.sessao.nome) || "",
-        msg: this.state.obrasFonte === "local" && this.state.sessao ? "Supabase não configurado: o cadastro fica só neste navegador." : "", erroMsg: this.state.obrasFonte === "local" && !!this.state.sessao,
+        msg: this.state.obrasFonte === "local" && this.state.sessao ? "Supabase não configurado: o cadastro fica só neste navegador." : (this.state.obrasSyncMsg || ""), erroMsg: this.state.obrasFonte === "local" && !!this.state.sessao,
         vinculos: o => this.obraVinculos(o), importar: adm ? () => this.obrasSemente() : null, abrirSigla: this.state.obraAbrir || "",
         api: { salvar: o => this.obrasGrava(o), excluir: id => this.obrasExclui(id) } });
     } catch (e) { console.error("[gadens] Cadastro de Obras:", e && e.message); raiz.textContent = "Não foi possível abrir o Cadastro de Obras: " + (e && e.message); }
