@@ -195,7 +195,9 @@ a:hover{color:var(--blue-700)}
               </sc-for>
             </div>
 
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(288px,1fr));gap:18px;align-items:start">
+            <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:stretch">
+            <div style="flex:2 1 600px;min-width:0;display:flex;flex-direction:column;gap:18px">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(288px,1fr));gap:18px;align-items:stretch">
               <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
                   <div>
@@ -234,6 +236,34 @@ a:hover{color:var(--blue-700)}
                   </sc-if>
                 </div>
 
+            </div>
+            <div style="flex:1 0 auto;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:18px 20px;box-shadow:var(--card-shadow)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+                <div>
+                  <h3 style="font-size:15px">Empreendimentos</h3>
+                  <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Fonte: Cadastro de Obras · clique no endereço para abrir o mapa</p>
+                </div>
+                <span class="mono" style="font-size:11.5px;color:var(--slate-400);white-space:nowrap">{{ consObrasResumo }}</span>
+              </div>
+              <div data-obras-tabela="1" style="flex:1 1 0;min-height:268px;max-height:268px;overflow:auto;margin-top:10px">
+                <table class="table" style="font-size:12px">
+                  <thead style="position:sticky;top:0;background:var(--card);z-index:1"><tr><th style="padding:7px 8px">Empreendimento</th><th style="padding:7px 8px">Unidade</th><th style="text-align:right;padding:7px 8px">UH</th><th style="text-align:right;padding:7px 8px">VGV</th><th style="padding:7px 8px">Endereço</th></tr></thead>
+                  <tbody>
+                    <sc-for list="{{ consObras }}" as="o" hint-placeholder-count="8">
+                      <tr>
+                        <td style="font-weight:700;white-space:nowrap;padding:6px 8px;font-size:12px"><span class="mono" style="color:var(--blue-600);font-size:10.5px;margin-right:6px">{{ o.sigla }}</span>{{ o.nome }}</td>
+                        <td style="white-space:nowrap;padding:6px 8px;font-size:12px">{{ o.bu }}</td>
+                        <td class="mono" style="text-align:right;padding:6px 8px;font-size:11.5px">{{ o.uh }}</td>
+                        <td class="mono" style="text-align:right;white-space:nowrap;padding:6px 8px;font-size:11.5px">{{ o.vgv }}</td>
+                        <td style="padding:6px 8px;font-size:12px;max-width:340px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><a href="{{ o.mapa }}" target="_blank" rel="noopener" title="{{ o.endereco }}" style="{{ o.endStyle }}">{{ o.endereco }}</a></td>
+                      </tr>
+                    </sc-for>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            </div>
+            <div style="flex:1 1 288px;min-width:0">
                 <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
                   <h3 style="font-size:15px">Vida útil por empreendimento</h3>
                   <p style="margin:3px 0 16px;font-size:12px;color:var(--slate-400)">Dias corridos do início até o fim do Projeto Executivo</p>
@@ -252,6 +282,38 @@ a:hover{color:var(--blue-700)}
                   </sc-if>
                   <p style="{{ consVidaMediaStyle }}">{{ consVidaMedia }}</p>
                 </div>
+            </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:18px;align-items:start">
+              <sc-for list="{{ consPrazos }}" as="c" hint-placeholder-count="2">
+                <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:12px">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                    <div>
+                      <h3 style="font-size:15px">{{ c.titulo }}</h3>
+                      <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">{{ c.sub }}</p>
+                    </div>
+                    <span style="{{ c.nStyle }}">{{ c.n }}</span>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px">
+                    <sc-for list="{{ c.resumo }}" as="x" hint-placeholder-count="2"><span style="{{ x.style }}">{{ x.t }}</span></sc-for>
+                  </div>
+                  <sc-if value="{{ c.vazio }}"><p style="margin:0;font-size:12.5px;color:var(--slate-400)">{{ c.vazioTxt }}</p></sc-if>
+                  <div style="display:flex;flex-direction:column;gap:7px;max-height:460px;overflow-y:auto">
+                    <sc-for list="{{ c.itens }}" as="t" hint-placeholder-count="4">
+                      <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:var(--slate-50)">
+                        <span class="mono" style="font-size:11px;font-weight:700;color:var(--blue-600);flex-shrink:0;min-width:30px">{{ t.sigla }}</span>
+                        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                          <a href="{{ t.url }}" target="_blank" rel="noopener" style="font-size:12.5px;font-weight:700;text-decoration:none;color:var(--color-text)">{{ t.n }}</a>
+                          <span style="font-size:11px;color:var(--slate-400)">{{ t.resp }}</span>
+                        </div>
+                        <span style="{{ t.tagStyle }}">{{ t.tag }}</span>
+                        <span class="mono" style="font-size:10.5px;color:var(--slate-500);white-space:nowrap">{{ t.info }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
             </div>
 
             <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
@@ -1570,6 +1632,9 @@ a:hover{color:var(--blue-700)}
       <sc-if value="{{ isLanc }}" hint-placeholder-val="{{ false }}">
         <div id="fin-lanc" style="min-height:300px"></div>
       </sc-if>
+      <sc-if value="{{ isObrasCad }}" hint-placeholder-val="{{ false }}">
+        <div id="obras-cad" style="min-height:300px"></div>
+      </sc-if>
 
       <sc-if value="{{ isProc }}" hint-placeholder-val="{{ false }}">
         <div id="proc-canvas" style="min-height:300px"></div>
@@ -2519,8 +2584,8 @@ class Component extends DCLogic {
     }).catch(falha);
     const ss = this.state.sessao;
     if (C && ss && ss.perfil === "admin") C.listaUsuarios().then(u => this.setState({ usuarios: u }));
-    if (C) C.carregar("data/config.json").then(c => { this.setState({ cfg: Object.assign({ url: "", anon: "", chave: "", fontes: null }, c) }); this.orgCarregar(c); this.finCarregar(c); }).catch(() => { this.finCarregar(null); });
-    else this.finCarregar(null);
+    if (C) C.carregar("data/config.json").then(c => { this.setState({ cfg: Object.assign({ url: "", anon: "", chave: "", fontes: null }, c) }); this.orgCarregar(c); this.finCarregar(c); this.obrasCarregar(c); }).catch(() => { this.finCarregar(null); this.obrasCarregar(null); });
+    else { this.finCarregar(null); this.obrasCarregar(null); }
   }
   async entrar(e) {
     if (e && e.preventDefault) e.preventDefault();
@@ -2684,7 +2749,118 @@ class Component extends DCLogic {
     this.aplicaTema(t);
     try { localStorage.setItem(this.TKEY, t); } catch (e) { /* sessão apenas */ }
   }
-  componentDidUpdate() { this.aplicaTema(this.state.tema); this.procMontar(); this.fechMontar(); this.finMontar(); }
+  componentDidUpdate() { this.aplicaTema(this.state.tema); this.procMontar(); this.fechMontar(); this.finMontar(); this.obrasMontar(); }
+  // ── Cadastro de Obras: Supabase dash_obras (id, dados, atualizado) · fonte única das obras do painel ──
+  OBKEY = "gadens.obras.v1";
+  async obrasCarregar(c) {
+    try {
+      this._obX = await this.carregaModulo("./data/obras.js");
+      let lista = null, fonte = "local";
+      if (this.sbOk(c)) {
+        const r = await this.sbFetch(c, "dash_obras?select=dados");
+        if (!r.ok) throw new Error("HTTP " + r.status + (r.status === 404 ? " · rode supabase-obras.sql" : ""));
+        lista = (await r.json()).map(x => x.dados).filter(Boolean); fonte = "supabase";
+        try { const t = await this.sbFetch(c, "taps?select=sigla,rev,criado_em"); if (t.ok) this.setState({ tapsLista: await t.json() }); } catch (e) {}
+      } else { try { lista = JSON.parse(localStorage.getItem(this.OBKEY) || "null") || []; } catch (e) { lista = []; } }
+      this.setState({ obrasCad: lista, obrasFonte: fonte, obrasErro: "" });
+    } catch (e) { this.setState({ obrasErro: e.message }); console.error("[gadens] Cadastro de Obras:", e && e.message); }
+  }
+  async obrasGrava(o) {
+    const c = this.state.cfg, lista = (this.state.obrasCad || []).filter(x => x.id !== o.id).concat([o]);
+    if (this.sbOk(c)) {
+      try { const r = await this.sbFetch(c, "dash_obras", { method: "POST", headers: { Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ id: o.id, dados: o, atualizado: new Date().toISOString() }) });
+        if (!r.ok) return { ok: false, msg: "Não gravou no Supabase (HTTP " + r.status + (r.status === 404 ? " · rode supabase-obras.sql" : "") + ")." }; }
+      catch (e) { return { ok: false, msg: "Não gravou no Supabase: " + e.message }; }
+      this.setState({ obrasCad: lista }); return { ok: true, msg: "Salvo. Já vale para todos." };
+    }
+    try { localStorage.setItem(this.OBKEY, JSON.stringify(lista)); } catch (e) {}
+    this.setState({ obrasCad: lista }); return { ok: true, msg: "Salvo só neste navegador: Supabase não configurado." };
+  }
+  async obrasExclui(id) {
+    const c = this.state.cfg, lista = (this.state.obrasCad || []).filter(x => x.id !== id);
+    if (this.sbOk(c)) {
+      try { const r = await this.sbFetch(c, "dash_obras?id=eq." + encodeURIComponent(id), { method: "DELETE" });
+        if (!r.ok) return { ok: false, msg: "Não excluiu no Supabase (HTTP " + r.status + ")." }; }
+      catch (e) { return { ok: false, msg: "Não excluiu no Supabase: " + e.message }; }
+    } else { try { localStorage.setItem(this.OBKEY, JSON.stringify(lista)); } catch (e) {} }
+    this.setState({ obrasCad: lista }); return { ok: true };
+  }
+  // vínculos de uma obra com as outras áreas do painel
+  obraVinculos(o) {
+    const d = this.dados(), out = {}; if (!d) return out;
+    const sg = o.sigla, ob = (d.obras || []).find(x => x.sigla === sg);
+    if (ob && ob.temDados) { out.tarefas = ob.totalCompl || 0; out.pct = ob.pct; const ax = (ob.axial || []).filter(a => a.kind === "done").slice(-1)[0]; out.fase = ax ? ax.label : "";
+      const eq = {}; (ob.tarefasCompl || []).forEach(t => (t.ass || []).forEach(a => { eq[a] = 1; })); out.equipe = Object.keys(eq).slice(0, 6); }
+    const TAL = { QUA: ["LEI"], AN1: ["AL1"], AN2: ["AL2"], EVO: ["JNE"], MAR: ["MAF"] };
+    const sgs = [sg].concat(TAL[sg] || []);
+    const ts = (this.state.tapsLista || []).filter(t => sgs.indexOf(String(t.sigla || "").trim().toUpperCase()) >= 0).sort((a, b) => a.rev - b.rev);
+    if (ts.length) out.taps = ts.map(t => ({ sigla: String(t.sigla).trim(), rev: t.rev, data: t.criado_em ? t.criado_em.slice(0, 10).split("-").reverse().join("/") : "" }));
+    const F = this.state.fin && this.state.fin.base;
+    if (F) { const fo = (F.obras || []).find(x => x.sigla === sg) || (F.obras || []).find(x => (this.matchObra(x.nome) || {}).sigla === sg);
+      if (fo) { const cs = (F.contratos || []).filter(c => c.obraId === fo.id); out.contratos = cs.length;
+        try { out.utilizado = this._finX ? this._finX.linhas(F, (this.state.fin.lanc || []).filter(l => l.status === "finalizado")).filter(x => x.obraId === fo.id).reduce((a, x) => a + x.valor, 0) : null; } catch (e) {} }
+      const N = id => (F.fornecedores.find(f => f.id === id) || {}).nome || "—";
+      out.fornecedores = Object.keys(F.vinculos || {}).filter(k => k.split("|")[0] === sg).map(k => ({ disc: k.split("|")[1], nome: N(F.vinculos[k]) })); }
+    const rs = ((d.indicadores && d.indicadores.riscos) || []).filter(r => (this.matchObra(r.obra) || {}).sigla === sg);
+    out.riscos = rs.length; out.riscosAbertos = rs.filter(r => !/conclu|tratado|cancel/i.test(String(r.status || ""))).length;
+    return out;
+  }
+  // pré-cadastro a partir do que o painel já tem: Mapa das fontes (ClickUp), Lançamento Financeiro e TAP
+  obrasSemente() {
+    const d = this.state.data; if (!d) return [];
+    const X = this._obX, base = this.dadosBase() || d, F = (this.state.fin && this.state.fin.base) || { obras: [] };
+    const fontes = this.mfLista().filter(f => f.tipo === "cronograma" && f.sigla);
+    const porSig = {}; (base.obras || []).forEach(o => { porSig[o.sigla] = o; });
+    const nome = s => { const f = fontes.find(x => x.sigla === s), o = porSig[s]; if (s === "EVO" && o && o.nome) return o.nome; return (f && f.nome ? String(f.nome).replace(/ I$/, " 1").replace(/ II$/, " 2") : o && o.nome) || s; };
+    const acharS = n => { const k = X.norm(n); if (!k) return null;
+      for (const s of Object.keys(porSig)) { const o = porSig[s], ap = [].concat(o.apelidos || [], this.OBRA_APELIDOS[s] || [], [nome(s)]);
+        if (X.norm(o.nome) === k || ap.some(a => X.norm(a) === k)) return s; }
+      const m = this.matchObra(n); return m ? m.sigla : null; };
+    const url = v => /^li:/.test(v) ? "https://app.clickup.com/9013344143/v/li/" + v.slice(3) : /^f:/.test(v) ? "https://app.clickup.com/9013344143/v/f/" + v.slice(2) : v ? "https://app.clickup.com/9013344143/v/l/" + v : "";
+    const out = fontes.map(f => { const o = porSig[f.sigla] || {};
+      return { id: "ob" + f.sigla.toLowerCase(), sigla: f.sigla, nome: nome(f.sigla), bu: f.bu || o.bu || "Make It", apelidos: [].concat(this.OBRA_APELIDOS[f.sigla] || [], o.nome && o.nome !== nome(f.sigla) ? [o.nome] : []),
+        ativa: f.ativo !== false, clickup: f.link || url(f.view), analistas: [] }; });
+    const bySig = {}; out.forEach(o => { bySig[o.sigla] = o; });
+    const set = (o, k, v) => { if (v != null && v !== "" && (o[k] == null || o[k] === "")) o[k] = v; };
+    (F.obras || []).forEach(fo => { let s = acharS(fo.nome) || (fo.apelidos || []).map(acharS).find(Boolean);
+      let o = s && bySig[s];
+      if (!o) { // obra só no Lançamento Financeiro (sem cronograma): entra desabilitada
+        let sg = X.norm(fo.nome).replace(/[^a-z]/g, "").slice(0, 3).toUpperCase() || "OBR", i = 2; while (bySig[sg]) sg = sg.slice(0, 2) + (i++);
+        o = { id: "ob" + sg.toLowerCase(), sigla: sg, nome: fo.nome.replace(/^\*/, ""), bu: fo.bu, apelidos: fo.apelidos || [], ativa: false, clickup: "", analistas: [], obs: "Importada do Lançamento Financeiro (sem cronograma no ClickUp)." };
+        out.push(o); bySig[sg] = o; }
+      else if (X.norm(fo.nome) !== X.norm(o.nome) && o.apelidos.indexOf(fo.nome) < 0) o.apelidos.push(fo.nome);
+      set(o, "endereco", fo.endereco); set(o, "spe", fo.spe); set(o, "cnpj", fo.cnpj); set(o, "gds", fo.gds); set(o, "uh", fo.uh || null); set(o, "aConst", fo.m2 || null);
+      set(o, "vgv", fo.vgv || null); set(o, "budget", fo.budget || null); });
+    const cad = fo => (porSig[fo.sigla] || {}).econ || {};
+    out.forEach(o => { const e = cad(o); set(o, "budget", e.budgetDisp || null); set(o, "aConst", e.m2 || null); });
+    // TAP: dados de identificação e produto da última revisão de cada sigla
+    const TAL = { LEI: "QUA", AL1: "AN1", AL2: "AN2", JNE: "EVO", MAF: "MAR" };
+    (this._tapsDados || []).forEach(t => { const id = t.ident || {}, pr = t.produto || {}; const s0 = String(t.sigla || "").trim().toUpperCase();
+      const s = bySig[s0] ? s0 : bySig[TAL[s0]] ? TAL[s0] : acharS(id.nome); const o = s && bySig[s]; if (!o) return;
+      const end = String(id.endereco || ""); set(o, "endereco", end); set(o, "cidade", id.cidade); set(o, "uf", id.uf); set(o, "matricula", id.matricula); set(o, "spe", id.spe);
+      set(o, "gerente", id.gerente && id.gerente !== "-" ? id.gerente : ""); set(o, "coordenador", id.coord && id.coord !== "-" ? id.coord : ""); set(o, "patrocinador", id.sponsor && id.sponsor !== "-" ? id.sponsor : "");
+      set(o, "padrao", pr.padrao); set(o, "lancamento", pr.lancamento); set(o, "uh", num(pr.unid)); set(o, "torres", num(pr.torres)); set(o, "pavimentos", num(pr.pav));
+      set(o, "subsolos", num(pr.subsolos)); set(o, "vagas", num(pr.vagas)); set(o, "aTerreno", num(pr.aTerreno)); set(o, "aConst", num(pr.aConst)); set(o, "aPriv", num(pr.aPriv)); });
+    function num(v) { if (v == null || v === "" || v === "-") return null; const n = parseFloat(String(v).replace(",", ".")); return isNaN(n) ? null : n; }
+    out.forEach(o => { if (!o.cidade && o.endereco) { const p = o.endereco.split(" - "); if (p.length >= 3) o.cidade = p[p.length - 1].trim(); } });
+    return out;
+  }
+  async obrasMontar() {
+    const raiz = document.getElementById("obras-cad");
+    if (!raiz || raiz.dataset.pronto) return;
+    if (!this.state.obrasCad || !this._obX) { raiz.textContent = this.state.obrasErro ? "Não foi possível abrir o Cadastro de Obras: " + this.state.obrasErro : "Carregando cadastro…"; return; }
+    raiz.dataset.pronto = "1";
+    const adm = !!(this.state.sessao && this.state.sessao.perfil === "admin");
+    if (adm && this.sbOk(this.state.cfg) && !this._tapsDados) {
+      this.sbFetch(this.state.cfg, "taps?select=sigla,rev,ident:tap->data->ident,produto:tap->data->produto&order=rev.desc").then(r => r.ok ? r.json() : []).then(j => {
+        const ult = {}; (j || []).forEach(t => { const k = String(t.sigla || "").trim(); if (!ult[k]) ult[k] = t; }); this._tapsDados = Object.values(ult); }).catch(() => {}); }
+    try {
+      this._obUI = this._obX.montar(raiz, { obras: this.state.obrasCad, admin: adm, usuario: (this.state.sessao && this.state.sessao.nome) || "",
+        msg: this.state.obrasFonte === "local" && this.state.sessao ? "Supabase não configurado: o cadastro fica só neste navegador." : "", erroMsg: this.state.obrasFonte === "local" && !!this.state.sessao,
+        vinculos: o => this.obraVinculos(o), importar: adm ? () => this.obrasSemente() : null, abrirSigla: this.state.obraAbrir || "",
+        api: { salvar: o => this.obrasGrava(o), excluir: id => this.obrasExclui(id) } });
+    } catch (e) { console.error("[gadens] Cadastro de Obras:", e && e.message); raiz.textContent = "Não foi possível abrir o Cadastro de Obras: " + (e && e.message); }
+  }
   // ── Lançamento Financeiro: dados no Supabase (fin_base, fin_lancamentos, fin_estouros) ──
   FINKEY = "gadens.fin.v1";
   async finLer(c) {
@@ -2748,15 +2924,31 @@ class Component extends DCLogic {
     if (!this.state.fin) { raiz.textContent = this.state.finErro ? "Não foi possível abrir o Lançamento Financeiro: " + this.state.finErro : "Carregando lançamentos…"; return; }
     raiz.dataset.pronto = "1";
     try {
-      const X = this._finX, adm = !!(this.state.sessao && this.state.sessao.perfil === "admin"), d = this.state.fin;
+      const X = this._finX, adm = !!(this.state.sessao && this.state.sessao.perfil === "admin"), d = this.finComCadastro(this.state.fin);
       const siglas = {}; ((this.state.data && this.state.data.obras) || []).forEach(o => { siglas[o.sigla] = o.nome; }); ((this.state.fdata && this.state.fdata.grupos) || []).forEach(g => { siglas[g.sigla] = siglas[g.sigla] || g.obra; });
-      X.montar(raiz, { dados: d, admin: adm, usuario: (this.state.sessao && this.state.sessao.nome) || "", siglas,
+      X.montar(raiz, { dados: d, admin: adm, cadastroObras: !!(this.state.obrasCad && this.state.obrasCad.length), irCadastro: () => this.setState({ page: "Cadastro de Obras" }), usuario: (this.state.sessao && this.state.sessao.nome) || "", siglas,
         msg: d.fonte === "local" && this.state.sessao ? "Supabase não configurado: os lançamentos ficam só neste navegador." : "", erroMsg: d.fonte === "local" && !!this.state.sessao,
         onDados: () => {}, abrirEmail: u => (window.__abrirEmail || (x => { window.location.href = x; }))(u),
         api: { salvarBase: b => this.finGrava("fin_base", 1, b), salvarLanc: l => this.finGrava("fin_lancamentos", l.id, l), salvarEst: e => this.finGrava("fin_estouros", e.id, e),
-          atual: () => this._finUlt,
+          atual: () => this.finComCadastro(this._finUlt),
           recarregar: async () => { try { const n = await this.finLer(this.state.cfg); this.finAplicar(n); return n; } catch (e) { return null; } } } });
     } catch (e) { console.error("[gadens] Lançamento Financeiro:", e && e.message); raiz.textContent = "Não foi possível abrir o Lançamento Financeiro: " + (e && e.message); }
+  }
+  // Base do Lançamento com as obras do Cadastro: liga por sigla, atualiza UH, m², VGV, budget e endereço, cria as que faltam e marca as desabilitadas.
+  finComCadastro(fin) {
+    const CAD = (this.state.obrasCad || []).filter(c => c && c.sigla); if (!fin || !fin.base || !CAD.length) return fin;
+    const B = JSON.parse(JSON.stringify(fin.base)); B.obras = B.obras || [];
+    const n = v => v == null || v === "" ? null : Number(v);
+    CAD.forEach(c => {
+      let o = B.obras.find(x => x.sigla === c.sigla) || B.obras.find(x => !x.sigla && x.bu === c.bu && [c.nome].concat(c.apelidos || []).some(a => this.norm(a) === this.norm(x.nome) || (x.apelidos || []).some(y => this.norm(y) === this.norm(a))));
+      if (!o) { if (c.ativa === false) return; o = { id: "o" + c.sigla.toLowerCase() + "cad", bu: c.bu, nome: c.nome, apelidos: [] }; B.obras.push(o); }
+      o.sigla = c.sigla; o.inativa = c.ativa === false; o.nomeCad = c.nome;
+      const outra = B.obras.some(x => x !== o && x.bu === o.bu && this.norm(x.nome) === this.norm(c.nome));
+      if (c.nome && !outra && c.nome !== o.nome) { if (this.norm(c.nome) !== this.norm(o.nome)) o.apelidos = (o.apelidos || []).concat([o.nome]).filter((x, i, v) => v.indexOf(x) === i); o.nome = c.nome; }
+      if (n(c.uh)) o.uh = n(c.uh); if (n(c.aConst)) o.m2 = n(c.aConst); if (n(c.vgv)) o.vgv = n(c.vgv); if (n(c.budget)) o.budget = n(c.budget);
+      ["spe", "cnpj", "gds"].forEach(k => { if (c[k]) o[k] = c[k]; }); if (c.endereco) o.endereco = [c.endereco, c.bairro, c.cidade].filter(Boolean).join(" - ");
+    });
+    return Object.assign({}, fin, { base: B });
   }
   // Financeiro do painel passa a ler o Lançamento Financeiro nas unidades já importadas.
   finNaBase(d) {
@@ -2994,12 +3186,23 @@ class Component extends DCLogic {
   // Obras do Mapa das fontes: é a lista que define o que existe no painel. O robô regrava a base, por isso a regra fica aqui.
   OBRA_APELIDOS = { VER: ["Follador"], QUA: ["Leilão"], AUR: ["Alta Tensão"], RAF: ["Rafitec", "Raftec"], EVO: ["Core Evo", "Core Evo (João Negrão)"], PAG: ["Pe Agostinho", "Padre Agostinho"] };
   obrasVigentes(d) {
-    const fontes = this.mfLista().filter(f => f.tipo === "cronograma" && f.sigla);
     const porSigla = {}; d.obras.forEach(o => { porSigla[o.sigla] = o; });
-    const obras = fontes.filter(f => porSigla[f.sigla]).map(f => {
+    const CAD = (this.state.obrasCad || []).filter(c => c && c.sigla);
+    let obras;
+    if (CAD.length) { // Cadastro de Obras: só as habilitadas, com nome, unidade e apelidos do cadastro
+      const vazia = { temDados: false, pct: 0, totalCompl: 0, doneCompl: 0, fases: [], axial: [], gantt: [], fasesLinha: [], vida: {}, econ: {}, tarefasCompl: [], complAbertas: [] };
+      obras = CAD.filter(c => c.ativa !== false).map(c => { const o = porSigla[c.sigla] || Object.assign({ sigla: c.sigla }, vazia);
+        const ap = [].concat(o.apelidos || [], this.OBRA_APELIDOS[c.sigla] || [], c.apelidos || [], o.nome && o.nome !== c.nome ? [o.nome] : []);
+        const n = v => v == null || v === "" ? null : Number(v);
+        const econ = Object.assign({}, o.econ || {}, n(c.budget) ? { budgetDisp: n(c.budget) } : {}, n(c.aConst) ? { m2: n(c.aConst) } : {});
+        return Object.assign({}, o, { nome: c.nome || o.nome, bu: c.bu || o.bu, apelidos: ap, axial: o.axial || [], gantt: o.gantt || [], econ, cad: c }); });
+    } else {
+    const fontes = this.mfLista().filter(f => f.tipo === "cronograma" && f.sigla);
+    obras = fontes.filter(f => porSigla[f.sigla]).map(f => {
       const o = porSigla[f.sigla], ap = [].concat(o.apelidos || [], this.OBRA_APELIDOS[f.sigla] || [], f.nome ? [f.nome] : []);
       return Object.assign({}, o, { nome: f.sigla === "EVO" || !f.nome ? o.nome : String(f.nome).replace(/ I$/, " 1").replace(/ II$/, " 2"), apelidos: ap, axial: o.axial || [], gantt: o.gantt || [] });
     });
+    }
     const achar = nome => { const n = this.norm(nome); if (!n) return null;
       return obras.find(o => this.norm(o.nome) === n) || obras.find(o => o.apelidos.some(x => this.norm(x) === n)) ||
         obras.find(o => this.norm(o.lista).indexOf(n) >= 0 || n.indexOf(this.norm(o.nome)) >= 0) || null; };
@@ -3016,15 +3219,15 @@ class Component extends DCLogic {
   }
   dados() {
     // Cache pela origem (base, uploads, config). dadosBase() gera objeto novo quando há upload no navegador.
-    const m = this._vig, cfg = this.state.cfg, base = this.state.data, u = this.state.uploads, fin = this.state.fin;
-    if (m && m.base === base && m.cfg === cfg && m.u === u && m.fin === fin) return m.out;
+    const m = this._vig, cfg = this.state.cfg, base = this.state.data, u = this.state.uploads, fin = this.state.fin, cad = this.state.obrasCad;
+    if (m && m.base === base && m.cfg === cfg && m.u === u && m.fin === fin && m.cad === cad) return m.out;
     let b = this.dadosBase(); if (!b) return null;
     try { b = this.finNaBase(b); } catch (e) { console.error("[gadens] financeiro do painel:", e && e.message); }
     // Falha ou lista vazia nunca derruba o painel: mostra a base completa e registra o motivo.
     let out = b;
     try { const v = this.obrasVigentes(b); if (v.obras.length) out = v; else console.error("[gadens] Mapa das fontes não casou com nenhuma obra da base"); }
     catch (e) { console.error("[gadens] obrasVigentes:", e && e.message); }
-    this._vig = { base, cfg, u, fin, out };
+    this._vig = { base, cfg, u, fin, cad, out };
     return out;
   }
   // base efetiva: original + uploads aplicados
@@ -3368,7 +3571,7 @@ class Component extends DCLogic {
   }
   consVals(d, list, ganttLegend) {
     const R = React;
-    const vazio = { geralConsolidado: false, geralObra: true, consKpis: [], consFases: [], consSemFases: false,
+    const vazio = { geralConsolidado: false, geralObra: true, consKpis: [], consFases: [], consSemFases: false, consObras: [], consObrasResumo: "", consPrazos: [],
       consVidas: [], consSemVidas: false, consVidaMedia: "", consVidaMediaStyle: "display:none",
       mapa: { tiles: null, pontos: null, viewBox: "0 0 460 332", boxStyle: "display:none" },
       mapaLegenda: [], mapaObras: [], mapaResumo: "—", marcoTabs: [], marcoRanking: [],
@@ -3569,7 +3772,26 @@ class Component extends DCLogic {
           .filter(f => f[1] > 0).map(f => ({ style: "display:block;height:100%;background:" + f[2] + ";width:" + ((f[1] / m.n) * 100).toFixed(1) + "%" }))
       }));
 
+    // tabela de empreendimentos (base do Lançamento Financeiro; endereço do mapa como reserva)
+    const FB = (this.state.fin && this.state.fin.base && this.state.fin.base.obras) || [];
+    const achaFin = o => FB.find(f => f.bu === o.bu && (this.norm(f.nome) === this.norm(o.nome) || (this.matchObra(f.nome) || {}).sigla === o.sigla ||
+      (f.apelidos || []).some(a => this.norm(a) === this.norm(o.nome)))) || FB.find(f => (this.matchObra(f.nome) || {}).sigla === o.sigla) || {};
+    const geoDe = o => (d.geo || []).find(g => (this.matchObra(g.obra) || {}).sigla === o.sigla) || {};
+    const benchDe = o => (d.benchmark || []).find(b => (this.matchObra(b.obra) || {}).sigla === o.sigla) || {};
+    const consObras = list.slice().sort((a, b) => String(a.bu).localeCompare(String(b.bu)) || a.nome.localeCompare(b.nome)).map(o => {
+      const f0 = achaFin(o), b0 = benchDe(o), g = geoDe(o);
+      const c0 = o.cad || {};
+      const endCad = c0.endereco ? [c0.endereco, c0.bairro, c0.cidade].filter(Boolean).join(" - ") : "";
+      const f = { uh: c0.uh || f0.uh || b0.unidades, vgv: c0.vgv || f0.vgv || b0.vgv, endereco: endCad || f0.endereco };
+      const end = f.endereco || g.endereco || "";
+      const q = c0.coord ? c0.coord : g.lat != null && g.lon != null ? g.lat + "," + g.lon : end;
+      return { sigla: o.sigla, nome: o.nome, bu: o.bu === "Gadens Inc" ? "Gadens" : o.bu,
+        uh: f.uh ? Number(f.uh).toLocaleString("pt-BR") : "—", vgv: f.vgv ? this.short(f.vgv) : "—",
+        endereco: end || "sem endereço cadastrado", mapa: end ? "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q) : "#",
+        endStyle: end ? "color:var(--blue-600);font-weight:600;text-decoration:none" : "color:var(--slate-400);pointer-events:none;text-decoration:none" };
+    });
     return Object.assign({ geralConsolidado: true, geralObra: false, consKpis, consFases, consSemFases: consFases.length === 0,
+      consObras, consObrasResumo: consObras.length + " obra(s)" + (buSel === "Todos" ? "" : " · " + buSel), consPrazos: this.prazosLista(list),
       consVidas, consSemVidas: consVidas.length === 0,
       consVidaMedia: mediaV == null ? "" : "Média de " + mediaV + " dias entre " + vidas.length + " obras",
       consVidaMediaStyle: mediaV == null ? "display:none" : "margin:14px 0 0;font-size:11.5px;color:var(--slate-400)",
@@ -3813,18 +4035,21 @@ class Component extends DCLogic {
         disc: segs(top, usado, CD, pctF), semDisc: !top.length };
   }
   // prazos das subatividades com tag (eng -) complementares: curto prazo/atrasadas e médio prazo
-  prazosObra(o) {
+  prazosObra(o) { return this.prazosLista(o ? [o] : []); }
+  prazosLista(obras) {
     const hoje = this.fuHoje(), dia = n => new Date(Date.parse(hoje) + n * 864e5).toISOString().slice(0, 10);
-    const d7 = dia(7), d30 = dia(30);
-    const todas = (o && o.tarefasCompl) || [];
-    const temSub = todas.some(t => t.mae === false);
+    const d7 = dia(7), d30 = dia(30), multi = obras.length > 1;
+    const todas = [];
+    obras.forEach(o => (o.tarefasCompl || []).forEach(t => todas.push(Object.assign({ sigla: o.sigla }, t))));
+    // por obra: se a obra tem subtarefas, só elas entram; se o export da obra não traz a tarefa-mãe, entram todas
+    const comSub = {}; todas.forEach(t => { if (t.mae === false) comSub[t.sigla] = 1; });
     const aberta = t => !/CONCLU|COMPLETE|CANCEL|TRATADO/i.test(String(t.status || ""));
     const naoIni = t => /EM ABERTO|TO DO|SEM IN[IÍ]CIO|N[AÃ]O INICIAD/i.test(String(t.status || ""));
-    const subs = todas.filter(t => (!temSub || t.mae === false) && aberta(t));
+    const subs = todas.filter(t => (!comSub[t.sigla] || t.mae === false) && aberta(t));
     const tg = (bg, fg) => "font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0;background:" + bg + ";color:" + fg;
     const dif = x => Math.round((Date.parse(x) - Date.parse(hoje)) / 864e5);
     const nome = t => String(t.n || "").replace(/^[A-Z0-9]{2,4}\s*[-|]\s*/, "");
-    const item = (t, tag, bg, fg, info) => ({ n: nome(t), url: t.url || "#", resp: (t.ass || []).join(", ") || "sem responsável", tag, tagStyle: tg(bg, fg), info });
+    const item = (t, tag, bg, fg, info) => ({ sigla: multi ? t.sigla : "", n: nome(t), url: t.url || "#", resp: (t.ass || []).join(", ") || "sem responsável", tag, tagStyle: tg(bg, fg), info });
     // atraso = somente o status "Em atraso". "Concluído com atraso" é concluído (já sai em aberta) e "Em progresso fora do prazo" é em progresso
     const emAtraso = t => /EM ATRASO/i.test(String(t.status || ""));
     const atras = subs.filter(emAtraso).sort((a, b) => String(a.d || "9").localeCompare(String(b.d || "9")));
@@ -4171,7 +4396,7 @@ class Component extends DCLogic {
   obras() {
     const d = this.dados(); if (!d) return [];
     const all = this.props.mostrarObrasSemDados ? d.obras
-      : d.obras.filter(o => o.temDados || this.temFinanceiro(o));
+      : d.obras.filter(o => o.cad || o.temDados || this.temFinanceiro(o));
     return this.state.bu === "Todos" ? all : all.filter(o => o.bu === this.state.bu);
   }
   obra() {
@@ -4760,7 +4985,7 @@ class Component extends DCLogic {
     const GRUPOS = { "Equipe": [["Organograma do Setor", "Organograma do Setor"], ["Gestão de Analistas", "Atividades por analista"]],
       "Dados e publicação": [["Base de dados", "Base de dados"], ["Exportação de dados", "Exportação"]].concat(isAdm ? [["Usuários e publicação", "Usuários e publicação"]] : []) };
     const grupoDe = p => Object.keys(GRUPOS).find(g => GRUPOS[g].some(s => s[0] === p));
-    const pages = [["Geral", ""], ["Prazos", ""], ["Financeiro", ""], ["Indicadores", ""], ["Riscos de Engenharia", ""],
+    const pages = [["Geral", ""], ["Cadastro de Obras", this.state.obrasCad ? String(this.state.obrasCad.filter(o => o.ativa !== false).length) : ""], ["Prazos", ""], ["Financeiro", ""], ["Indicadores", ""], ["Riscos de Engenharia", ""],
       ["Gestão de Fornecedores", fnMark], ["Equipe", anMark], ["Processos", ""], ["Dados e publicação", upMark], ["Termos de Abertura de Projeto (TAP)", "↗"], ["Lançamento Financeiro", this.state.finMark || ""]];
     const gAtual = grupoDe(page);
     const subTabs = gAtual ? GRUPOS[gAtual].map(s => ({ label: s[1], go: this.go(s[0]),
@@ -4785,6 +5010,7 @@ class Component extends DCLogic {
       "Organograma do Setor": "Organograma do setor · obras por analista, UH e área construída",
       "Processos": "Fluxo de projetos por fase, com documentos, formulários e indicadores",
       "Lançamento Financeiro": "Pedidos e aditivos por obra, controle de budget e contrato, pagamentos e estouros",
+      "Cadastro de Obras": "Fonte única das obras do painel · dados cadastrais, links do ClickUp e vínculos com TAP, financeiro, fornecedores e riscos",
       "Base de dados": "Arquivos que alimentam o painel e atualização por upload",
       "Usuários e publicação": "Acessos ao painel e pacote criptografado para o GitHub",
       "Exportação de dados": "Apresentação do setor e planilha de indicadores da empresa",
@@ -4807,11 +5033,11 @@ class Component extends DCLogic {
       isGeral: page === "Geral", isPrazos: page === "Prazos", isIndicadores: page === "Indicadores",
       isRiscos: page === "Riscos de Engenharia", isFinanceiro: page === "Financeiro",
       isAnalistas: page === "Gestão de Analistas", isOrg: page === "Organograma do Setor",
-      orgBotaoEditar: page === "Organograma do Setor" && !!(this.state.sessao && this.state.sessao.perfil === "admin") && !this.state.orgDraft, isProc: page === "Processos", isLanc: page === "Lançamento Financeiro",
+      orgBotaoEditar: page === "Organograma do Setor" && !!(this.state.sessao && this.state.sessao.perfil === "admin") && !this.state.orgDraft, isProc: page === "Processos", isLanc: page === "Lançamento Financeiro", isObrasCad: page === "Cadastro de Obras",
       procBlocos: [["Processos mapeados", "Fluxos do setor, etapa a etapa"], ["POPs e ITs", "Procedimentos operacionais e instruções de trabalho"], ["Diretrizes de projeto", "Diretrizes vigentes por disciplina"]].map(b => ({ t: b[0], s: b[1] })), isFornecedores: page === "Gestão de Fornecedores",
       isBase: page === "Base de dados", isExport: page === "Exportação de dados", isReuniao: page === "Reunião Diretoria", isFollow: page === "Reunião Follow-up",
       isAdmin: page === "Usuários e publicação" && !!(this.state.sessao && this.state.sessao.perfil === "admin"),
-      showFilters: page !== "Lançamento Financeiro" && page.indexOf("Gestão") !== 0 && page !== "Reunião Follow-up" && page !== "Base de dados" && page !== "Exportação de dados" && page !== "Usuários e publicação" && page !== "Organograma do Setor" && page !== "Processos",
+      showFilters: page !== "Lançamento Financeiro" && page !== "Cadastro de Obras" && page.indexOf("Gestão") !== 0 && page !== "Reunião Follow-up" && page !== "Base de dados" && page !== "Exportação de dados" && page !== "Usuários e publicação" && page !== "Organograma do Setor" && page !== "Processos",
       ...this.authVals(), ...this.orgVals(), ...this.alt7Vals(d),
       stop: e => e.stopPropagation(), closeModal: () => this.setState({ modal: null, taskModal: null }),
       modalPill: this.state.taskModal ? "Atividades" : "Indicador",
