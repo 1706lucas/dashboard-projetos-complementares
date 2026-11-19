@@ -4097,6 +4097,9 @@ class Component extends DCLogic {
     obras.forEach(o => (o.tarefasCompl || []).forEach(t => todas.push(Object.assign({ sigla: o.sigla }, t))));
     // por obra: se a obra tem subtarefas, só elas entram; se o export da obra não traz a tarefa-mãe, entram todas
     const comSub = {}; todas.forEach(t => { if (t.mae === false) comSub[t.sigla] = 1; });
+    // obras que o robô não conseguiu ler na última execução: os status delas são antigos
+    const velha = {}; obras.forEach(o => { if (o.foraDoExport) velha[o.sigla] = o.lidoEm ? this.br(o.lidoEm) : "data desconhecida"; });
+    const nVelha = Object.keys(velha);
     // regra de status (definida pelo Lucas em 19/11/2026) — normaliza acentos e caixa
     const N = t => String(t.status || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase().trim();
     const ignora = t => /CONCLU|COMPLETE|CANCEL|TRATADO/.test(N(t));
@@ -4105,10 +4108,12 @@ class Component extends DCLogic {
     const tg = (bg, fg) => "font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0;background:" + bg + ";color:" + fg;
     const dif = x => Math.round((Date.parse(x) - Date.parse(hoje)) / 864e5);
     const nome = t => String(t.n || "").replace(/^[A-Z0-9]{2,4}\s*[-|]\s*/, "");
+    const pill = (t, bg, fg) => ({ t, style: tg(bg, fg).replace("white-space:nowrap", "white-space:normal") });
     const stTxt = t => String(t.status || "sem status").toUpperCase();
     const datas = t => [t.s ? "início " + this.br(t.s) : "", t.d ? "prazo " + this.br(t.d) : "sem prazo"].filter(Boolean).join(" · ");
     const item = (t, tag, bg, fg) => ({ sigla: multi ? t.sigla : "", n: nome(t), url: t.url || "#", resp: (t.ass || []).join(", ") || "sem responsável",
-      tag, tagStyle: tg(bg, fg), info: "ClickUp: " + stTxt(t) + " · " + datas(t) });
+      tag, tagStyle: tg(bg, fg), info: (velha[t.sigla] ? "⚠ dado antigo (" + velha[t.sigla] + ") · " : "") + "ClickUp: " + stTxt(t) + " · " + datas(t) });
+    const avisoV = nVelha.length ? [pill("⚠ " + nVelha.length + " obra(s) sem leitura do ClickUp: " + nVelha.map(k => k + " (" + velha[k] + ")").join(", ") + " — confira o link no Cadastro de Obras", "#FEE2E2", "#7F1D1D")] : [];
     const ord = (a, b) => String(a.d || a.s || "9").localeCompare(String(b.d || b.s || "9"));
     const curto = [], medio = [];
     let nAtraso = 0, nAberto = 0, nProg = 0, nIni = 0;
@@ -4124,16 +4129,15 @@ class Component extends DCLogic {
       // início a mais de 15 dias ou sem datas: não relaciona
     });
     curto.sort((a, b) => ord(a[0], b[0])); medio.sort((a, b) => ord(a[0], b[0]));
-    const pill = (t, bg, fg) => ({ t, style: tg(bg, fg) });
     const nSt = c => "font-family:var(--font-heading);font-weight:900;font-size:26px;line-height:1;color:" + c;
     return [
       { titulo: "Curto prazo e atrasadas", sub: "Em atraso (sempre) e em aberto com início já passado ou prazo vencido",
         n: String(curto.length), nStyle: nSt(nAtraso ? "#B91C1C" : "var(--slate-700)"),
-        resumo: [pill(nAtraso + " em atraso", "#FEE2E2", "#991B1B"), pill(nAberto + " em aberto com prazo correndo/vencido", "#FFEDD5", "#9A3412")],
+        resumo: [pill(nAtraso + " em atraso", "#FEE2E2", "#991B1B"), pill(nAberto + " em aberto com prazo correndo/vencido", "#FFEDD5", "#9A3412")].concat(avisoV),
         itens: curto.map(x => x[1]), vazio: !curto.length, vazioTxt: "Nenhuma subatividade em atraso ou em aberto com prazo correndo." },
       { titulo: "Médio prazo · em progresso e próximas a iniciar", sub: "Em progresso (no prazo ou fora) e em aberto com início até " + this.br(d15) + " (15 dias)",
         n: String(medio.length), nStyle: nSt("var(--slate-700)"),
-        resumo: [pill(nProg + " em progresso", "#FEF3C7", "#92400E"), pill(nIni + " a iniciar em até 15 dias", "#DBEAFE", "#1E40AF")],
+        resumo: [pill(nProg + " em progresso", "#FEF3C7", "#92400E"), pill(nIni + " a iniciar em até 15 dias", "#DBEAFE", "#1E40AF")].concat(avisoV),
         itens: medio.map(x => x[1]), vazio: !medio.length, vazioTxt: "Nenhuma subatividade em progresso ou iniciando nos próximos 15 dias." }
     ];
   }
