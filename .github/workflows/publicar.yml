@@ -33,6 +33,7 @@ jobs:
           node-version: 20
 
       - name: Buscar dados no ClickUp
+        id: robo
         if: github.event_name != 'push'
         run: node .github/scripts/atualizar-clickup.mjs
         env:
@@ -60,3 +61,13 @@ jobs:
           path: .
       - id: deploy
         uses: actions/deploy-pages@v4
+
+      # Publica mesmo assim e, no fim, marca a execução como FALHA quando o cronograma não foi lido.
+      # Execução com falha = e-mail automático do GitHub para o dono do repositório.
+      - name: Alerta - leitura do ClickUp incompleta
+        if: steps.robo.outputs.alerta != ''
+        env:
+          ALERTA: ${{ steps.robo.outputs.alerta }}
+        run: |
+          echo "::error title=Dashboard com dados antigos::$ALERTA"
+          exit 1
