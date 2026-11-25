@@ -236,4 +236,3 @@ if (alertas.length) {
   console.log("ALERTA: " + alertas.join(" | "));
   if (process.env.GITHUB_OUTPUT) await appendFile(process.env.GITHUB_OUTPUT, "alerta=" + alertas.join(" | ").replace(/[\r\n]+/g, " ") + "\n");
 }
-
