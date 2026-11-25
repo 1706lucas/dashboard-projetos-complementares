@@ -321,6 +321,7 @@ button:active{transform:scale(.98)}
                   <div style="display:flex;flex-wrap:wrap;gap:6px">
                     <sc-for list="{{ c.resumo }}" as="x" hint-placeholder-count="2"><span style="{{ x.style }}">{{ x.t }}</span></sc-for>
                   </div>
+                  <div style="{{ c.filtrosStyle }}"><sc-for list="{{ c.filtros }}" as="f"><div style="position:relative"><button onClick="{{ f.tog }}" style="{{ f.btnStyle }}">{{ f.label }} ▾</button><sc-if value="{{ f.aberto }}"><div style="position:absolute;z-index:30;top:38px;left:0;min-width:260px;max-width:340px;background:var(--card);border:1px solid var(--slate-200);border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.16);padding:6px;display:flex;flex-direction:column;gap:2px"><div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:2px"><sc-for list="{{ f.opts }}" as="o"><button onClick="{{ o.go }}" style="{{ o.style }}"><span style="{{ o.box }}">{{ o.mark }}</span><span style="flex:1;text-align:left">{{ o.t }}</span><span class="mono" style="font-size:10.5px;color:var(--slate-400)">{{ o.n }}</span></button></sc-for></div><div style="display:flex;justify-content:space-between;gap:6px;padding:6px 4px 2px;border-top:1px solid var(--slate-100)"><button onClick="{{ f.limpar }}" class="btn" style="padding:5px 10px;font-size:12px">Limpar</button><button onClick="{{ f.tog }}" class="btn" style="padding:5px 12px;font-size:12px;background:var(--blue-600);color:#fff;border-color:var(--blue-600)">OK</button></div></div></sc-if></div></sc-for><button onClick="{{ c.limpar }}" style="{{ c.limparStyle }}">Limpar filtros</button></div>
                   <sc-if value="{{ c.vazio }}"><p style="margin:0;font-size:12.5px;color:var(--slate-400)">{{ c.vazioTxt }}</p></sc-if>
                   <div style="display:flex;flex-direction:column;gap:7px;max-height:460px;overflow-y:auto">
                     <sc-for list="{{ c.itens }}" as="t" hint-placeholder-count="4">
@@ -443,6 +444,7 @@ button:active{transform:scale(.98)}
                 <div style="display:flex;flex-wrap:wrap;gap:6px">
                   <sc-for list="{{ c.resumo }}" as="x" hint-placeholder-count="2"><span style="{{ x.style }}">{{ x.t }}</span></sc-for>
                 </div>
+                <div style="{{ c.filtrosStyle }}"><sc-for list="{{ c.filtros }}" as="f"><div style="position:relative"><button onClick="{{ f.tog }}" style="{{ f.btnStyle }}">{{ f.label }} ▾</button><sc-if value="{{ f.aberto }}"><div style="position:absolute;z-index:30;top:38px;left:0;min-width:260px;max-width:340px;background:var(--card);border:1px solid var(--slate-200);border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.16);padding:6px;display:flex;flex-direction:column;gap:2px"><div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:2px"><sc-for list="{{ f.opts }}" as="o"><button onClick="{{ o.go }}" style="{{ o.style }}"><span style="{{ o.box }}">{{ o.mark }}</span><span style="flex:1;text-align:left">{{ o.t }}</span><span class="mono" style="font-size:10.5px;color:var(--slate-400)">{{ o.n }}</span></button></sc-for></div><div style="display:flex;justify-content:space-between;gap:6px;padding:6px 4px 2px;border-top:1px solid var(--slate-100)"><button onClick="{{ f.limpar }}" class="btn" style="padding:5px 10px;font-size:12px">Limpar</button><button onClick="{{ f.tog }}" class="btn" style="padding:5px 12px;font-size:12px;background:var(--blue-600);color:#fff;border-color:var(--blue-600)">OK</button></div></div></sc-if></div></sc-for><button onClick="{{ c.limpar }}" style="{{ c.limparStyle }}">Limpar filtros</button></div>
                 <sc-if value="{{ c.vazio }}"><p style="margin:0;font-size:12.5px;color:var(--slate-400)">{{ c.vazioTxt }}</p></sc-if>
                 <div style="display:flex;flex-direction:column;gap:7px;max-height:420px;overflow-y:auto">
                   <sc-for list="{{ c.itens }}" as="t" hint-placeholder-count="4">
@@ -512,6 +514,7 @@ button:active{transform:scale(.98)}
                       <div><h3 style="font-size:15px">{{ c.titulo }}</h3><p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">{{ c.sub }}</p></div>
                       <span style="font-family:var(--font-heading);font-weight:600;font-size:28px;line-height:1">{{ c.total }}</span>
                     </div>
+                    <div style="{{ c.filtrosStyle }}"><sc-for list="{{ c.filtros }}" as="f"><div style="position:relative"><button onClick="{{ f.tog }}" style="{{ f.btnStyle }}">{{ f.label }} ▾</button><sc-if value="{{ f.aberto }}"><div style="position:absolute;z-index:30;top:38px;left:0;min-width:260px;max-width:340px;background:var(--card);border:1px solid var(--slate-200);border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.16);padding:6px;display:flex;flex-direction:column;gap:2px"><div style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:2px"><sc-for list="{{ f.opts }}" as="o"><button onClick="{{ o.go }}" style="{{ o.style }}"><span style="{{ o.box }}">{{ o.mark }}</span><span style="flex:1;text-align:left">{{ o.t }}</span><span class="mono" style="font-size:10.5px;color:var(--slate-400)">{{ o.n }}</span></button></sc-for></div><div style="display:flex;justify-content:space-between;gap:6px;padding:6px 4px 2px;border-top:1px solid var(--slate-100)"><button onClick="{{ f.limpar }}" class="btn" style="padding:5px 10px;font-size:12px">Limpar</button><button onClick="{{ f.tog }}" class="btn" style="padding:5px 12px;font-size:12px;background:var(--blue-600);color:#fff;border-color:var(--blue-600)">OK</button></div></div></sc-if></div></sc-for><button onClick="{{ c.limpar }}" style="{{ c.limparStyle }}">Limpar filtros</button></div>
                     <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
                       <svg viewBox="0 0 200 200" style="width:170px;height:170px;flex-shrink:0">
                         <sc-for list="{{ c.slices }}" as="f"><path d="{{ f.d }}" fill="{{ f.color }}" stroke="var(--card)" stroke-width="2" style="{{ f.style }}" onClick="{{ f.go }}"><title>{{ f.title }}</title></path></sc-for>
@@ -3856,7 +3859,7 @@ class Component extends DCLogic {
         endStyle: end ? "color:var(--blue-600);font-weight:600;text-decoration:none" : "color:var(--slate-400);pointer-events:none;text-decoration:none" };
     });
     return Object.assign({ geralConsolidado: true, geralObra: false, consKpis, consFases, consSemFases: consFases.length === 0,
-      consObras, consObrasResumo: consObras.length + " obra(s)" + (buSel === "Todos" ? "" : " · " + buSel), consPrazos: this.prazosLista(list),
+      consObras, consObrasResumo: consObras.length + " obra(s)" + (buSel === "Todos" ? "" : " · " + buSel), consPrazos: this.quadroFiltros(this.prazosLista(list), "gc"),
       consVidas, consSemVidas: consVidas.length === 0,
       consVidaMedia: mediaV == null ? "" : "Média de " + mediaV + " dias entre " + vidas.length + " obras",
       consVidaMediaStyle: mediaV == null ? "display:none" : "margin:14px 0 0;font-size:11.5px;color:var(--slate-400)",
@@ -4100,7 +4103,49 @@ class Component extends DCLogic {
         disc: segs(top, usado, CD, pctF), semDisc: !top.length };
   }
   // prazos das subatividades com tag (eng -) complementares: curto prazo/atrasadas e médio prazo
-  prazosObra(o) { return this.prazosLista(o ? [o] : []); }
+  prazosObra(o) { return this.quadroFiltros(this.prazosLista(o ? [o] : []), "go"); }
+  // filtros de cada quadro: status, analista e empreendimento (estado separado por quadro)
+  // quadro único (curto prazo + em andamento) com status exato do ClickUp e filtros de múltipla escolha
+  quadroFiltros(cards, chave) {
+    const QF = this.state.qf || {}, ab = this.state.qfAberto || "", nomes = {}; (this.obras() || []).forEach(o => { nomes[o.sigla] = o.nome; });
+    const f = Object.assign({ st: [], an: [], ob: [] }, QF[chave] || {});
+    const set = patch => this.setState({ qf: Object.assign({}, this.state.qf || {}, { [chave]: Object.assign({}, f, patch) }) });
+    const stDe = t => String((t.raw && t.raw.status) || "SEM STATUS").toUpperCase();
+    const anDe = t => (t.raw && t.raw.ass && t.raw.ass.length) ? t.raw.ass : ["Sem responsável"];
+    const COR = st => /EM ATRASO/.test(st) ? ["#FEE2E2", "#991B1B"] : /FORA DO PRAZO/.test(st) ? ["#FFEDD5", "#9A3412"] : /PROGRESS/.test(st) ? ["#FEF3C7", "#92400E"] : /ABERTO|TO DO/.test(st) ? ["#E6F1FD", "#1E40AF"] : ["var(--slate-100)", "var(--slate-600)"];
+    const tg = (bg, fg) => "font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0;background:" + bg + ";color:" + fg;
+    const todos = [].concat(...cards.map(c => c.itens)).map(t => { const st = stDe(t), cor = COR(st);
+      const quando = String(t.tag || "").replace(/^Em atraso ?/, "").replace(/^Em aberto · /, "").replace(/^Sem início · /, "").replace(/^Em progresso( · fora do prazo)?/, "").trim();
+      const m = String(t.info || "").match(/^(⚠[^·]*· )?ClickUp: [^·]*· (.*)$/), datas = m ? (m[1] || "") + m[2] : t.info;
+      return Object.assign({}, t, { tag: st, tagStyle: tg(cor[0], cor[1]), info: (quando ? quando + " · " : "") + datas }); });
+    todos.sort((x, y) => String((x.raw && (x.raw.d || x.raw.s)) || "9").localeCompare(String((y.raw && (y.raw.d || y.raw.s)) || "9")));
+    const conta = (fn) => { const m = {}; todos.forEach(t => [].concat(fn(t)).forEach(v => { m[v] = (m[v] || 0) + 1; })); return m; };
+    const cSt = conta(stDe), cAn = conta(anDe), cOb = conta(t => t.siglaReal);
+    const passa = (t, ign) => (ign === "st" || !f.st.length || f.st.indexOf(stDe(t)) >= 0) && (ign === "an" || !f.an.length || anDe(t).some(a => f.an.indexOf(a) >= 0)) && (ign === "ob" || !f.ob.length || f.ob.indexOf(t.siglaReal) >= 0);
+    const itens = todos.filter(t => passa(t));
+    const ativo = !!(f.st.length || f.an.length || f.ob.length);
+    const mk = (k, rot, cont, rotulo) => { const sel = f[k], aberto = ab === chave + "|" + k;
+      const chaves = Object.keys(cont).sort((x, y) => k === "st" ? cont[y] - cont[x] || x.localeCompare(y) : x.localeCompare(y));
+      return { aberto, label: rot + (sel.length ? " (" + sel.length + ")" : ""), tog: () => this.setState({ qfAberto: aberto ? "" : chave + "|" + k }), limpar: () => set({ [k]: [] }),
+        btnStyle: "height:34px;border-radius:10px;padding:0 12px;cursor:pointer;font-family:var(--font-body);font-size:12.5px;font-weight:600;white-space:nowrap;background:" + (sel.length ? "var(--blue-50)" : "var(--card)") + ";color:var(--color-text);border:1px solid " + (sel.length ? "var(--blue-500)" : "var(--slate-200)"),
+        opts: chaves.map(v => { const on = sel.indexOf(v) >= 0; return { t: rotulo ? rotulo(v) : v, n: String(cont[v]), mark: on ? "✓" : "",
+          go: () => set({ [k]: on ? sel.filter(x => x !== v) : sel.concat([v]) }),
+          box: "width:16px;height:16px;border-radius:5px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;background:" + (on ? "var(--blue-600)" : "transparent") + ";border:1.5px solid " + (on ? "var(--blue-600)" : "var(--slate-300)"),
+          style: "display:flex;align-items:center;gap:8px;width:100%;padding:7px 8px;border:0;border-radius:8px;cursor:pointer;font-family:var(--font-body);font-size:12.5px;background:" + (on ? "var(--slate-50)" : "transparent") + ";color:var(--color-text)" }; }) }; };
+    const obs = Object.keys(cOb);
+    const filtros = [mk("st", "Status", cSt), mk("an", "Analista", cAn)].concat(obs.length > 1 || f.ob.length ? [mk("ob", "Empreendimento", cOb, v => v + (nomes[v] ? " · " + nomes[v] : ""))] : []);
+    const pill = (t, bg, fg) => ({ t, style: "font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:" + bg + ";color:" + fg });
+    const porSt = {}; itens.forEach(t => { const st = stDe(t); porSt[st] = (porSt[st] || 0) + 1; });
+    const resumo = Object.keys(porSt).sort((x, y) => porSt[y] - porSt[x]).map(st => { const c = COR(st); return pill(porSt[st] + " " + st.toLowerCase(), c[0], c[1]); })
+      .concat(ativo ? [pill("filtrado: " + itens.length + " de " + todos.length, "var(--blue-50)", "var(--blue-700)")] : [])
+      .concat(((cards[0] && cards[0].resumo) || []).filter(x => /^⚠/.test(x.t)));
+    const atr = itens.filter(t => /EM ATRASO/.test(stDe(t))).length;
+    return [{ titulo: "Atividades de curto prazo, atrasadas e em andamento", sub: "Em atraso, em aberto com prazo correndo ou vencido, em progresso e a iniciar em até 15 dias · status como está no ClickUp",
+      n: String(itens.length), nStyle: "font-family:var(--font-heading);font-weight:900;font-size:26px;line-height:1;color:" + (atr ? "#B91C1C" : "var(--slate-700)"),
+      resumo, itens, todos, vazio: !itens.length, vazioTxt: ativo ? "Nenhuma tarefa para os filtros escolhidos." : "Nenhuma atividade de curto prazo, atrasada ou em andamento.",
+      filtros, filtrosStyle: todos.length ? "display:flex;gap:6px;flex-wrap:wrap;align-items:center" : "display:none",
+      limpar: () => set({ st: [], an: [], ob: [] }), limparStyle: ativo ? "cursor:pointer;border:0;background:transparent;color:var(--color-accent);font-family:var(--font-body);font-size:12px;font-weight:600;padding:4px 6px" : "display:none" }];
+  }
   prazosLista(obras) {
     const hoje = this.fuHoje(), dia = n => new Date(Date.parse(hoje) + n * 864e5).toISOString().slice(0, 10);
     const d7 = dia(7), d30 = dia(30), multi = obras.length > 1;
@@ -4479,22 +4524,26 @@ class Component extends DCLogic {
     miniLista: [], miniListaStyle: "display:none", miniDiaTitulo: "", miniDicaStyle: "display:none" }; }
   // Prazos · visão "Todos": pizzas dos quadros, atividades críticas, Gantt dos quadros e minicalendário de marcos axiais
   pz2Vals(list) {
-    const hoje = this.fuHoje(), cards = this.prazosLista(list), sel = this.state.pz2Sel || null;
+    const hoje = this.fuHoje(), cards = this.quadroFiltros(this.prazosLista(list), "pz"), sel = this.state.pz2Sel || null;
     const COR = { atraso: ["#FF4747", "Em atraso"], aberto: ["#F5A524", "Em aberto · prazo correndo ou vencido"], prog: ["#A78BEA", "Em progresso (no prazo ou fora)"], ini: ["#6C7CF5", "A iniciar em até 15 dias"] };
-    const ordem = [["atraso", "aberto"], ["prog", "ini"]];
-    const pz2Pies = cards.map((c, ci) => { const tot = c.itens.length || 0; let a0 = -Math.PI / 2;
-      const slices = ordem[ci].map(k => { const n = c.itens.filter(i => i.cat === k).length; const frac = tot ? n / tot : 0; const a1 = a0 + frac * Math.PI * 2;
+    const PAL = ["#FF4747", "#F5A524", "#A78BEA", "#6C7CF5", "#33C3F0", "#4CC97A", "#B4B7C0", "#FFB55B"];
+    const c0 = cards[0], stD = t => String((t.raw && t.raw.status) || "SEM STATUS").toUpperCase();
+    const ks = []; c0.itens.forEach(t => { const st = stD(t); if (ks.indexOf(st) < 0) ks.push(st); });
+    const nK = k => c0.itens.filter(t => stD(t) === k).length; ks.sort((x, y) => nK(y) - nK(x));
+    const corK = k => /EM ATRASO/.test(k) ? "#FF4747" : /FORA DO PRAZO/.test(k) ? "#FFB55B" : /PROGRESS/.test(k) ? "#F5A524" : /ABERTO|TO DO/.test(k) ? "#6C7CF5" : PAL[(ks.indexOf(k) + 4) % PAL.length];
+    const pz2Pies = [(() => { const tot = c0.itens.length || 0; let a0 = -Math.PI / 2;
+      const slices = ks.map(k => { const n = nK(k); const frac = tot ? n / tot : 0; const a1 = a0 + frac * Math.PI * 2;
         const x0 = 100 + 88 * Math.cos(a0), y0 = 100 + 88 * Math.sin(a0), x1 = 100 + 88 * Math.cos(a1 - (frac >= 1 ? 1e-4 : 0)), y1 = 100 + 88 * Math.sin(a1 - (frac >= 1 ? 1e-4 : 0));
         const d = n ? "M100,100 L" + x0.toFixed(2) + "," + y0.toFixed(2) + " A88,88 0 " + (frac > .5 ? 1 : 0) + " 1 " + x1.toFixed(2) + "," + y1.toFixed(2) + " Z" : ""; a0 = a1;
-        const on = sel && sel.c === ci && sel.k === k;
-        return { d, color: COR[k][0], label: COR[k][1], n: String(n), pct: tot ? Math.round(frac * 100) + "%" : "—", title: COR[k][1] + ": " + n,
-          style: "cursor:pointer;opacity:" + (sel && !on ? ".45" : "1") + ";transition:opacity .15s", go: () => this.setState({ pz2Sel: on ? null : { c: ci, k } }),
-          dot: "width:11px;height:11px;border-radius:3px;flex-shrink:0;background:" + COR[k][0],
+        const on = sel && sel.k === k, cor = corK(k);
+        return { d, color: cor, label: k, n: String(n), pct: tot ? Math.round(frac * 100) + "%" : "—", title: k + ": " + n,
+          style: "cursor:pointer;opacity:" + (sel && !on ? ".45" : "1") + ";transition:opacity .15s", go: () => this.setState({ pz2Sel: on ? null : { c: 0, k } }),
+          dot: "width:11px;height:11px;border-radius:3px;flex-shrink:0;background:" + cor,
           legStyle: "display:flex;align-items:center;gap:8px;width:100%;padding:7px 9px;border-radius:9px;cursor:pointer;font-size:12.5px;border:1px solid " + (on ? "var(--slate-300)" : "transparent") + ";background:" + (on ? "var(--slate-50)" : "transparent") }; });
-      return { titulo: c.titulo, sub: c.sub, total: String(tot), slices }; });
-    const selItens = sel && cards[sel.c] ? cards[sel.c].itens.filter(i => i.cat === sel.k) : [];
+      return { titulo: c0.titulo, sub: c0.sub, total: String(tot), slices, filtros: c0.filtros, filtrosStyle: c0.filtrosStyle, limpar: c0.limpar, limparStyle: c0.limparStyle }; })()];
+    const selItens = sel ? c0.itens.filter(t => stD(t) === sel.k) : [];
     // atividades críticas: > 5 dias de atraso, ou sem início com o prazo correndo/vencido
-    const todos = cards[0].itens.concat(cards[1].itens);
+    const todos = c0.itens;
     const N = t => String(t.status || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
     const semIni = t => /SEM INICIO|EM ABERTO|TO DO|NAO INICIAD/.test(N(t));
     const dias = x => Math.round((Date.parse(hoje) - Date.parse(x)) / 864e5);
@@ -4537,10 +4586,10 @@ class Component extends DCLogic {
           ";border:" + (iso && iso === diaSel ? "2px solid var(--color-text)" : iso === hoje ? "1px solid var(--slate-400)" : "1px solid transparent") + ";background:" + bg + ";color:" + (es.length ? "#fff" : dentro ? "var(--color-text)" : "transparent") }); }
     const doDia = ev.filter(e => e.dt === diaSel);
     return { pz2Pies, pz2SelTem: !!selItens.length || !!sel, pz2SelItens: selItens,
-      pz2SelTitulo: sel ? (pz2Pies[sel.c] ? pz2Pies[sel.c].titulo : "") + " · " + COR[sel.k][1] + " (" + selItens.length + ")" : "", pz2SelFechar: () => this.setState({ pz2Sel: null }),
+      pz2SelTitulo: sel ? "Status " + sel.k + " (" + selItens.length + ")" : "", pz2SelFechar: () => this.setState({ pz2Sel: null }),
       pz2Crit: crit, pz2CritResumo: [pc(crit.length + " crítica(s)", "var(--slate-100)", "var(--slate-600)"), pc(nAtr + " com mais de 5 dias de atraso", "#FEE2E2", "#991B1B"), pc((crit.length - nAtr) + " sem início com prazo correndo", "#FFEDD5", "#9A3412")],
       pz2CritTabStyle: crit.length ? "max-height:460px;overflow:auto" : "display:none", pz2CritVazioStyle: crit.length ? "display:none" : "margin:0;font-size:12.5px;color:var(--slate-400)",
-      pz2Gantt, pz2GanttMeses: meses, pz2GanttSub: gi.length + " atividade(s) dos quadros Curto prazo e Médio prazo · linha vermelha = hoje · clique para abrir no ClickUp",
+      pz2Gantt, pz2GanttMeses: meses, pz2GanttSub: gi.length + " atividade(s) do quadro (com os filtros aplicados) · linha vermelha = hoje · clique para abrir no ClickUp",
       pz2GanttLeg: Object.keys(COR).map(k => ({ t: COR[k][1], dot: "width:10px;height:10px;border-radius:3px;background:" + COR[k][0] })), pz2GanttVazioStyle: gi.length ? "display:none" : "margin:8px 0 0;font-size:12.5px;color:var(--slate-400)",
       miniDias, miniSemana: ["S", "T", "Q", "Q", "S", "S", "D"], miniTitulo: MNL[m - 1] + " " + y, miniAnt: () => ir(-1), miniProx: () => ir(1),
       miniLista: doDia.map(e => ({ sigla: e.sigla, marco: e.marco, obra: e.obra, bu: e.bu || "—", st: ST[e.k] || "", cor: corBU(e.bu) })),
