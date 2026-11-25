@@ -1,6 +1,6 @@
 // Busca cronograma, indicadores e pendências no ClickUp, recalcula e recriptografa a base.
 // Segredos do repositório: CLICKUP_TOKEN (token pessoal do ClickUp) e DASH_KEY (chave dos dados).
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, appendFile } from "node:fs/promises";
 
 const TOKEN = process.env.CLICKUP_TOKEN, KEY_B64 = process.env.DASH_KEY;
 if (!TOKEN || !KEY_B64) { console.error("Faltam os segredos CLICKUP_TOKEN e/ou DASH_KEY."); process.exit(1); }
@@ -119,6 +119,7 @@ const hoje = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10); // ho
 const dias = (s, n) => new Date(Date.parse(s) + n * 864e5).toISOString().slice(0, 10);
 const d = await abrir("data/dashboard.json.enc");
 const log = []; let ok = 0;
+const alertas = []; // vira falha no GitHub Actions (e e-mail de aviso) ao final da execução
 let FONTES = PADRAO;
 let CFG = null;
 try { CFG = await abrir("data/config.json.enc"); if (CFG && Array.isArray(CFG.fontes) && CFG.fontes.some(f => f.view)) { FONTES = CFG.fontes.filter(f => f.view && f.ativo !== false && ["8cktdwf-90873", "8cktdwf-104773"].indexOf(f.view) < 0);
@@ -182,7 +183,8 @@ try {
   // marca a data da última leitura de cada obra; obra sem tarefas nesta execução mantém dados antigos (aviso no dashboard)
   d.obras.forEach(o => { if (o.temDados && !o.foraDoExport) o.lidoEm = hoje; });
   { const fora = d.obras.filter(o => o.foraDoExport).map(o => o.sigla + (o.lidoEm ? " (" + o.lidoEm + ")" : ""));
-    if (fora.length) log.push("ATENÇÃO obras SEM leitura nesta execução (dados antigos mantidos): " + fora.join(", ")); }
+    if (fora.length) { log.push("ATENÇÃO obras SEM leitura nesta execução (dados antigos mantidos): " + fora.join(", "));
+      alertas.push("obras sem leitura do ClickUp: " + fora.join(", ")); } }
   let hist = []; try { hist = await abrir("data/historico.json.enc"); } catch (e) { hist = []; }
   hist = hist.filter(h => h.quando !== hoje).sort((a, b) => a.quando.localeCompare(b.quando));
   const snap = X.snapshotCompl(wb);
@@ -192,7 +194,13 @@ try {
   const alt7 = X.alteracoesJanela(hist, d.obras, hoje, 7); if (alt7) d.alteracoes7 = alt7;
   await fechar("data/historico.json.enc", hist.filter(h => h.quando >= dias(hoje, -14)));
   log.push("cronograma: " + (wb.Tasks.length - 1) + " tarefas"); ok++;
-} catch (e) { log.push("cronograma NÃO atualizado: " + e.message); }
+  d.cronoLido = { quando: new Date().toISOString(), tarefas: wb.Tasks.length - 1, obras: d.obras.filter(o => o.lidoEm === hoje).length };
+  delete d.cronoErro;
+} catch (e) {
+  log.push("cronograma NÃO atualizado: " + e.message);
+  d.cronoErro = { quando: new Date().toISOString(), msg: String(e.message).slice(0, 240) };
+  alertas.push("cronograma NÃO atualizado (status e prazos do painel ficaram com a leitura anterior): " + String(e.message).slice(0, 200));
+}
 
 try {
   const I = X.mapIndicadores(paraPlanilha(await lerTodas(VIEWS.indicadores)));
@@ -223,3 +231,9 @@ d.fontesUltima = Object.assign({}, d.fontesUltima);
 leitura.forEach(l => { if (!l.erro && l.n) d.fontesUltima[l.view] = hoje; });
 d.automatico = { quando: new Date().toISOString(), log, leitura };
 await fechar("data/dashboard.json.enc", d);
+// alerta: o workflow publica normalmente e, no fim, marca a execução como falha (o GitHub envia o e-mail de aviso)
+if (alertas.length) {
+  console.log("ALERTA: " + alertas.join(" | "));
+  if (process.env.GITHUB_OUTPUT) await appendFile(process.env.GITHUB_OUTPUT, "alerta=" + alertas.join(" | ").replace(/[\r\n]+/g, " ") + "\n");
+}
+
