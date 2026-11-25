@@ -10,30 +10,35 @@
 <helmet>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --font-heading:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --font-body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+  /* SnowUI Design System · modo claro */
+  --font-heading:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
   --font-mono:'DM Mono',ui-monospace,'Consolas',monospace;
-  --color-bg:#FFFFFF; --color-surface:#F1F5F9; --color-text:#1E293B;
-  --color-accent:#2563EB; --color-divider:#E2E8F0;
-  --slate-50:#F8FAFC; --slate-100:#F1F5F9; --slate-200:#E2E8F0; --slate-300:#CBD5E1;
-  --slate-400:#94A3B8; --slate-500:#64748B; --slate-600:#475569; --slate-700:#334155;
-  --blue-50:#EFF6FF; --blue-100:#DBEAFE; --blue-500:#3B82F6; --blue-600:#2563EB; --blue-700:#1D4ED8;
-  --green:#10B981; --green-50:#ECFDF5; --amber:#F59E0B; --amber-50:#FFFBEB;
-  --red:#EF4444; --red-50:#FEF2F2; --violet:#8B5CF6;
-  --card:#FFFFFF;
-  --card-shadow:0 1px 2px rgba(15,23,42,.06);
+  --color-bg:#FFFFFF; --color-surface:#FFFFFF; --color-text:#1C1C1C;
+  --color-accent:#0A8DB8; --color-divider:#E5E5E7;
+  --slate-50:#F3F3F5; --slate-100:#EDEDF0; --slate-200:#E2E2E6; --slate-300:#C8C8CE;
+  --slate-400:#8E8E93; --slate-500:#6B6B70; --slate-600:#4A4A4F; --slate-700:#1C1C1C;
+  --blue-50:#EDEEFC; --blue-100:#E6F1FD; --blue-500:#95A4FC; --blue-600:#1C1C1C; --blue-700:#1C1C1C;
+  --green:#4CC97A; --green-50:#EBF9EF; --amber:#F5A524; --amber-50:#FFF6E6;
+  --red:#FF4747; --red-50:#FFEDED; --violet:#B899EB;
+  --brand:#33D1FF; --kpi-1:#E6F1FD; --kpi-2:#EDEEFC;
+  --card:#F9F9FA;
+  --card-shadow:none;
+  --mov:220ms; --mov-curva:cubic-bezier(.2,.8,.2,1);
 }
 :root[data-tema="escuro"]{
-  --color-bg:#0F172A; --color-surface:#0B1220; --color-text:#E7EDF5; --card:#141E33;
-  --color-divider:#25324B;
-  --slate-50:#1A2439; --slate-100:#24314B; --slate-200:#31405C; --slate-300:#48587A;
-  --slate-400:#9AA8BD; --slate-500:#B4C0D2; --slate-600:#D2DBE7; --slate-700:#E7EDF5;
-  --blue-50:#1B2B54; --blue-100:#23386B; --blue-500:#5B93F8; --blue-600:#5B93F8; --blue-700:#93B8FB;
-  --green-50:#12301F; --amber-50:#2E2410; --red-50:#331A1A;
-  --card-shadow:0 1px 2px rgba(0,0,0,.4);
+  /* SnowUI · modo escuro */
+  --color-bg:#1C1C1C; --color-surface:#141414; --color-text:#F5F5F7; --card:#1F1F21;
+  --color-accent:#33D1FF; --color-divider:#2E2E31;
+  --slate-50:#27272A; --slate-100:#2C2C30; --slate-200:#38383D; --slate-300:#4D4D53;
+  --slate-400:#8E8E93; --slate-500:#AEAEB2; --slate-600:#D1D1D6; --slate-700:#F5F5F7;
+  --blue-50:#262842; --blue-100:#22324A; --blue-500:#8F9BFF; --blue-600:#7381FF; --blue-700:#C6CCFF;
+  --green-50:#16301F; --amber-50:#33260F; --red-50:#3A1C1C;
+  --kpi-1:#1F2A38; --kpi-2:#24253D;
+  --card-shadow:none;
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;background:var(--color-surface);color:var(--color-text);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
@@ -53,6 +58,24 @@ a:hover{color:var(--blue-700)}
 *::-webkit-scrollbar{width:6px;height:6px}
 *::-webkit-scrollbar-thumb{background:var(--slate-300);border-radius:99px}
 :focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
+/* ── SnowUI: pesos de fonte mais leves, rótulos sem caixa alta (React grava o estilo com espaço após ":") ── */
+h1,h2,h3,h4{font-weight:600!important;letter-spacing:-0.015em}
+[style*="font-weight:900"],[style*="font-weight: 900"],[style*="font-weight:800"],[style*="font-weight: 800"]{font-weight:600!important}
+[style*="text-transform:uppercase"],[style*="text-transform: uppercase"]{text-transform:none!important;letter-spacing:0!important}
+[style*="text-transform: uppercase"][style*="font-size: 10px"],[style*="text-transform: uppercase"][style*="font-size: 9.5px"],[style*="text-transform: uppercase"][style*="font-size: 10.5px"],[style*="text-transform: uppercase"][style*="font-size: 11px"]{font-size:12px!important}
+.table th{text-transform:none;letter-spacing:0;font-size:12px;font-weight:400;color:var(--slate-400)}
+aside{background:var(--color-bg)!important;border-right:1px solid var(--color-divider)!important}
+main{background:var(--color-bg)}
+/* ── transições (perfil deslizante) ── */
+button,a,[role="button"]{transition:background-color 120ms ease,border-color 120ms ease,color 120ms ease,box-shadow 120ms ease,transform 100ms ease}
+button:active{transform:scale(.98)}
+@keyframes snow-deslizar{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes snow-fade{from{opacity:0}to{opacity:1}}
+@keyframes snow-modal{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+.snow-pagina{animation:snow-deslizar var(--mov) var(--mov-curva) both}
+[style*="position: fixed"][style*="inset: 0"]{animation:snow-fade 180ms ease-out both}
+[style*="position: fixed"][style*="inset: 0"]>*{animation:snow-modal 200ms var(--mov-curva) both}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 <script src="data/cofre.js"></script>
 </helmet>
@@ -316,50 +339,6 @@ a:hover{color:var(--blue-700)}
               </sc-for>
             </div>
 
-            <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
-              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
-                <div>
-                  <h3 style="font-size:15px">Ranking de marcos</h3>
-                  <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Marcos recorrentes nas obras · duração média e situação</p>
-                </div>
-                <div style="display:flex;gap:4px;background:var(--slate-100);border-radius:11px;padding:4px">
-                  <sc-for list="{{ marcoTabs }}" as="t" hint-placeholder-count="2">
-                    <button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
-                  </sc-for>
-                </div>
-              </div>
-              <p style="{{ marcoVazioStyle }}">{{ marcoVazio }}</p>
-              <div style="{{ marcoTabelaStyle }}">
-                <table class="table">
-                  <thead><tr><th style="width:42px">#</th><th>Marco</th><th style="text-align:right">Obras</th><th style="text-align:right">Duração média</th><th style="width:26%">Situação</th><th style="text-align:right">Concluído</th></tr></thead>
-                  <tbody>
-                    <sc-for list="{{ marcoRanking }}" as="m" hint-placeholder-count="10">
-                      <tr onClick="{{ m.go }}" style="cursor:pointer">
-                        <td><span style="{{ m.posStyle }}">{{ m.pos }}</span></td>
-                        <td style="font-weight:700">{{ m.label }}<span style="display:block;font-size:10.5px;font-weight:700;color:var(--blue-600);margin-top:2px">ver composição →</span></td>
-                        <td class="mono" style="text-align:right">{{ m.obras }}</td>
-                        <td class="mono" style="text-align:right;font-weight:700">{{ m.dias }}</td>
-                        <td>
-                          <span style="display:flex;height:9px;border-radius:99px;overflow:hidden;background:var(--slate-100)">
-                            <sc-for list="{{ m.faixas }}" as="f" hint-placeholder-count="3">
-                              <span style="{{ f.style }}"></span>
-                            </sc-for>
-                          </span>
-                        </td>
-                        <td class="mono" style="text-align:right">{{ m.pctDone }}</td>
-                      </tr>
-                    </sc-for>
-                  </tbody>
-                </table>
-              </div>
-              <div style="display:flex;gap:16px;margin-top:14px;flex-wrap:wrap">
-                <sc-for list="{{ ganttLegend }}" as="l" hint-placeholder-count="3">
-                  <span style="display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--slate-500)">
-                    <span style="{{ l.dotStyle }}"></span>{{ l.label }}
-                  </span>
-                </sc-for>
-              </div>
-            </div>
 
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px">
               <sc-for list="{{ resumo }}" as="r" hint-placeholder-count="5">
@@ -526,73 +505,116 @@ a:hover{color:var(--blue-700)}
         <section style="display:flex;flex-direction:column;gap:22px">
           <sc-if value="{{ prazosCons }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:22px">
-              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
-                  <div>
-                    <h3 style="font-size:15px">Datas alteradas nos últimos 7 dias</h3>
-                    <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Atividades com tag complementares que tiveram início ou término alterado · maior variação primeiro</p>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:18px;align-items:stretch">
+                <sc-for list="{{ pz2Pies }}" as="c" hint-placeholder-count="2">
+                  <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:12px">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                      <div><h3 style="font-size:15px">{{ c.titulo }}</h3><p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">{{ c.sub }}</p></div>
+                      <span style="font-family:var(--font-heading);font-weight:600;font-size:28px;line-height:1">{{ c.total }}</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+                      <svg viewBox="0 0 200 200" style="width:170px;height:170px;flex-shrink:0">
+                        <sc-for list="{{ c.slices }}" as="f"><path d="{{ f.d }}" fill="{{ f.color }}" stroke="var(--card)" stroke-width="2" style="{{ f.style }}" onClick="{{ f.go }}"><title>{{ f.title }}</title></path></sc-for>
+                        <circle cx="100" cy="100" r="46" fill="var(--card)"></circle>
+                      </svg>
+                      <div style="flex:1;min-width:160px;display:flex;flex-direction:column;gap:8px">
+                        <sc-for list="{{ c.slices }}" as="f">
+                          <button onClick="{{ f.go }}" style="{{ f.legStyle }}"><span style="{{ f.dot }}"></span><span style="flex:1;text-align:left">{{ f.label }}</span><span class="mono" style="font-weight:600">{{ f.n }}</span><span class="mono" style="color:var(--slate-400);width:38px;text-align:right">{{ f.pct }}</span></button>
+                        </sc-for>
+                        <span style="font-size:11.5px;color:var(--slate-400)">Clique numa fatia para ver as tarefas</span>
+                      </div>
+                    </div>
                   </div>
-                  <div style="display:flex;gap:8px;flex-wrap:wrap">
-                    <sc-for list="{{ alt7Kpis }}" as="k" hint-placeholder-count="3">
-                      <span style="{{ k.style }}">{{ k.label }}</span>
+                </sc-for>
+              </div>
+              <sc-if value="{{ pz2SelTem }}" hint-placeholder-val="{{ false }}">
+                <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h3 style="font-size:15px">{{ pz2SelTitulo }}</h3><button onClick="{{ pz2SelFechar }}" class="btn">Fechar</button></div>
+                  <div style="display:flex;flex-direction:column;gap:7px;max-height:420px;overflow-y:auto">
+                    <sc-for list="{{ pz2SelItens }}" as="t" hint-placeholder-count="4">
+                      <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:var(--slate-50)">
+                        <span class="mono" style="font-size:11px;font-weight:700;color:var(--blue-600);width:34px;flex-shrink:0">{{ t.siglaReal }}</span>
+                        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><a href="{{ t.url }}" target="_blank" rel="noopener" style="font-size:12.5px;font-weight:600;text-decoration:none;color:var(--color-text)">{{ t.n }}</a><span style="font-size:11px;color:var(--slate-400)">{{ t.resp }}</span></div>
+                        <span style="{{ t.tagStyle }}">{{ t.tag }}</span>
+                        <span class="mono" style="font-size:10.5px;color:var(--slate-500);white-space:nowrap">{{ t.info }}</span>
+                      </div>
                     </sc-for>
                   </div>
                 </div>
-                <sc-if value="{{ alt7Tem }}" hint-placeholder-val="{{ false }}">
-                  <div style="overflow-x:auto;margin-top:14px;max-height:520px;overflow-y:auto">
-                    <table class="table" style="table-layout:fixed;min-width:860px">
-                      <thead><tr><th style="width:34%">Atividade</th><th style="width:16%">Obra</th><th style="width:18%">Início (antes → agora)</th><th style="width:18%">Término (antes → agora)</th><th style="text-align:right;width:80px">Variação</th><th style="text-align:right;width:90px">Alterado em</th></tr></thead>
+              </sc-if>
+
+              <div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(300px,1fr);gap:18px;align-items:start">
+                <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:12px">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+                    <div><h3 style="font-size:15px">Atividades críticas</h3><p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Mais de 5 dias de atraso, ou sem início com o prazo já correndo ou vencido</p></div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ pz2CritResumo }}" as="x"><span style="{{ x.style }}">{{ x.t }}</span></sc-for></div>
+                  </div>
+                  <div style="{{ pz2CritTabStyle }}">
+                    <table class="table" style="font-size:12.5px">
+                      <thead><tr><th style="width:48px">Obra</th><th>Atividade</th><th style="width:130px">Status · prazo</th><th style="width:150px">Motivo</th></tr></thead>
                       <tbody>
-                        <sc-for list="{{ alt7 }}" as="a" hint-placeholder-count="8">
-                          <tr>
-                            <td style="min-width:0;padding:9px 8px">{{ a.link }}</td>
-                            <td style="padding:9px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span class="mono" style="font-size:10.5px;font-weight:700;color:var(--blue-600)">{{ a.sigla }}</span> {{ a.obra }}</td>
-                            <td class="mono" style="padding:9px 8px;font-size:11.5px;white-space:nowrap"><span style="color:var(--slate-400)">{{ a.sAnt }}</span> → <b style="{{ a.sStyle }}">{{ a.s }}</b></td>
-                            <td class="mono" style="padding:9px 8px;font-size:11.5px;white-space:nowrap"><span style="color:var(--slate-400)">{{ a.dAnt }}</span> → <b style="{{ a.dStyle }}">{{ a.d }}</b></td>
-                            <td style="text-align:right;padding:9px 8px"><span style="{{ a.varStyle }}">{{ a.var }}</span></td>
-                            <td class="mono" style="text-align:right;padding:9px 8px;font-size:11.5px;color:var(--slate-500)">{{ a.quando }}</td>
-                          </tr>
+                        <sc-for list="{{ pz2Crit }}" as="r" hint-placeholder-count="6">
+                          <tr><td class="mono" style="font-weight:700;color:var(--blue-600)">{{ r.sigla }}</td><td><a href="{{ r.url }}" target="_blank" rel="noopener" style="color:var(--color-text);text-decoration:none;font-weight:600;display:block">{{ r.n }}</a><span style="font-size:11px;color:var(--slate-400)">{{ r.resp }}</span></td><td style="font-size:11.5px"><span style="display:block">{{ r.status }}</span><span class="mono" style="color:var(--slate-500)">{{ r.prazo }}</span></td><td><span style="{{ r.motStyle }}">{{ r.mot }}</span></td></tr>
                         </sc-for>
                       </tbody>
                     </table>
                   </div>
-                </sc-if>
-                <p style="margin:12px 0 0;font-size:11.5px;color:var(--slate-400)">{{ alt7Nota }}</p>
-              </div>
-              <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
-                <div style="flex:2 1 600px;min-width:0;background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
-                  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
-                    <div>
-                      <h3 style="font-size:15px">Atrasos entre bases</h3>
-                      <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Marcos com tag complementares · maior atraso primeiro</p>
-                    </div>
-                    <span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                      <span class="mono" style="font-size:11.5px;color:var(--slate-400);white-space:nowrap">{{ atrasoResumo }}</span>
-                      <a href="https://forms.clickup.com/9013344143/f/8cktdwf-93613/V8SQVN6LW4BITT0J5G" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-family:var(--font-heading);font-weight:700;font-size:12.5px;padding:9px 15px;border-radius:11px;background:var(--blue-600);color:#fff;white-space:nowrap">Registrar atraso ↗</a>
-                    </span>
-                  </div>
-                  <div style="{{ atrasoTabelaStyle }}">
-                    <table class="table" style="table-layout:fixed">
-                      <thead><tr><th style="width:40%">Atividade</th><th style="width:18%">Obra</th><th style="text-align:right;width:12%">Início</th><th style="text-align:right;width:12%">Base ant.</th><th style="text-align:right;width:12%">Base atual</th><th style="text-align:right;width:70px">Atraso</th></tr></thead>
-                      <tbody>
-                        <sc-for list="{{ atrasos }}" as="a" hint-placeholder-count="12">
-                          <tr>
-                            <td style="min-width:0;padding:9px 8px">{{ a.link }}</td>
-                            <td style="padding:9px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span class="mono" style="font-size:10.5px;font-weight:700;color:var(--blue-600)">{{ a.sigla }}</span> {{ a.obra }}</td>
-                            <td class="mono" style="text-align:right;white-space:nowrap;color:var(--slate-500);padding:9px 8px;font-size:11.5px">{{ a.start }}</td>
-                            <td class="mono" style="text-align:right;white-space:nowrap;color:var(--slate-500);padding:9px 8px;font-size:11.5px">{{ a.anterior }}</td>
-                            <td class="mono" style="text-align:right;white-space:nowrap;font-weight:700;padding:9px 8px;font-size:11.5px">{{ a.atual }}</td>
-                            <td style="text-align:right;padding:9px 8px"><span style="{{ a.diasStyle }}">{{ a.dias }}</span></td>
-                          </tr>
-                        </sc-for>
-                      </tbody>
-                    </table>
-                  </div>
-                  <p style="{{ atrasoVazioStyle }}">{{ atrasoVazio }}</p>
-                  <p style="{{ atrasoNotaStyle }}">{{ atrasoNota }}</p>
+                  <p style="{{ pz2CritVazioStyle }}">Nenhuma atividade crítica no filtro.</p>
                 </div>
 
-                <div style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:16px">
+                <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:12px">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                    <h3 style="font-size:15px">Marcos axiais</h3>
+                    <div style="display:flex;align-items:center;gap:4px">
+                      <button onClick="{{ miniAnt }}" class="btn" style="padding:4px 9px" title="Mês anterior">‹</button>
+                      <span style="min-width:118px;text-align:center;font-weight:600;font-size:13px">{{ miniTitulo }}</span>
+                      <button onClick="{{ miniProx }}" class="btn" style="padding:4px 9px" title="Próximo mês">›</button>
+                    </div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center">
+                    <sc-for list="{{ miniSemana }}" as="w"><span style="font-size:10.5px;color:var(--slate-400);padding:2px 0">{{ w }}</span></sc-for>
+                    <sc-for list="{{ miniDias }}" as="c" hint-placeholder-count="35"><button onClick="{{ c.go }}" title="{{ c.title }}" style="{{ c.style }}">{{ c.num }}</button></sc-for>
+                  </div>
+                  <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--slate-500)">
+                    <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#2F80ED"></span>Gadens</span>
+                    <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#FF9100"></span>Make It</span>
+                    <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,#2F80ED 50%,#FF9100 50%)"></span>As duas</span>
+                  </div>
+                  <div style="{{ miniListaStyle }}">
+                    <span style="font-size:12px;font-weight:600">{{ miniDiaTitulo }}</span>
+                    <sc-for list="{{ miniLista }}" as="e" hint-placeholder-count="2">
+                      <div style="display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:10px;background:var(--slate-50);border-left:3px solid {{ e.cor }}">
+                        <span style="font-size:12.5px;font-weight:600"><span class="mono" style="margin-right:6px">{{ e.sigla }}</span>{{ e.marco }}</span>
+                        <span style="font-size:11.5px;color:var(--slate-500)">{{ e.obra }} · {{ e.bu }} · {{ e.st }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <span style="{{ miniDicaStyle }}">Clique num dia destacado para ver o descritivo.</span>
+                </div>
+              </div>
+
+              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+                  <div><h3 style="font-size:15px">Gantt das atividades dos quadros</h3><p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">{{ pz2GanttSub }}</p></div>
+                  <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--slate-500)"><sc-for list="{{ pz2GanttLeg }}" as="l"><span style="display:inline-flex;align-items:center;gap:5px"><span style="{{ l.dot }}"></span>{{ l.t }}</span></sc-for></div>
+                </div>
+                <div style="overflow-x:auto">
+                  <div style="min-width:900px">
+                    <div style="display:flex;margin-left:300px;border-bottom:1px solid var(--slate-200)"><sc-for list="{{ pz2GanttMeses }}" as="m"><span style="{{ m.style }}">{{ m.t }}</span></sc-for></div>
+                    <div style="position:relative;max-height:520px;overflow-y:auto">
+                      <sc-for list="{{ pz2Gantt }}" as="g" hint-placeholder-count="8">
+                        <div style="display:flex;align-items:center;height:30px;border-bottom:1px solid var(--slate-100)">
+                          <a href="{{ g.url }}" target="_blank" rel="noopener" title="{{ g.title }}" style="width:300px;flex-shrink:0;display:flex;gap:6px;align-items:center;font-size:12px;text-decoration:none;color:var(--color-text);padding-right:10px;overflow:hidden"><span class="mono" style="font-weight:700;color:var(--blue-600);flex-shrink:0">{{ g.sigla }}</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ g.n }}</span></a>
+                          <div style="position:relative;flex:1;height:100%"><span style="{{ g.hojeStyle }}"></span><span title="{{ g.title }}" style="{{ g.barStyle }}"></span></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+                <p style="{{ pz2GanttVazioStyle }}">Nenhuma atividade com datas nos quadros.</p>
+              </div>
+
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:18px;align-items:start">
                 <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
                   <h3 style="font-size:15px">Tempo médio das fases</h3>
                   <p style="margin:3px 0 16px;font-size:12px;color:var(--slate-400)">Projetos complementares · média de dias corridos entre as obras</p>
@@ -632,45 +654,7 @@ a:hover{color:var(--blue-700)}
                   <p style="{{ consVidaMediaStyle }}">{{ consVidaMedia }}</p>
                 </div>
                 </div>
-              </div>
 
-              <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:22px 24px;box-shadow:var(--card-shadow)">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
-                  <div>
-                    <h3 style="font-size:15px">Ranking de marcos</h3>
-                    <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Marcos recorrentes nas obras · duração média e situação</p>
-                  </div>
-                  <div style="display:flex;gap:4px;background:var(--slate-100);border-radius:11px;padding:4px">
-                    <sc-for list="{{ marcoTabs }}" as="t" hint-placeholder-count="2">
-                      <button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
-                    </sc-for>
-                  </div>
-                </div>
-                <p style="{{ marcoVazioStyle }}">{{ marcoVazio }}</p>
-                <div style="{{ marcoTabelaStyle }}">
-                  <table class="table">
-                    <thead><tr><th style="width:42px">#</th><th>Marco</th><th style="text-align:right">Obras</th><th style="text-align:right">Duração média</th><th style="width:26%">Situação</th><th style="text-align:right">Concluído</th></tr></thead>
-                    <tbody>
-                      <sc-for list="{{ marcoRanking }}" as="m" hint-placeholder-count="10">
-                        <tr onClick="{{ m.go }}" style="cursor:pointer">
-                          <td><span style="{{ m.posStyle }}">{{ m.pos }}</span></td>
-                          <td style="font-weight:700">{{ m.label }}<span style="display:block;font-size:10.5px;font-weight:700;color:var(--blue-600);margin-top:2px">ver composição →</span></td>
-                          <td class="mono" style="text-align:right">{{ m.obras }}</td>
-                          <td class="mono" style="text-align:right;font-weight:700">{{ m.dias }}</td>
-                          <td>
-                            <span style="display:flex;height:9px;border-radius:99px;overflow:hidden;background:var(--slate-100)">
-                              <sc-for list="{{ m.faixas }}" as="f" hint-placeholder-count="3">
-                                <span style="{{ f.style }}"></span>
-                              </sc-for>
-                            </span>
-                          </td>
-                          <td class="mono" style="text-align:right">{{ m.pctDone }}</td>
-                        </tr>
-                      </sc-for>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
             </div>
           </sc-if>
 
@@ -838,7 +822,7 @@ a:hover{color:var(--blue-700)}
               </div>
             </div>
             <div style="{{ ganttLegendaWrapStyle }}">
-              <span style="{{ ganttHojeLegendaStyle }}"><span style="width:2px;height:12px;background:#EF4444;display:inline-block"></span>Hoje</span>
+              <span style="{{ ganttHojeLegendaStyle }}"><span style="width:2px;height:12px;background:#FF4747;display:inline-block"></span>Hoje</span>
               <sc-for list="{{ ganttLegend }}" as="l" hint-placeholder-count="3">
                 <span style="display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--slate-500)">
                   <span style="{{ l.dotStyle }}"></span>{{ l.label }}
@@ -1028,13 +1012,13 @@ a:hover{color:var(--blue-700)}
                 </sc-for>
                 {{ curvaTextosY }}
                 <path d="{{ curvaArea }}" fill="rgba(37,99,235,.12)"></path>
-                <polyline points="{{ curvaLine }}" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linejoin="round"></polyline>
-                <line x1="46" y1="{{ contratadoY }}" x2="610" y2="{{ contratadoY }}" stroke="#10B981" stroke-width="2" stroke-dasharray="6 5"></line>
+                <polyline points="{{ curvaLine }}" fill="none" stroke="#6C7CF5" stroke-width="2.5" stroke-linejoin="round"></polyline>
+                <line x1="46" y1="{{ contratadoY }}" x2="610" y2="{{ contratadoY }}" stroke="#4CC97A" stroke-width="2" stroke-dasharray="6 5"></line>
                 {{ curvaTextosX }}
               </svg>
               <div style="display:flex;gap:20px;margin-top:8px;flex-wrap:wrap;font-size:11.5px;color:var(--slate-500)">
-                <span style="display:inline-flex;align-items:center;gap:7px"><span style="width:14px;height:3px;background:#2563EB;border-radius:2px"></span>Medido acumulado (NF)</span>
-                <span style="display:inline-flex;align-items:center;gap:7px"><span style="width:14px;height:3px;background:#10B981;border-radius:2px"></span>Total contratado</span>
+                <span style="display:inline-flex;align-items:center;gap:7px"><span style="width:14px;height:3px;background:#6C7CF5;border-radius:2px"></span>Medido acumulado (NF)</span>
+                <span style="display:inline-flex;align-items:center;gap:7px"><span style="width:14px;height:3px;background:#4CC97A;border-radius:2px"></span>Total contratado</span>
               </div>
             </div>
           </div>
@@ -1062,7 +1046,7 @@ a:hover{color:var(--blue-700)}
                   </sc-for>
                 </div>
                 <div style="display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;font-size:11px;color:var(--slate-500)">
-                  <span style="display:inline-flex;align-items:center;gap:7px"><span style="width:14px;height:8px;border-radius:99px;background:#2563EB"></span>Realizado</span>
+                  <span style="display:inline-flex;align-items:center;gap:7px"><span style="width:14px;height:8px;border-radius:99px;background:#6C7CF5"></span>Realizado</span>
                   <span style="display:inline-flex;align-items:center;gap:7px"><span style="width:2px;height:12px;background:#1E293B"></span>Budget de referência</span>
                   <span class="mono" style="margin-left:auto">média {{ bc.media }}</span>
                 </div>
@@ -1730,8 +1714,8 @@ a:hover{color:var(--blue-700)}
               <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:14px">
                 <sc-for list="{{ lv.pessoas }}" as="p" hint-placeholder-count="1">
                   <div style="display:flex;flex-direction:column;gap:6px;max-width:420px">
-                  <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #8B5CF6;display:flex;align-items:center;gap:14px;padding:16px 22px;min-width:220px">
-                    <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#8B5CF6;background:#EFE9FE">{{ p.ini }}</div>
+                  <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #A78BEA;display:flex;align-items:center;gap:14px;padding:16px 22px;min-width:220px">
+                    <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#A78BEA;background:#EFE9FE">{{ p.ini }}</div>
                     <sc-if value="{{ p.ver }}" hint-placeholder-val="{{ true }}"><div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400)">{{ p.cargo }}</div><h2 style="margin:2px 0 0;font-size:20px;font-weight:900">{{ p.nome }}</h2></div></sc-if>
                     <sc-if value="{{ p.edit }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex;align-items:flex-start;gap:6px;min-width:0;flex:1">
@@ -1808,9 +1792,9 @@ a:hover{color:var(--blue-700)}
             <sc-for list="{{ b.an }}" as="a" hint-placeholder-count="3">
               <div style="display:flex;flex-direction:column;min-width:0">
                 <div style="width:2px;height:20px;background:var(--slate-200);align-self:center"></div>
-                <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #8B5CF6;padding:14px">
+                <div style="background:var(--card);border-radius:14px;box-shadow:var(--card-shadow);border-left:4px solid #A78BEA;padding:14px">
                   <div style="{{ a.headStyle }}">
-                    <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#8B5CF6;background:#EFE9FE">{{ a.ini }}</div>
+                    <div style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;color:#A78BEA;background:#EFE9FE">{{ a.ini }}</div>
                     <sc-if value="{{ a.ver }}" hint-placeholder-val="{{ true }}"><div><h3 style="margin:0;font-size:15px;font-weight:800;line-height:1.2">{{ a.n }}</h3><div style="font-size:11px;color:var(--slate-400);font-weight:600">{{ a.cargo }}</div></div></sc-if>
                     <sc-if value="{{ a.edit }}" hint-placeholder-val="{{ false }}">
                       <div style="display:flex;align-items:flex-start;gap:6px;min-width:0;flex:1">
@@ -1831,7 +1815,7 @@ a:hover{color:var(--blue-700)}
                     <div style="display:flex;justify-content:space-between;gap:6px;font-size:12px;color:var(--slate-500)"><span>{{ a.m2L }}</span><b class="mono" style="color:var(--color-text)">{{ a.m2 }}</b></div>
                   </div>
                   <div title="{{ a.mixT }}" style="display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:12px;background:var(--slate-100)">
-                    <i style="display:block;height:100%;background:#2563EB;width:{{ a.wg }}"></i><i style="display:block;height:100%;background:#F59E0B;width:{{ a.wm }}"></i><i style="display:block;height:100%;background:#94A0B4;width:{{ a.wx }}"></i>
+                    <i style="display:block;height:100%;background:#6C7CF5;width:{{ a.wg }}"></i><i style="display:block;height:100%;background:#F5A524;width:{{ a.wm }}"></i><i style="display:block;height:100%;background:#94A0B4;width:{{ a.wx }}"></i>
                   </div>
                   </sc-if>
                 </div>
@@ -1839,7 +1823,7 @@ a:hover{color:var(--blue-700)}
                   <div style="display:flex;flex-direction:column;gap:6px;margin:10px 0 0 14px;padding-left:12px;border-left:2px solid var(--slate-200)">
                     <sc-for list="{{ a.abaixo }}" as="p" hint-placeholder-count="1">
                       <div style="background:var(--card);border-radius:10px;box-shadow:var(--card-shadow);border-left:4px solid #C4B5FD;padding:8px 11px;display:flex;align-items:center;gap:9px">
-                        <div style="width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:10.5px;flex:none;color:#8B5CF6;background:#EFE9FE">{{ p.ini }}</div>
+                        <div style="width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:10.5px;flex:none;color:#A78BEA;background:#EFE9FE">{{ p.ini }}</div>
                         <sc-if value="{{ p.ver }}" hint-placeholder-val="{{ true }}"><div style="min-width:0"><div style="font-weight:800;font-size:12.5px">{{ p.nome }}</div><div style="font-size:10.5px;color:var(--slate-400);font-weight:600">{{ p.cargo }}</div></div></sc-if>
                         <sc-if value="{{ p.edit }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex;align-items:flex-start;gap:6px;min-width:0;flex:1">
@@ -1864,7 +1848,7 @@ a:hover{color:var(--blue-700)}
                       <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:800;font-size:13px"><span>{{ o.n }}</span><span style="font-size:9.5px;font-weight:900;letter-spacing:.04em;padding:2px 6px;border-radius:6px;flex:none;color:{{ o.cor }};background:{{ o.bg }}">{{ o.chip }}</span></div>
                       <div style="display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11.5px;color:var(--slate-400);margin-top:3px">
                         <span>{{ o.dados }}</span>
-                        <sc-if value="{{ o.est }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px;font-weight:800;color:#B45309;background:#FEF3E2;border:1px dashed #F59E0B;border-radius:6px;padding:0 5px">estimativo</span></sc-if>
+                        <sc-if value="{{ o.est }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px;font-weight:800;color:#B45309;background:#FEF3E2;border:1px dashed #F5A524;border-radius:6px;padding:0 5px">estimativo</span></sc-if>
                       </div>
                     </sc-if>
                     <sc-if value="{{ o.edit }}" hint-placeholder-val="{{ false }}">
@@ -1913,7 +1897,7 @@ a:hover{color:var(--blue-700)}
                       <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:800;font-size:13px"><span>{{ o.n }}</span><span style="font-size:9.5px;font-weight:900;letter-spacing:.04em;padding:2px 6px;border-radius:6px;flex:none;color:{{ o.cor }};background:{{ o.bg }}">{{ o.chip }}</span></div>
                       <div style="display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11.5px;color:var(--slate-400);margin-top:3px">
                         <span>{{ o.dados }}</span>
-                        <sc-if value="{{ o.est }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px;font-weight:800;color:#B45309;background:#FEF3E2;border:1px dashed #F59E0B;border-radius:6px;padding:0 5px">estimativo</span></sc-if>
+                        <sc-if value="{{ o.est }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px;font-weight:800;color:#B45309;background:#FEF3E2;border:1px dashed #F5A524;border-radius:6px;padding:0 5px">estimativo</span></sc-if>
                       </div>
                     </sc-if>
                     <sc-if value="{{ o.edit }}" hint-placeholder-val="{{ false }}">
@@ -1937,9 +1921,9 @@ a:hover{color:var(--blue-700)}
           </sc-if>
           <div style="margin-top:26px;width:100%;max-width:980px;display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--slate-500)">
             <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
-              <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:4px;height:16px;border-radius:2px;background:#2563EB"></i>Gadens (GD)</span>
-              <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:4px;height:16px;border-radius:2px;background:#F59E0B"></i>Make It (MK)</span>
-              <span style="display:inline-flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:800;color:#B45309;background:#FEF3E2;border:1px dashed #F59E0B;border-radius:6px;padding:0 5px">estimativo</span>valor estimado</span>
+              <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:4px;height:16px;border-radius:2px;background:#6C7CF5"></i>Gadens (GD)</span>
+              <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:4px;height:16px;border-radius:2px;background:#F5A524"></i>Make It (MK)</span>
+              <span style="display:inline-flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:800;color:#B45309;background:#FEF3E2;border:1px dashed #F5A524;border-radius:6px;padding:0 5px">estimativo</span>valor estimado</span>
             </div>
             <sc-if value="{{ orgTemEst }}" hint-placeholder-val="{{ false }}"><div><strong style="color:var(--color-text)">* Totais incluem estimativas:</strong> {{ orgEstTxt }}</div></sc-if>
             <sc-if value="{{ orgVer }}" hint-placeholder-val="{{ true }}">
@@ -2103,146 +2087,132 @@ a:hover{color:var(--blue-700)}
       <sc-if value="{{ isFornecedores }}" hint-placeholder-val="{{ false }}">
         <section style="display:flex;flex-direction:column;gap:18px">
           <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
-            <h3 style="font-size:15px">Fornecedores cadastrados</h3>
-            <p style="margin:3px 0 14px;font-size:12px;color:var(--slate-400)">Cadastre os projetistas que atendem as obras e vincule cada linha da tabela abaixo. Cadastro único com o Lançamento Financeiro: fornecedores e vínculos valem para todos os usuários. CNPJ e contatos ficam em Lançamento Financeiro → Fornecedores.</p>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
-              <sc-for list="{{ fnChips }}" as="f" hint-placeholder-count="8">
-                <span style="display:inline-flex;align-items:center;gap:8px;background:var(--blue-50);color:var(--blue-700);border-radius:99px;padding:5px 6px 5px 13px;font-size:12.5px;font-weight:700;white-space:nowrap;max-width:100%">
-                  <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">{{ f.nome }}</span>
-                  <span class="mono" style="font-size:11px;opacity:.7">{{ f.n }}</span>
-                  <button onClick="{{ f.remove }}" style="border:0;background:rgba(37,99,235,.12);color:inherit;width:19px;height:19px;border-radius:50%;cursor:pointer;font-size:11px;line-height:1">✕</button>
-                </span>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+              <div>
+                <h3 style="font-size:15px">Obras × disciplinas × projetistas</h3>
+                <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Cada coluna é uma obra e cada cartão é uma disciplina. Escolha o projetista no cartão. Role para o lado para ver as outras obras.</p>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <span class="mono" style="font-size:12px;color:var(--slate-400)">{{ fnCount }}</span>
+                <button class="btn" onClick="{{ fnBancoTog }}">{{ fnBancoLabel }}</button>
+              </div>
+            </div>
+            <sc-if value="{{ fnBancoAberto }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:14px;padding:14px;border-radius:12px;background:var(--slate-50);display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <input type="text" value="{{ fnNew }}" onChange="{{ setFnNew }}" onKeyDown="{{ fnKey }}" placeholder="Novo fornecedor / projetista..." style="flex:1;min-width:240px;height:36px;border:1px solid var(--slate-200);border-radius:12px;padding:0 12px;font-family:var(--font-body);font-size:13px;background:var(--card);color:var(--color-text)">
+                  <button class="btn" onClick="{{ fnAdd }}" style="background:var(--blue-600);color:#fff;border-color:var(--blue-600)">Adicionar</button>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ fnChips }}" as="f" hint-placeholder-count="8">
+                    <span style="display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--slate-200);border-radius:99px;padding:4px 5px 4px 12px;font-size:12px;font-weight:600;white-space:nowrap">
+                      <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">{{ f.nome }}</span>
+                      <span class="mono" style="font-size:10.5px;color:var(--slate-400)">{{ f.n }}</span>
+                      <button onClick="{{ f.remove }}" title="Excluir fornecedor" style="border:0;background:var(--slate-100);color:var(--slate-500);width:18px;height:18px;border-radius:50%;cursor:pointer;font-size:10px;line-height:1">✕</button>
+                    </span>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 12px">
+              <select value="{{ fnObra }}" onChange="{{ setFnObra }}" style="height:36px;border:1px solid var(--slate-200);border-radius:12px;padding:0 10px;font-family:var(--font-body);font-size:13px;background:var(--card);color:var(--color-text)">
+                <sc-for list="{{ fnObraOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.label }}</option></sc-for>
+              </select>
+              <select value="{{ fnDisc }}" onChange="{{ setFnDisc }}" style="height:36px;border:1px solid var(--slate-200);border-radius:12px;padding:0 10px;font-family:var(--font-body);font-size:13px;background:var(--card);color:var(--color-text)">
+                <sc-for list="{{ fnDiscOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.label }}</option></sc-for>
+              </select>
+              <select value="{{ fnVinc }}" onChange="{{ setFnVinc }}" style="height:36px;border:1px solid var(--slate-200);border-radius:12px;padding:0 10px;font-family:var(--font-body);font-size:13px;background:var(--card);color:var(--color-text)">
+                <option value="all">Todos os vínculos</option><option value="linked">Somente vinculados</option><option value="unlinked">Somente não vinculados</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x proximity;align-items:flex-start">
+              <sc-for list="{{ fnKanban }}" as="k" hint-placeholder-count="4">
+                <div style="flex:0 0 280px;scroll-snap-align:start;background:var(--slate-100);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px;max-height:620px">
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:2px 4px 4px">
+                    <span style="font-size:13px;font-weight:600;min-width:0;overflow-wrap:anywhere"><span class="mono" style="color:var(--blue-600);margin-right:6px">{{ k.sigla }}</span>{{ k.obra }}</span>
+                    <span style="{{ k.contStyle }}">{{ k.cont }}</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;padding:1px">
+                    <sc-for list="{{ k.cards }}" as="r" hint-placeholder-count="5">
+                      <div style="{{ r.cardStyle }}">
+                        <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><span style="font-size:12.5px;font-weight:600;line-height:1.3;overflow-wrap:anywhere">{{ r.disciplina }}</span><span class="mono" style="font-size:10.5px;color:var(--slate-400);white-space:nowrap">{{ r.count }} entr.</span></div>
+                        <span class="mono" style="font-size:10.5px;color:var(--slate-500)">{{ r.periodo }}</span>
+                        <select value="{{ r.value }}" onChange="{{ r.onChange }}" style="{{ r.selStyle }}">
+                          <option value="">— sem projetista —</option>
+                          <sc-for list="{{ fnFornOpts }}" as="f" hint-placeholder-count="6"><option value="{{ f.id }}">{{ f.nome }}</option></sc-for>
+                        </select>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
               </sc-for>
             </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <input type="text" value="{{ fnNew }}" onChange="{{ setFnNew }}" onKeyDown="{{ fnKey }}" placeholder="Nome do fornecedor / projetista..." style="flex:1;min-width:240px;height:38px;border:1px solid var(--slate-200);border-radius:12px;padding:0 12px;font-family:var(--font-body);font-size:13px;background:var(--card);color:var(--color-text)">
-              <button class="btn" onClick="{{ fnAdd }}" style="background:var(--blue-600);color:#fff;border-color:var(--blue-600)">Adicionar</button>
-            </div>
+            <p style="{{ fnKanbanVazioStyle }}">Nenhuma combinação obra × disciplina para os filtros escolhidos.</p>
           </div>
 
           <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
               <div>
-                <h3 style="font-size:15px">Vínculo obra × disciplina</h3>
-                <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Entregas de projetista agrupadas por obra e disciplina</p>
+                <h3 style="font-size:15px">Sobrecarga por fornecedor</h3>
+                <p style="margin:3px 0 0;font-size:12px;color:var(--slate-400)">Pico de entregas simultâneas no tempo · clique no nome do fornecedor para ver o Gantt detalhado</p>
               </div>
-              <span class="mono" style="font-size:12px;color:var(--slate-400)">{{ fnCount }}</span>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--slate-500)">
+                <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#4CC97A"></span>1</span>
+                <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#F5A524"></span>2</span>
+                <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#FF4747"></span>3 ou mais</span>
+              </div>
             </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0">
-              <select value="{{ fnObra }}" onChange="{{ setFnObra }}" style="height:36px;border:1px solid var(--slate-200);border-radius:12px;padding:0 10px;font-family:var(--font-body);font-size:13px;background:var(--card);color:var(--color-text)">
-                <sc-for list="{{ fnObraOpts }}" as="o" hint-placeholder-count="6">
-                  <option value="{{ o.v }}">{{ o.label }}</option>
-                </sc-for>
-              </select>
-              <select value="{{ fnDisc }}" onChange="{{ setFnDisc }}" style="height:36px;border:1px solid var(--slate-200);border-radius:12px;padding:0 10px;font-family:var(--font-body);font-size:13px;background:var(--card);color:var(--color-text)">
-                <sc-for list="{{ fnDiscOpts }}" as="o" hint-placeholder-count="6">
-                  <option value="{{ o.v }}">{{ o.label }}</option>
-                </sc-for>
-              </select>
-              <select value="{{ fnVinc }}" onChange="{{ setFnVinc }}" style="height:36px;border:1px solid var(--slate-200);border-radius:12px;padding:0 10px;font-family:var(--font-body);font-size:13px;background:var(--card);color:var(--color-text)">
-                <option value="all">Todos os vínculos</option>
-                <option value="linked">Somente vinculados</option>
-                <option value="unlinked">Somente não vinculados</option>
-              </select>
-            </div>
-            <div style="max-height:520px;overflow-y:auto">
-              <table class="table">
-                <thead><tr><th style="width:24%">Obra</th><th style="width:20%">Disciplina</th><th>Entregas</th><th>Período</th><th style="width:24%">Fornecedor</th></tr></thead>
-                <tbody>
-                  <sc-for list="{{ fnRows }}" as="r" hint-placeholder-count="8">
-                    <tr>
-                      <td><span class="mono" style="color:var(--blue-600);font-weight:700;font-size:11px">{{ r.sigla }}</span> {{ r.obra }}</td>
-                      <td>{{ r.disciplina }}</td>
-                      <td class="mono">{{ r.count }}</td>
-                      <td class="mono" style="color:var(--slate-500);white-space:nowrap">{{ r.periodo }}</td>
-                      <td>
-                        <select value="{{ r.value }}" onChange="{{ r.onChange }}" style="{{ r.selStyle }}">
-                          <option value="">— não vinculado —</option>
-                          <sc-for list="{{ fnFornOpts }}" as="f" hint-placeholder-count="6">
-                            <option value="{{ f.id }}">{{ f.nome }}</option>
-                          </sc-for>
-                        </select>
-                      </td>
-                    </tr>
-                  </sc-for>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div style="background:var(--card);border:1px solid var(--slate-100);border-radius:16px;padding:20px 22px;box-shadow:var(--card-shadow)">
-            <h3 style="font-size:15px">Sobrecarga por fornecedor</h3>
-            <p style="margin:3px 0 14px;font-size:12px;color:var(--slate-400)">Entregas no tempo e janelas com entregas simultâneas em obras diferentes</p>
             <sc-if value="{{ fnSemVinculo }}" hint-placeholder-val="{{ false }}">
-              <p style="font-size:13px;color:var(--slate-400);margin:0">Nenhum fornecedor vinculado ainda. Vincule linhas na tabela acima para ver a análise.</p>
+              <p style="font-size:13px;color:var(--slate-400);margin:14px 0 0">Nenhum fornecedor vinculado ainda. Escolha o projetista nos cartões acima para ver a análise.</p>
             </sc-if>
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <sc-for list="{{ fnCards }}" as="c" hint-placeholder-count="4">
-                <div style="border:1px solid var(--slate-100);border-radius:14px;overflow:hidden">
-                  <button onClick="{{ c.go }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:13px 16px;border:0;background:var(--slate-50);cursor:pointer;text-align:left;font-family:var(--font-body)">
-                    <span style="{{ c.chevStyle }}">▸</span>
-                    <span style="font-size:13.5px;font-weight:700">{{ c.nome }}</span>
-                    <span style="display:flex;gap:6px;margin-left:auto;flex-wrap:wrap">
-                      <sc-for list="{{ c.pills }}" as="p" hint-placeholder-count="3">
-                        <span style="{{ p.style }}">{{ p.label }}</span>
-                      </sc-for>
-                    </span>
-                  </button>
-                  <sc-if value="{{ c.aberto }}" hint-placeholder-val="{{ false }}">
-                    <div style="padding:16px;border-top:1px solid var(--slate-100)">
-                      <div style="overflow-x:auto" ref="{{ c.gantt.ref }}">
-                        <div style="{{ c.gantt.minStyle }}">
-                          <div style="height:22px;position:relative;margin-left:220px">
-                            <sc-for list="{{ c.gantt.ticks }}" as="k" hint-placeholder-count="8">
-                              <span style="{{ k.style }}">{{ k.label }}</span>
-                            </sc-for>
-                          </div>
-                          <sc-for list="{{ c.gantt.rows }}" as="r" hint-placeholder-count="6">
-                            <div style="display:flex;align-items:center;min-height:26px">
-                              <div style="width:220px;flex-shrink:0;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:12px;position:sticky;left:0;z-index:2;background:var(--card)">
-                                <span class="mono" style="color:var(--blue-600);font-weight:700;font-size:10.5px">{{ r.sigla }}</span> {{ r.label }}
-                              </div>
-                              <div style="flex:1;position:relative;height:26px">
-                                <div style="{{ r.todayStyle }}"></div>
-                                <div style="{{ r.barStyle }}" title="{{ r.title }}"></div>
-                              </div>
-                            </div>
-                          </sc-for>
-                        </div>
-                      </div>
-                      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:12px">
-                        <sc-for list="{{ c.legend }}" as="l" hint-placeholder-count="3">
-                          <span style="display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--slate-500)"><span style="{{ l.dotStyle }}"></span>{{ l.label }}</span>
-                        </sc-for>
-                      </div>
-                      <sc-if value="{{ c.temJanelas }}" hint-placeholder-val="{{ false }}">
-                        <div style="margin-top:16px">
-                          <div style="font-size:12.5px;font-weight:800;margin-bottom:8px">Janelas com entregas simultâneas</div>
-                          <div style="display:flex;flex-direction:column;gap:6px">
-                            <sc-for list="{{ c.janelas }}" as="w" hint-placeholder-count="4">
-                              <div style="display:flex;align-items:center;gap:10px;font-size:12px;flex-wrap:wrap">
-                                <span style="{{ w.badgeStyle }}">{{ w.n }}</span>
-                                <span style="flex:1;min-width:180px;color:var(--slate-600)">{{ w.itens }}</span>
-                                <span class="mono" style="color:var(--slate-400);white-space:nowrap">{{ w.periodo }}</span>
-                              </div>
-                            </sc-for>
-                          </div>
-                        </div>
-                      </sc-if>
-                      <sc-if value="{{ c.semJanelas }}" hint-placeholder-val="{{ false }}">
-                        <p style="margin:14px 0 0;font-size:12px;color:var(--slate-400)">Nenhuma sobreposição detectada — as entregas deste fornecedor não se cruzam no tempo.</p>
-                      </sc-if>
-                    </div>
-                  </sc-if>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+              <sc-for list="{{ fnBarras }}" as="b" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <button onClick="{{ b.go }}" title="Ver Gantt detalhado" style="width:230px;flex-shrink:0;text-align:right;border:0;background:transparent;cursor:pointer;font-family:var(--font-body);font-size:12.5px;font-weight:600;color:var(--color-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:4px 6px;border-radius:8px" style-hover="background:var(--slate-100)">{{ b.nome }}</button>
+                  <div onClick="{{ b.go }}" title="Ver Gantt detalhado" style="flex:1;height:22px;background:var(--slate-100);border-radius:6px;position:relative;overflow:hidden;cursor:pointer"><span style="{{ b.barStyle }}"></span></div>
+                  <span class="mono" style="width:34px;font-size:12.5px;font-weight:600;text-align:right">{{ b.pico }}</span>
+                  <span style="width:150px;font-size:11px;color:var(--slate-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.sub }}</span>
                 </div>
               </sc-for>
             </div>
+            <div style="{{ fnEixoStyle }}"><sc-for list="{{ fnEixo }}" as="x"><span style="{{ x.style }}">{{ x.t }}</span></sc-for></div>
           </div>
         </section>
       </sc-if>
 
     </div>
   </main>
+
+  <sc-if value="{{ fnModalOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fnModalFechar }}" style="position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:flex-start;justify-content:center;padding:48px 24px;z-index:60;overflow-y:auto">
+      <div onClick="{{ stop }}" style="width:100%;max-width:1180px;background:var(--card);border-radius:20px;box-shadow:0 18px 50px rgba(15,23,42,.25);padding:24px 26px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
+          <div><span style="font-size:12px;color:var(--slate-400)">Gantt detalhado do fornecedor</span><h2 style="font-size:21px;margin:6px 0 4px">{{ fnM.nome }}</h2>
+            <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ fnM.pills }}" as="p"><span style="{{ p.style }}">{{ p.label }}</span></sc-for></div></div>
+          <button class="btn" onClick="{{ fnModalFechar }}">Fechar</button>
+        </div>
+        <div style="overflow-x:auto" ref="{{ fnM.gantt.ref }}">
+          <div style="{{ fnM.gantt.minStyle }}">
+            <div style="height:22px;position:relative;margin-left:220px"><sc-for list="{{ fnM.gantt.ticks }}" as="k"><span style="{{ k.style }}">{{ k.label }}</span></sc-for></div>
+            <sc-for list="{{ fnM.gantt.rows }}" as="r">
+              <div style="display:flex;align-items:center;min-height:26px">
+                <div style="width:220px;flex-shrink:0;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:12px;position:sticky;left:0;z-index:2;background:var(--card)"><span class="mono" style="color:var(--blue-600);font-weight:700;font-size:10.5px">{{ r.sigla }}</span> {{ r.label }}</div>
+                <div style="flex:1;position:relative;height:26px"><div style="{{ r.todayStyle }}"></div><div style="{{ r.barStyle }}" title="{{ r.title }}"></div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap"><sc-for list="{{ fnM.legend }}" as="l"><span style="display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--slate-500)"><span style="{{ l.dotStyle }}"></span>{{ l.label }}</span></sc-for></div>
+        <div style="{{ fnM.janStyle }}">
+          <div style="font-size:12.5px;font-weight:600;margin-bottom:8px">Janelas com entregas simultâneas</div>
+          <div style="display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto">
+            <sc-for list="{{ fnM.janelas }}" as="w"><div style="display:flex;align-items:center;gap:10px;font-size:12px;flex-wrap:wrap"><span style="{{ w.badgeStyle }}">{{ w.n }}</span><span style="flex:1;min-width:180px;color:var(--slate-600)">{{ w.itens }}</span><span class="mono" style="color:var(--slate-400);white-space:nowrap">{{ w.periodo }}</span></div></sc-for>
+          </div>
+        </div>
+        <p style="{{ fnM.semJanStyle }}">Nenhuma sobreposição: as entregas deste fornecedor não se cruzam no tempo.</p>
+      </div>
+    </div>
+  </sc-if>
 
   <!-- ══════════ MODAL DA OBRA ══════════ -->
   <sc-if value="{{ obraModalOpen }}" hint-placeholder-val="{{ false }}">
@@ -2587,19 +2557,19 @@ class Component extends DCLogic {
   UKEY = "gadens.uploads.v1";
   TKEY = "gadens.tema.v1";
   RKEY = "gadens.restricoes.v1";
-  RLISTAS = [["obra", "Restrições com a obra", "#EF4444"], ["inc", "Restrições de incorporação", "#8B5CF6"], ["ger", "Restrições gerais", "#64748B"]];
+  RLISTAS = [["obra", "Restrições com a obra", "#FF4747"], ["inc", "Restrições de incorporação", "#A78BEA"], ["ger", "Restrições gerais", "#64748B"]];
   FONTES = {
-    indicadores: { titulo: "Indicadores de engenharia", arquivo: "DADOS INDICADORES 120926.xlsx", cor: "#2563EB",
+    indicadores: { titulo: "Indicadores de engenharia", arquivo: "DADOS INDICADORES 120926.xlsx", cor: "#6C7CF5",
       alimenta: "Riscos, Linha de Base Oficializada, Desvio de LB de PE, Alterações, Estouro, Qualidade e Economia. Export da lista do ClickUp." },
-    cronograma: { titulo: "Cronograma de obras", arquivo: "CRONO MAKE IT 110926.xlsx", cor: "#8B5CF6",
+    cronograma: { titulo: "Cronograma de obras", arquivo: "CRONO MAKE IT 110926.xlsx", cor: "#A78BEA",
       alimenta: "Prazos e Geral: % de complementares, fase do projeto, linha axial, Gantt, vida útil e datas de Pré-executivo. Export do ClickUp com a coluna Classe Datas Marco." },
-    saidas: { titulo: "Financeiro — SAÍDAS Make It", arquivo: "SAÍDAS - MAKE IT R01.xlsx", cor: "#10B981",
+    saidas: { titulo: "Financeiro — SAÍDAS Make It", arquivo: "SAÍDAS - MAKE IT R01.xlsx", cor: "#4CC97A",
       alimenta: "Contratado, notas fiscais (curva S) e os índices de R$/m² e R$/UH da aba CNPJ MAKE IT." },
-    saidasGadens: { titulo: "Financeiro — SAÍDAS Gadens", arquivo: "SAÍDAS - GADENS.xlsx", cor: "#06B6D4",
+    saidasGadens: { titulo: "Financeiro — SAÍDAS Gadens", arquivo: "SAÍDAS - GADENS.xlsx", cor: "#33C3F0",
       alimenta: "Contratos e pagamentos da aba GERAL e os índices de R$/m² e R$/UH da aba ORÇAMENTOS." },
-    pendencias: { titulo: "Pendências de gestão", arquivo: "COMPL ATIVIDADES - Pendências Gestão.xlsx", cor: "#EF4444",
+    pendencias: { titulo: "Pendências de gestão", arquivo: "COMPL ATIVIDADES - Pendências Gestão.xlsx", cor: "#FF4747",
       alimenta: "Restrições com a obra, de incorporação e gerais da aba Reunião Diretoria. Export semanal da lista COMPL | ATIVIDADES - Lista Pendências Gestão." },
-    siglas: { titulo: "Planilha de siglas", arquivo: "PLANILHA DE SIGLAS.xlsx", cor: "#F59E0B",
+    siglas: { titulo: "Planilha de siglas", arquivo: "PLANILHA DE SIGLAS.xlsx", cor: "#F5A524",
       alimenta: "Nomes dos empreendimentos, siglas e unidade de negócio — é a chave que liga todas as bases." }
   };
 
@@ -2800,7 +2770,14 @@ class Component extends DCLogic {
     this.aplicaTema(t);
     try { localStorage.setItem(this.TKEY, t); } catch (e) { /* sessão apenas */ }
   }
-  componentDidUpdate() { this.aplicaTema(this.state.tema); this.procMontar(); this.fechMontar(); this.finMontar(); this.obrasSincroniza(); this.obrasMontar(); }
+  animaPagina() {
+    const chave = (this.state.page || "") + "|" + (this.state.subPage || "");
+    if (this._pgAnim === chave) return; this._pgAnim = chave;
+    const el = document.querySelector("main > div"); if (!el) return;
+    el.classList.remove("snow-pagina"); void el.offsetWidth; el.classList.add("snow-pagina");
+    const m = document.querySelector("main"); if (m) m.scrollTop = 0;
+  }
+  componentDidUpdate() { this.animaPagina(); this.aplicaTema(this.state.tema); this.procMontar(); this.fechMontar(); this.finMontar(); this.obrasSincroniza(); this.obrasMontar(); }
   // Cadastro de Obras sempre completo: quando um admin abre o painel, toda obra existente (Mapa das fontes/ClickUp,
   // Lançamento Financeiro e TAP) que ainda não está no cadastro é incluída, e campos vazios (link do ClickUp, endereço,
   // UH, m², VGV, budget, SPE…) são preenchidos. Nunca sobrescreve o que alguém já digitou, nem recria obra excluída.
@@ -3382,9 +3359,9 @@ class Component extends DCLogic {
     { tipo: "cronograma", nome: "Pe Agostinho", sigla: "PAG", bu: "Gadens Inc", link: "https://app.clickup.com/9013344143/v/f/901310219261" }
   ];
   MF_TIPOS = {
-    cronograma: ["#8B5CF6", "Geral, Prazos, Reunião Diretoria (linha axial), Follow-up, Gestão de Analistas"],
-    indicadores: ["#2563EB", "Indicadores, Riscos de Engenharia, Desvio de LB de PE, Follow-up (riscos)"],
-    pendencias: ["#EF4444", "Reunião Diretoria (restrições)"]
+    cronograma: ["#A78BEA", "Geral, Prazos, Reunião Diretoria (linha axial), Follow-up, Gestão de Analistas"],
+    indicadores: ["#6C7CF5", "Indicadores, Riscos de Engenharia, Desvio de LB de PE, Follow-up (riscos)"],
+    pendencias: ["#FF4747", "Reunião Diretoria (restrições)"]
   };
   mfView(link) {
     const s = String(link || ""), li = s.match(/\/v\/li\/(\d+)/), fo = s.match(/\/v\/f\/(\d+)/), m = s.match(/(8[a-z0-9]{5,}-\d{3,})/i);
@@ -3409,7 +3386,7 @@ class Component extends DCLogic {
     const lista = this.mfLista();
     const pill = (bg, fg) => "display:inline-block;font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:99px;white-space:nowrap;background:" + bg + ";color:" + fg;
     const linhas = lista.map((f, i) => {
-      const v = this.mfView(f.link), l = lidas.find(x => x.view === v), t = this.MF_TIPOS[f.tipo] || ["#94A3B8", ""];
+      const v = this.mfView(f.link), l = lidas.find(x => x.view === v), t = this.MF_TIPOS[f.tipo] || ["#B4B7C0", ""];
       const upT = (this.state.uploads || {})[f.tipo];
       const cand = [[d && d.fontesUltima && d.fontesUltima[v], "robô"], [l && !l.erro && l.n && a ? String(a.quando).slice(0, 10) : null, "robô"],
         [f.tipo === "pendencias" && d && d.pendencias ? d.pendencias.quando : null, "base publicada"], [upT ? upT.quando : null, "upload neste navegador"],
@@ -3437,8 +3414,8 @@ class Component extends DCLogic {
         remStyle: adm ? "cursor:pointer;border:0;background:transparent;color:var(--slate-400);font-size:18px;line-height:1" : "display:none" };
     });
     const up = this.state.uploads || {};
-    [["Financeiro · SAÍDAS", "#10B981", "Financeiro, Geral (budget), Follow-up (viabilidade e composição)", "saidas"],
-     ["Planilha de siglas", "#F59E0B", "Liga cada tarefa à obra pela sigla · todas as abas", "siglas"]].forEach(m => linhas.push({
+    [["Financeiro · SAÍDAS", "#4CC97A", "Financeiro, Geral (budget), Follow-up (viabilidade e composição)", "saidas"],
+     ["Planilha de siglas", "#F5A524", "Liga cada tarefa à obra pela sigla · todas as abas", "siglas"]].forEach(m => linhas.push({
       atual: up[m[3]] ? this.br(up[m[3]].quando) : d && d.geradoEm ? this.br(d.geradoEm) : "—", atualSub: up[m[3]] ? "upload neste navegador" : "base publicada",
       nome: m[0], modo: "Manual · upload nesta aba", link: "", linkTxt: "Envie o .xlsx em Atualizar dados, abaixo", editavel: false, fixo: true,
       dot: "width:10px;height:10px;border-radius:3px;flex-shrink:0;background:" + m[1], alimenta: m[2], viewTxt: "", viewStyle: "display:none",
@@ -3481,27 +3458,27 @@ class Component extends DCLogic {
         (this.state.upLoading ? "var(--slate-300)" : "var(--blue-600)") + ";color:#fff;white-space:nowrap",
       upMsg: this.state.upMsg || "",
       guias: [
-        { pill: "Cronograma Gadens", cor: "#F59E0B", titulo: "Atualização de datas · Gadens Inc",
+        { pill: "Cronograma Gadens", cor: "#F5A524", titulo: "Atualização de datas · Gadens Inc",
           url: "https://app.clickup.com/9013344143/v/gr/8cktdwf-104773", img: "", linkLabel: "Abrir visualização da Gadens ↗",
           passos: ["1. Atualização automática: o robô do GitHub lê esta visualização todo dia às 7h, junto com a da Make It",
             "2. Para atualizar à mão: abra a visualização → Exportar visualização → Excel → Colunas visíveis → Baixar",
             "3. Mantenha a coluna Classe Datas Marco visível na visualização",
             "4. Envie o arquivo aqui: atualiza Prazos, Geral e Follow-up das obras da Gadens"] },
-        { pill: "Datas e cronograma", cor: "#8B5CF6", titulo: "Atualização de datas",
+        { pill: "Datas e cronograma", cor: "#A78BEA", titulo: "Atualização de datas",
           url: "https://app.clickup.com/9013344143/v/gr/8cktdwf-90873", img: "data/guia-datas.png",
           linkLabel: "Abrir visualização COM | DADOS ↗",
           passos: ["1. Espaços → Todas as tarefas (Grupo Gadens)",
             "2. Aba COM | DADOS → clique no nome da visualização",
             "3. Exportar visualização → Excel → Colunas visíveis → Baixar",
             "4. Envie o arquivo aqui: atualiza Prazos, Geral e a fonte Cronograma"] },
-        { pill: "Indicadores", cor: "#2563EB", titulo: "Atualização de indicadores",
+        { pill: "Indicadores", cor: "#6C7CF5", titulo: "Atualização de indicadores",
           url: "https://app.clickup.com/9013344143/v/gr/8cktdwf-91333", img: "data/guia-indicadores.png",
           linkLabel: "Abrir visualização COM | INDICADORES ↗",
           passos: ["1. Espaços → COMPL | Gestão",
             "2. Aba COM | INDICADORES → clique no nome da visualização",
             "3. Exportar visualização → Excel → Colunas visíveis → Baixar",
             "4. Envie o arquivo aqui: atualiza Indicadores e Riscos"] },
-        { pill: "Restrições", cor: "#EF4444", titulo: "Atualização de pendências de gestão",
+        { pill: "Restrições", cor: "#FF4747", titulo: "Atualização de pendências de gestão",
           url: "https://sharing.clickup.com/9013344143/gr/h/8cktdwf-98893/f6f7e1cf61f7996",
           img: "data/guia-pendencias.png", linkLabel: "Abrir lista no ClickUp ↗",
           passos: ["1. Espaços → COMPL | Gestão",
@@ -3519,11 +3496,11 @@ class Component extends DCLogic {
         linkStyle: g.url ? "margin-top:4px;align-self:flex-start;font-size:11.5px;font-weight:800;color:var(--blue-600);text-decoration:none" : "display:none"
       })),
       finGuias: [
-        { titulo: "Make It", arquivo: "SAÍDAS - MAKE IT R01.xlsx", cor: "#10B981",
+        { titulo: "Make It", arquivo: "SAÍDAS - MAKE IT R01.xlsx", cor: "#4CC97A",
           abas: [["Contratado", "Empreendimento, disciplina, fornecedor e valor do contrato — vira o total contratado e a composição por disciplina."],
             ["NF", "Notas emitidas com mês e ano de pagamento — alimentam o medido e a curva S de desembolso."],
             ["CNPJ MAKE IT", "Unidades, m² construídos, VGV e budget disponível — geram R$/m², R$/UH, o selo dentro/acima do budget e o mapa (coluna Endereço)."]] },
-        { titulo: "Gadens Inc", arquivo: "SAÍDAS - GADENS.xlsx", cor: "#06B6D4",
+        { titulo: "Gadens Inc", arquivo: "SAÍDAS - GADENS.xlsx", cor: "#33C3F0",
           abas: [["GERAL", "Uma linha por pagamento: valor total do contrato, valor pago, mês e ano. O painel usa o valor total mais recente de cada contrato."],
             ["ORÇAMENTOS", "Unidades, m², VGV e budget por obra — geram R$/m² e R$/UH da Gadens."],
             ["DADOS", "Lista de contratados por disciplina — referência de fornecedores."]] }
@@ -3572,8 +3549,8 @@ class Component extends DCLogic {
     const uh = ec.unidades != null ? ec.unidades : (bm ? bm.unidades : null);
     const m2 = ec.m2 != null ? ec.m2 : (bm ? bm.m2 : null);
     const vgv = ec.vgv != null ? ec.vgv : (bm ? bm.vgv : null);
-    const CIDCOR = { "Pinhais": "#2563EB", "Curitiba": "#8B5CF6", "São José dos Pinhais": "#10B981",
-      "Araucária": "#F59E0B", "Almirante Tamandaré": "#EF4444" };
+    const CIDCOR = { "Pinhais": "#6C7CF5", "Curitiba": "#A78BEA", "São José dos Pinhais": "#4CC97A",
+      "Araucária": "#F5A524", "Almirante Tamandaré": "#FF4747" };
     const cor = g ? (CIDCOR[g.cidade] || "#64748B") : "#64748B";
     const W = 620, H = 260;
     const mapa = g ? {
@@ -3691,18 +3668,18 @@ class Component extends DCLogic {
     const totBu = buSel === "Make It" ? mk : buSel === "Gadens Inc" ? gd : null;
     const consKpis = [
       { label: "Budget contratado", value: money(contratado),
-        sub: list.length + " obras" + (buSel === "Todos" ? " no filtro" : " · " + buSel), icon: "R$", cor: "#2563EB" },
-      { label: "Budget disponível", value: money(disp), sub: disp ? Math.round((contratado / disp) * 100) + "% comprometido" : "Sem budget na planilha", icon: "◱", cor: "#10B981" }
+        sub: list.length + " obras" + (buSel === "Todos" ? " no filtro" : " · " + buSel), icon: "R$", cor: "#6C7CF5" },
+      { label: "Budget disponível", value: money(disp), sub: disp ? Math.round((contratado / disp) * 100) + "% comprometido" : "Sem budget na planilha", icon: "◱", cor: "#4CC97A" }
     ].concat(totBu
-      ? [m2Kpi(buSel, totBu, "#8B5CF6"),
+      ? [m2Kpi(buSel, totBu, "#A78BEA"),
          { label: "Área construída", value: totBu.m2 ? Math.round(totBu.m2).toLocaleString("pt-BR") + " m²" : "—",
-           sub: totBu.n + (totBu.n === 1 ? " obra com m²" : " obras com m²"), icon: "◳", cor: "#F59E0B" }]
-      : [m2Kpi("Make It", mk, "#8B5CF6"), m2Kpi("Gadens", gd, "#F59E0B")]
+           sub: totBu.n + (totBu.n === 1 ? " obra com m²" : " obras com m²"), icon: "◳", cor: "#F5A524" }]
+      : [m2Kpi("Make It", mk, "#A78BEA"), m2Kpi("Gadens", gd, "#F5A524")]
     ).map(k => ({ label: k.label, value: k.value, sub: k.sub, icon: k.icon, flag: "", flagStyle: "display:none", cardStyle: card(k.cor), iconStyle: ik(k.cor) }));
 
     // fases médias
     const ORDEM = ["Estudo Preliminar", "Anteprojeto", "Pré-executivo", "Executivo"];
-    const CORF = { "Estudo Preliminar": "#10B981", "Anteprojeto": "#06B6D4", "Pré-executivo": "#8B5CF6", "Executivo": "#2563EB" };
+    const CORF = { "Estudo Preliminar": "#4CC97A", "Anteprojeto": "#33C3F0", "Pré-executivo": "#A78BEA", "Executivo": "#6C7CF5" };
     const agg = ORDEM.map(f => {
       const vs = list.map(o => (o.fasesLinha || []).find(x => x.fase === f)).filter(x => x && x.dias != null).map(x => x.dias);
       return { fase: f, media: vs.length ? Math.round(vs.reduce((a, b) => a + b, 0) / vs.length) : null, n: vs.length };
@@ -3718,15 +3695,15 @@ class Component extends DCLogic {
     const mediaV = vidas.length ? Math.round(vidas.reduce((a, o) => a + o.vida.dias, 0) / vidas.length) : null;
     const consVidas = vidas.map(o => ({ sigla: o.sigla, nome: o.nome, dias: o.vida.dias + " d",
       barStyle: "display:block;height:100%;border-radius:99px;background:" +
-        (o.vida.dias > (mediaV || 0) ? "#F59E0B" : "#2563EB") + ";width:" + ((o.vida.dias / maxV) * 100).toFixed(1) + "%" }));
+        (o.vida.dias > (mediaV || 0) ? "#F5A524" : "#6C7CF5") + ";width:" + ((o.vida.dias / maxV) * 100).toFixed(1) + "%" }));
 
     // mapa
     const geo = (d.geo || []).map(g => {
       const o = this.matchObra(g.obra);
       return Object.assign({}, g, { sigla: o ? o.sigla : "", bu: o ? o.bu : null, noFiltro: !!(o && list.some(x => x.sigla === o.sigla)) });
     }).filter(g => g.lat != null && g.noFiltro);
-    const CIDCOR = { "Pinhais": "#2563EB", "Curitiba": "#8B5CF6", "São José dos Pinhais": "#10B981",
-      "Araucária": "#F59E0B", "Almirante Tamandaré": "#EF4444" };
+    const CIDCOR = { "Pinhais": "#6C7CF5", "Curitiba": "#A78BEA", "São José dos Pinhais": "#4CC97A",
+      "Araucária": "#F5A524", "Almirante Tamandaré": "#FF4747" };
     const W = 460, H = 332;
     let mapa = { tiles: null, pontos: null, viewBox: "0 0 " + W + " " + H,
       boxStyle: "display:none" }, mapaLegenda = [], mapaObras = [];
@@ -3856,7 +3833,7 @@ class Component extends DCLogic {
         pctDone: Math.round((m.done / m.n) * 100) + "%",
         posStyle: "display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:7px;font-family:var(--font-heading);font-weight:800;font-size:11px;background:" +
           (i === 0 ? "var(--blue-600);color:#fff" : "var(--slate-200);color:var(--slate-600)"),
-        faixas: [["done", m.done, "#10B981"], ["prog", m.prog, "#F59E0B"], ["todo", m.todo, "#CBD5E1"]]
+        faixas: [["done", m.done, "#4CC97A"], ["prog", m.prog, "#F5A524"], ["todo", m.todo, "#CBD5E1"]]
           .filter(f => f[1] > 0).map(f => ({ style: "display:block;height:100%;background:" + f[2] + ";width:" + ((f[1] / m.n) * 100).toFixed(1) + "%" }))
       }));
 
@@ -4004,7 +3981,7 @@ class Component extends DCLogic {
             Object.assign({ label: "Atraso registrado na fase de PE", valor: atraso + " d" }, nc(o.pe && o.pe.dias ? this.nota(atraso <= 0.3 * o.pe.dias ? 100 : 100 - 2.25 * ((atraso / o.pe.dias) * 100 - 30)) : null)),
             Object.assign({ label: "Alterações de projeto", valor: String(alt) }, nc(o.inicioObra ? this.nota(alt <= 10 ? 100 - 2 * alt : alt <= 20 ? 80 - 3 * (alt - 10) : alt <= 30 ? 50 - 4 * (alt - 20) : Math.max(0, 10 - 4 * (alt - 30))) : null)),
             Object.assign({ label: "Estouro de obra por projetos", valor: this.money(est) }, nc(o.econ && o.econ.vgv && est ? this.nota((f => f <= 0.05 ? 100 - 500 * f : f <= 1 ? 75 - 26.3 * (f - 0.05) : f <= 2 ? 50 - 40 * (f - 1) : Math.max(0, 10 - 40 * (f - 2)))(est / o.econ.vgv)) : est ? null : 100)),
-            Object.assign({ label: "Economia por projetos", valor: this.money(eco) }, { nota: "—", cor: "#94A3B8" }),
+            Object.assign({ label: "Economia por projetos", valor: this.money(eco) }, { nota: "—", cor: "#B4B7C0" }),
             Object.assign({ label: "Qualidade de entrega (média 1-5)", valor: qm == null ? "—" : qm.toFixed(1).replace(".", ",") }, nc(qm == null ? null : this.nota((qm / 5) * 100)))
           ],
           riscosTop: abertos.map(r => ({ tarefa: r.tarefa, disciplina: r.disciplina || "—", status: r.status, s: this.riscoScore(r) }))
@@ -4097,8 +4074,8 @@ class Component extends DCLogic {
     const segs = (lista, total, cores, fmt) => lista.map((x, i) => ({ label: x[0], valor: fmt(x[1]), title: x[0] + " · " + fmt(x[1]),
       style: "height:100%;background:" + cores[i % cores.length] + ";width:" + (total ? (x[1] / total * 100).toFixed(2) : 0) + "%",
       dot: "width:9px;height:9px;border-radius:3px;flex-shrink:0;background:" + cores[i % cores.length] }));
-    const CF = { "Estudo Preliminar": ["EP", "#10B981"], "Anteprojeto": ["AP", "#06B6D4"], "Pré-executivo": ["PE", "#8B5CF6"], "Executivo": ["EX", "#2563EB"] };
-    const CD = ["#2563EB", "#8B5CF6", "#06B6D4", "#10B981", "#F59E0B", "#EF4444", "#94A3B8"];
+    const CF = { "Estudo Preliminar": ["EP", "#4CC97A"], "Anteprojeto": ["AP", "#33C3F0"], "Pré-executivo": ["PE", "#A78BEA"], "Executivo": ["EX", "#6C7CF5"] };
+    const CD = ["#6C7CF5", "#A78BEA", "#33C3F0", "#4CC97A", "#F5A524", "#FF4747", "#B4B7C0"];
       const fl = (o.fasesLinha || []).filter(f => f.dias > 0);
       const tf = fl.reduce((a, f) => a + f.dias, 0);
       const ct = dd.financeiro.contratado.filter(c => { const m = this.matchObra(c.empreendimento); return m && m.sigla === o.sigla; });
@@ -4111,13 +4088,13 @@ class Component extends DCLogic {
       return { sigla: o.sigla, nome: o.nome, tituloStyle: multi ? "font-size:13px;font-weight:800" : "display:none",
         pct: (o.pct || 0) + "%", pctSub: (o.doneCompl || 0) + " de " + (o.totalCompl || 0) + " tarefas",
         pctBar: "height:100%;border-radius:99px;background:var(--blue-600);width:" + (o.pct || 0) + "%",
-        fases: segs(fl.map(f => [(CF[f.fase] || [f.fase])[0], f.dias]), tf, fl.map(f => (CF[f.fase] || [0, "#94A3B8"])[1]), v => v + " d"),
+        fases: segs(fl.map(f => [(CF[f.fase] || [f.fase])[0], f.dias]), tf, fl.map(f => (CF[f.fase] || [0, "#B4B7C0"])[1]), v => v + " d"),
         fasesTotal: tf ? tf + " dias" : "—", semFases: !fl.length,
         budget: [
-          { label: "Viabilidade", valor: viab ? this.short(viab) : "—", sub: "budget disponível", style: cardB("#2563EB"), valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px" },
-          { label: "Utilizado", valor: this.short(usado), sub: ct.length + " contrato(s)", style: cardB("#8B5CF6"), valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px" },
+          { label: "Viabilidade", valor: viab ? this.short(viab) : "—", sub: "budget disponível", style: cardB("#6C7CF5"), valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px" },
+          { label: "Utilizado", valor: this.short(usado), sub: ct.length + " contrato(s)", style: cardB("#A78BEA"), valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px" },
           { label: est != null && est > 0 ? "Estouro" : "Saldo", valor: est == null ? "—" : (est > 0 ? "+" : "") + est.toFixed(1).replace(".", ",") + "%",
-            sub: est == null ? "sem viabilidade" : est > 0 ? "acima do budget" : "dentro do budget", style: cardB(est != null && est > 0 ? "#EF4444" : "#10B981"),
+            sub: est == null ? "sem viabilidade" : est > 0 ? "acima do budget" : "dentro do budget", style: cardB(est != null && est > 0 ? "#FF4747" : "#4CC97A"),
             valorStyle: "font-family:var(--font-heading);font-weight:900;font-size:19px;color:" + (est != null && est > 0 ? "#B91C1C" : "#047857") }
         ],
         disc: segs(top, usado, CD, pctF), semDisc: !top.length };
@@ -4145,7 +4122,7 @@ class Component extends DCLogic {
     const pill = (t, bg, fg) => ({ t, style: tg(bg, fg).replace("white-space:nowrap", "white-space:normal") });
     const stTxt = t => String(t.status || "sem status").toUpperCase();
     const datas = t => [t.s ? "início " + this.br(t.s) : "", t.d ? "prazo " + this.br(t.d) : "sem prazo"].filter(Boolean).join(" · ");
-    const item = (t, tag, bg, fg) => ({ sigla: multi ? t.sigla : "", n: nome(t), url: t.url || "#", resp: (t.ass || []).join(", ") || "sem responsável",
+    const item = (t, tag, bg, fg, cat) => ({ cat, raw: t, siglaReal: t.sigla, sigla: multi ? t.sigla : "", n: nome(t), url: t.url || "#", resp: (t.ass || []).join(", ") || "sem responsável",
       tag, tagStyle: tg(bg, fg), info: (velha[t.sigla] ? "⚠ dado antigo (" + velha[t.sigla] + ") · " : "") + "ClickUp: " + stTxt(t) + " · " + datas(t) });
     const avisoV = nVelha.length ? [pill("⚠ " + nVelha.length + " obra(s) sem leitura do ClickUp: " + nVelha.map(k => k + " (" + velha[k] + ")").join(", ") + " — confira o link no Cadastro de Obras", "#FEE2E2", "#7F1D1D")] : [];
     const ord = (a, b) => String(a.d || a.s || "9").localeCompare(String(b.d || b.s || "9"));
@@ -4153,13 +4130,13 @@ class Component extends DCLogic {
     let nAtraso = 0, nAberto = 0, nProg = 0, nIni = 0;
     subs.forEach(t => {
       const st = N(t);
-      if (/EM ATRASO/.test(st)) { nAtraso++; curto.push([t, item(t, "Em atraso" + (t.d && t.d < hoje ? " +" + (-dif(t.d)) + " d" : ""), "#FEE2E2", "#991B1B")]); return; }
-      if (/PROGRESSO/.test(st)) { nProg++; medio.push([t, item(t, /FORA DO PRAZO/.test(st) ? "Em progresso · fora do prazo" : "Em progresso", "#FEF3C7", "#92400E")]); return; }
+      if (/EM ATRASO/.test(st)) { nAtraso++; curto.push([t, item(t, "Em atraso" + (t.d && t.d < hoje ? " +" + (-dif(t.d)) + " d" : ""), "#FEE2E2", "#991B1B", "atraso")]); return; }
+      if (/PROGRESSO/.test(st)) { nProg++; medio.push([t, item(t, /FORA DO PRAZO/.test(st) ? "Em progresso · fora do prazo" : "Em progresso", "#FEF3C7", "#92400E", "prog")]); return; }
       // em aberto (e qualquer outro status não concluído)
-      if (t.d && t.d < hoje) { nAberto++; curto.push([t, item(t, "Em aberto · vencida +" + (-dif(t.d)) + " d", "#FFEDD5", "#9A3412")]); return; }
-      if (t.s && t.s <= hoje) { nAberto++; curto.push([t, item(t, "Em aberto · prazo correndo", "#FFEDD5", "#9A3412")]); return; }
-      if (t.s && t.s <= d15) { nIni++; medio.push([t, item(t, "Inicia em " + dif(t.s) + " d", "#DBEAFE", "#1E40AF")]); return; }
-      if (!t.s && t.d && t.d <= d15) { nIni++; medio.push([t, item(t, "Sem início · vence em " + dif(t.d) + " d", "#DBEAFE", "#1E40AF")]); }
+      if (t.d && t.d < hoje) { nAberto++; curto.push([t, item(t, "Em aberto · vencida +" + (-dif(t.d)) + " d", "#FFEDD5", "#9A3412", "aberto")]); return; }
+      if (t.s && t.s <= hoje) { nAberto++; curto.push([t, item(t, "Em aberto · prazo correndo", "#FFEDD5", "#9A3412", "aberto")]); return; }
+      if (t.s && t.s <= d15) { nIni++; medio.push([t, item(t, "Inicia em " + dif(t.s) + " d", "#DBEAFE", "#1E40AF", "ini")]); return; }
+      if (!t.s && t.d && t.d <= d15) { nIni++; medio.push([t, item(t, "Sem início · vence em " + dif(t.d) + " d", "#DBEAFE", "#1E40AF", "ini")]); }
       // início a mais de 15 dias ou sem datas: não relaciona
     });
     curto.sort((a, b) => ord(a[0], b[0])); medio.sort((a, b) => ord(a[0], b[0]));
@@ -4273,8 +4250,8 @@ class Component extends DCLogic {
     const segs = (lista, total, cores, fmt) => lista.map((x, i) => ({ label: x[0], valor: fmt(x[1]), title: x[0] + " · " + fmt(x[1]),
       style: "height:100%;background:" + cores[i % cores.length] + ";width:" + (total ? (x[1] / total * 100).toFixed(2) : 0) + "%",
       dot: "width:9px;height:9px;border-radius:3px;flex-shrink:0;background:" + cores[i % cores.length] }));
-    const CF = { "Estudo Preliminar": ["EP", "#10B981"], "Anteprojeto": ["AP", "#06B6D4"], "Pré-executivo": ["PE", "#8B5CF6"], "Executivo": ["EX", "#2563EB"] };
-    const CD = ["#2563EB", "#8B5CF6", "#06B6D4", "#10B981", "#F59E0B", "#EF4444", "#94A3B8"];
+    const CF = { "Estudo Preliminar": ["EP", "#4CC97A"], "Anteprojeto": ["AP", "#33C3F0"], "Pré-executivo": ["PE", "#A78BEA"], "Executivo": ["EX", "#6C7CF5"] };
+    const CD = ["#6C7CF5", "#A78BEA", "#33C3F0", "#4CC97A", "#F5A524", "#FF4747", "#B4B7C0"];
     const fuResumo = D.obras.map(o => this.resumoObra(o, D.obras.length > 1));
     const linhaT = (t, tag, bg, fg, info) => ({ sigla: t.sigla, n: t.n, url: t.url, tag, tagStyle: tagSt(bg, fg), info });
 
@@ -4341,7 +4318,7 @@ class Component extends DCLogic {
     const list = this.state.sigla ? this.obras().filter(o => o.sigla === this.state.sigla) : this.obras();
     const ctx = list.length ? this.ctxApresentacao(list) : { obras: [] };
     const encerrado = s => /conclu|tratado|cancelad/i.test(String(s || ""));
-    const pinCor = { done: ["var(--blue-600)", "var(--blue-600)", "#fff"], prog: ["#F59E0B", "#F59E0B", "#fff"], atraso: ["#EF4444", "#EF4444", "#fff"] };
+    const pinCor = { done: ["var(--blue-600)", "var(--blue-600)", "#fff"], prog: ["#F5A524", "#F5A524", "#fff"], atraso: ["#FF4747", "#FF4747", "#fff"] };
     const rdObras = ctx.obras.map((c, k) => {
       const o = list[k], sig = o.sigla, R = this.restrDe(sig);
       const riscos = (d.indicadores.riscos || []).filter(r => this.norm(r.obra) === this.norm(o.nome))
@@ -4365,7 +4342,7 @@ class Component extends DCLogic {
         semAxial: c.axial.length === 0,
         matriz: c.matriz.map(m => ({ n: m.n || "", style: "height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:800;font-size:13px;background:" + m.bg + ";color:" + m.fg + (m.n ? "" : ";opacity:.5") })),
         matrizNota: c.matrizNota,
-        riscos: riscos.map(x => { const s = x.s, cor = s == null ? "#94A3B8" : s >= 15 ? "#EF4444" : s >= 8 ? "#F59E0B" : s >= 4 ? "#3B82F6" : "#10B981";
+        riscos: riscos.map(x => { const s = x.s, cor = s == null ? "#B4B7C0" : s >= 15 ? "#FF4747" : s >= 8 ? "#F5A524" : s >= 4 ? "#6C7CF5" : "#4CC97A";
           return { tarefa: x.r.tarefa, disciplina: x.r.disciplina || "—", status: x.r.status, score: s == null ? "—" : String(s),
             scoreStyle: "display:inline-block;min-width:30px;font-family:var(--font-heading);font-size:12px;font-weight:800;padding:3px 8px;border-radius:8px;background:" + cor + "1F;color:" + cor }; }),
         semRiscos: riscos.length === 0
@@ -4405,12 +4382,12 @@ class Component extends DCLogic {
       exResumo: escolhidas.length + " de " + list.length + " obras selecionadas" +
         (escolhidas.length ? ": " + escolhidas.map(o => o.sigla).join(", ") : ""),
       exCards: [
-        { kicker: "Apresentação", cor: "#2563EB", titulo: "Apresentação Geral do Setor",
+        { kicker: "Apresentação", cor: "#6C7CF5", titulo: "Apresentação Geral do Setor",
           desc: "Uma página por obra, no layout do painel, pronta para imprimir ou salvar em PDF.",
           itens: ["Fase atual e linha axial completa", "Budget comprometido, R$/m² e vida útil do projeto",
             "Matriz de risco 5×5 da obra", "Indicadores do empreendimento com nota", "Riscos em aberto de maior score"],
           acoes: [btn("Abrir para imprimir", "print", true), btn("Baixar .html", "html", false)] },
-        { kicker: "Planilha", cor: "#10B981", titulo: "Planilha de indicadores da empresa",
+        { kicker: "Planilha", cor: "#4CC97A", titulo: "Planilha de indicadores da empresa",
           desc: "Arquivo .xlsx na estrutura da aba Por Empreendimento do modelo corporativo.",
           itens: ["Colunas Processo · Mês · Nº Indicador · Indicador · Empreendimento · Valor (%)",
             "Aderência de cronograma por fase (Estudo Preliminar, Anteprojeto, Pré-executivo, Executivo)",
@@ -4463,7 +4440,7 @@ class Component extends DCLogic {
   calVals() {
     const vz = { prazosCal: false, calDias: [], calSemana: [], calLegenda: [], calLista: [], calTitulo: "", calSub: "", calListaStyle: "display:none", calVazio: "", calVazioStyle: "display:none",
       calMesAnt: () => {}, calMesProx: () => {}, calAnoAnt: () => {}, calAnoProx: () => {}, calHoje: () => {} };
-    if (this.state.sigla) return vz;
+    if (this.state.sigla || this.state.bu === "Todos") return vz;
     const list = this.obras(), hoje = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10);
     const ref = /^\d{4}-\d{2}$/.test(this.state.calMes || "") ? this.state.calMes : hoje.slice(0, 7);
     const y = +ref.slice(0, 4), m = +ref.slice(5, 7);
@@ -4497,12 +4474,85 @@ class Component extends DCLogic {
       calVazioStyle: ev.length ? "display:none" : "margin:0;font-size:12.5px;color:var(--slate-400)",
       calMesAnt: () => ir(0, -1), calMesProx: () => ir(0, 1), calAnoAnt: () => ir(-1, 0), calAnoProx: () => ir(1, 0), calHoje: () => this.setState({ calMes: hoje.slice(0, 7) }) };
   }
+  pz2Vazio() { return { pz2Pies: [], pz2SelTem: false, pz2SelItens: [], pz2SelTitulo: "", pz2SelFechar: () => {}, pz2Crit: [], pz2CritResumo: [], pz2CritTabStyle: "display:none", pz2CritVazioStyle: "display:none",
+    pz2Gantt: [], pz2GanttMeses: [], pz2GanttLeg: [], pz2GanttSub: "", pz2GanttVazioStyle: "display:none", miniDias: [], miniSemana: [], miniTitulo: "", miniAnt: () => {}, miniProx: () => {},
+    miniLista: [], miniListaStyle: "display:none", miniDiaTitulo: "", miniDicaStyle: "display:none" }; }
+  // Prazos · visão "Todos": pizzas dos quadros, atividades críticas, Gantt dos quadros e minicalendário de marcos axiais
+  pz2Vals(list) {
+    const hoje = this.fuHoje(), cards = this.prazosLista(list), sel = this.state.pz2Sel || null;
+    const COR = { atraso: ["#FF4747", "Em atraso"], aberto: ["#F5A524", "Em aberto · prazo correndo ou vencido"], prog: ["#A78BEA", "Em progresso (no prazo ou fora)"], ini: ["#6C7CF5", "A iniciar em até 15 dias"] };
+    const ordem = [["atraso", "aberto"], ["prog", "ini"]];
+    const pz2Pies = cards.map((c, ci) => { const tot = c.itens.length || 0; let a0 = -Math.PI / 2;
+      const slices = ordem[ci].map(k => { const n = c.itens.filter(i => i.cat === k).length; const frac = tot ? n / tot : 0; const a1 = a0 + frac * Math.PI * 2;
+        const x0 = 100 + 88 * Math.cos(a0), y0 = 100 + 88 * Math.sin(a0), x1 = 100 + 88 * Math.cos(a1 - (frac >= 1 ? 1e-4 : 0)), y1 = 100 + 88 * Math.sin(a1 - (frac >= 1 ? 1e-4 : 0));
+        const d = n ? "M100,100 L" + x0.toFixed(2) + "," + y0.toFixed(2) + " A88,88 0 " + (frac > .5 ? 1 : 0) + " 1 " + x1.toFixed(2) + "," + y1.toFixed(2) + " Z" : ""; a0 = a1;
+        const on = sel && sel.c === ci && sel.k === k;
+        return { d, color: COR[k][0], label: COR[k][1], n: String(n), pct: tot ? Math.round(frac * 100) + "%" : "—", title: COR[k][1] + ": " + n,
+          style: "cursor:pointer;opacity:" + (sel && !on ? ".45" : "1") + ";transition:opacity .15s", go: () => this.setState({ pz2Sel: on ? null : { c: ci, k } }),
+          dot: "width:11px;height:11px;border-radius:3px;flex-shrink:0;background:" + COR[k][0],
+          legStyle: "display:flex;align-items:center;gap:8px;width:100%;padding:7px 9px;border-radius:9px;cursor:pointer;font-size:12.5px;border:1px solid " + (on ? "var(--slate-300)" : "transparent") + ";background:" + (on ? "var(--slate-50)" : "transparent") }; });
+      return { titulo: c.titulo, sub: c.sub, total: String(tot), slices }; });
+    const selItens = sel && cards[sel.c] ? cards[sel.c].itens.filter(i => i.cat === sel.k) : [];
+    // atividades críticas: > 5 dias de atraso, ou sem início com o prazo correndo/vencido
+    const todos = cards[0].itens.concat(cards[1].itens);
+    const N = t => String(t.status || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+    const semIni = t => /SEM INICIO|EM ABERTO|TO DO|NAO INICIAD/.test(N(t));
+    const dias = x => Math.round((Date.parse(hoje) - Date.parse(x)) / 864e5);
+    const crit = []; todos.forEach(i => { const t = i.raw; const atr = t.d && dias(t.d) > 5, sem = semIni(t) && ((t.s && t.s <= hoje) || (t.d && t.d < hoje));
+      if (!atr && !sem) return;
+      crit.push({ sigla: i.siglaReal, n: i.n, url: i.url, resp: i.resp, status: String(t.status || "—").toUpperCase(), prazo: t.d ? this.br(t.d) : "sem prazo", ord: t.d || t.s || "9",
+        mot: atr ? "+" + dias(t.d) + " d de atraso" + (sem ? " · sem início" : "") : "Sem início · prazo " + (t.d && t.d < hoje ? "vencido" : "correndo"),
+        motStyle: "display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:normal;line-height:1.35;background:" + (atr ? "#FEE2E2;color:#991B1B" : "#FFEDD5;color:#9A3412") }); });
+    crit.sort((a, b) => a.ord.localeCompare(b.ord));
+    const pc = (t, bg, fg) => ({ t, style: "font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:99px;background:" + bg + ";color:" + fg });
+    const nAtr = crit.filter(r => /atraso/.test(r.mot)).length;
+    // Gantt das atividades dos quadros (agrupado por obra)
+    const gi = todos.filter(i => i.raw.s || i.raw.d).map(i => ({ i, s: i.raw.s || i.raw.d, e: i.raw.d || i.raw.s })).map(x => x.e < x.s ? Object.assign(x, { e: x.s }) : x)
+      .sort((a, b) => a.i.siglaReal.localeCompare(b.i.siglaReal) || a.s.localeCompare(b.s));
+    let g0 = gi.reduce((m, x) => x.s < m ? x.s : m, hoje), g1 = gi.reduce((m, x) => x.e > m ? x.e : m, hoje);
+    const t0 = Date.parse(g0.slice(0, 8) + "01"), fimM = new Date(Date.parse(g1)); const t1 = Date.UTC(fimM.getUTCFullYear(), fimM.getUTCMonth() + 1, 1); const span = Math.max(1, t1 - t0);
+    const pct = x => ((Date.parse(x) - t0) / span * 100);
+    const MN = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"], meses = [];
+    for (let d = new Date(t0); d.getTime() < t1; d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1))) { const a = d.getTime(), b = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
+      meses.push({ t: MN[d.getUTCMonth()] + " " + String(d.getUTCFullYear()).slice(2), style: "flex:0 0 " + ((b - a) / span * 100).toFixed(3) + "%;font-size:10.5px;color:var(--slate-400);padding:6px 0 6px 4px;border-left:1px solid var(--slate-100);white-space:nowrap;overflow:hidden" }); }
+    const hp = pct(hoje).toFixed(2);
+    const pz2Gantt = gi.map(x => { const l = pct(x.s), w = Math.max(pct(x.e) + (100 / (span / 864e5)) - l, .6), c = COR[x.i.cat][0];
+      return { sigla: x.i.siglaReal, n: x.i.n, url: x.i.url, title: x.i.n + " · " + this.br(x.s) + " → " + this.br(x.e) + " · " + x.i.tag,
+        barStyle: "position:absolute;top:8px;height:14px;border-radius:99px;left:" + l.toFixed(2) + "%;width:" + w.toFixed(2) + "%;background:" + c,
+        hojeStyle: "position:absolute;top:0;bottom:0;width:2px;background:#FF4747;opacity:.55;left:" + hp + "%" }; });
+    // minicalendário de marcos axiais (Gadens azul, Make It laranja, as duas: azul e laranja)
+    const ref = /^\d{4}-\d{2}$/.test(this.state.calMes || "") ? this.state.calMes : hoje.slice(0, 7);
+    const y = +ref.slice(0, 4), m = +ref.slice(5, 7), MNL = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const ir = k => { const t = new Date(Date.UTC(y, m - 1 + k, 1)); this.setState({ calMes: t.toISOString().slice(0, 7), calDia: "" }); };
+    const ev = []; list.forEach(o => (o.axial || []).forEach(a => { const dt = a.end || a.start; if (!dt || dt.slice(0, 7) !== ref) return; let k = this.statusKind(a.status, a.kind); if (k === "cancel") return;
+      if (k !== "done" && k !== "late" && dt < hoje) k = "late"; ev.push({ dt, sigla: o.sigla, obra: o.nome, bu: o.bu, marco: a.label || "Marco", k }); }));
+    const ST = { done: "Concluído", prog: "Em andamento", late: "Em atraso", todo: "Previsto" };
+    const corBU = bu => /gadens/i.test(bu || "") ? "#2F80ED" : "#FF9100";
+    const ini = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7, nd = new Date(Date.UTC(y, m, 0)).getUTCDate(), diaSel = this.state.calDia || "";
+    const miniDias = []; for (let i = 0; i < Math.ceil((ini + nd) / 7) * 7; i++) { const dn = i - ini + 1, dentro = dn >= 1 && dn <= nd, iso = dentro ? ref + "-" + String(dn).padStart(2, "0") : "";
+      const es = dentro ? ev.filter(e => e.dt === iso) : [], gd = es.some(e => /gadens/i.test(e.bu || "")), mk = es.some(e => !/gadens/i.test(e.bu || ""));
+      const bg = gd && mk ? "linear-gradient(135deg,#2F80ED 50%,#FF9100 50%)" : gd ? "#2F80ED" : mk ? "#FF9100" : "transparent";
+      miniDias.push({ num: dentro ? String(dn) : "", title: es.map(e => e.sigla + " · " + e.marco).join("\n"), go: () => { if (es.length) this.setState({ calDia: diaSel === iso ? "" : iso }); },
+        style: "height:32px;border-radius:9px;font-family:var(--font-body);font-size:12px;font-weight:" + (es.length ? "700" : "500") + ";cursor:" + (es.length ? "pointer" : "default") +
+          ";border:" + (iso && iso === diaSel ? "2px solid var(--color-text)" : iso === hoje ? "1px solid var(--slate-400)" : "1px solid transparent") + ";background:" + bg + ";color:" + (es.length ? "#fff" : dentro ? "var(--color-text)" : "transparent") }); }
+    const doDia = ev.filter(e => e.dt === diaSel);
+    return { pz2Pies, pz2SelTem: !!selItens.length || !!sel, pz2SelItens: selItens,
+      pz2SelTitulo: sel ? (pz2Pies[sel.c] ? pz2Pies[sel.c].titulo : "") + " · " + COR[sel.k][1] + " (" + selItens.length + ")" : "", pz2SelFechar: () => this.setState({ pz2Sel: null }),
+      pz2Crit: crit, pz2CritResumo: [pc(crit.length + " crítica(s)", "var(--slate-100)", "var(--slate-600)"), pc(nAtr + " com mais de 5 dias de atraso", "#FEE2E2", "#991B1B"), pc((crit.length - nAtr) + " sem início com prazo correndo", "#FFEDD5", "#9A3412")],
+      pz2CritTabStyle: crit.length ? "max-height:460px;overflow:auto" : "display:none", pz2CritVazioStyle: crit.length ? "display:none" : "margin:0;font-size:12.5px;color:var(--slate-400)",
+      pz2Gantt, pz2GanttMeses: meses, pz2GanttSub: gi.length + " atividade(s) dos quadros Curto prazo e Médio prazo · linha vermelha = hoje · clique para abrir no ClickUp",
+      pz2GanttLeg: Object.keys(COR).map(k => ({ t: COR[k][1], dot: "width:10px;height:10px;border-radius:3px;background:" + COR[k][0] })), pz2GanttVazioStyle: gi.length ? "display:none" : "margin:8px 0 0;font-size:12.5px;color:var(--slate-400)",
+      miniDias, miniSemana: ["S", "T", "Q", "Q", "S", "S", "D"], miniTitulo: MNL[m - 1] + " " + y, miniAnt: () => ir(-1), miniProx: () => ir(1),
+      miniLista: doDia.map(e => ({ sigla: e.sigla, marco: e.marco, obra: e.obra, bu: e.bu || "—", st: ST[e.k] || "", cor: corBU(e.bu) })),
+      miniListaStyle: doDia.length ? "display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--slate-100);padding-top:10px" : "display:none",
+      miniDiaTitulo: diaSel ? diaSel.split("-").reverse().join("/") + " · " + doDia.length + " marco(s)" : "", miniDicaStyle: doDia.length ? "display:none" : "font-size:11.5px;color:var(--slate-400)" };
+  }
   mesAno(d) {
     if (typeof d !== "string" || !d) return "—";
     const mn = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     return mn[+d.slice(5, 7) - 1] + " " + d.slice(2, 4);
   }
-  kc(k) { return { done: "#10B981", prog: "#F59E0B", late: "#EF4444", todo: "#CBD5E1", cancel: "#94A3B8" }[k] || "#CBD5E1"; }
+  kc(k) { return { done: "#4CC97A", prog: "#F5A524", late: "#FF4747", todo: "#CBD5E1", cancel: "#B4B7C0" }[k] || "#CBD5E1"; }
   // classifica pelo texto do status: verde concluído, vermelho em atraso, amarelo em andamento, cinza sem início
   statusKind(s, fallback) {
     const t = this.norm(s);
@@ -4588,7 +4638,7 @@ class Component extends DCLogic {
     return items.map((it, i) => R.createElement("text", Object.assign({ key: "t" + i }, base, it.attrs), it.label));
   }
   nota(v) { return v == null ? null : Math.max(0, Math.min(100, Math.round(v))); }
-  notaCor(v) { return v == null ? "#94A3B8" : v >= 80 ? "#10B981" : v >= 50 ? "#F59E0B" : "#EF4444"; }
+  notaCor(v) { return v == null ? "#B4B7C0" : v >= 80 ? "#4CC97A" : v >= 50 ? "#F5A524" : "#FF4747"; }
   notaPill(v) {
     const c = this.notaCor(v);
     return { nota: v == null ? "sem base" : "Nota " + v, style: "font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px;white-space:nowrap;background:" + c + "1F;color:" + c };
@@ -4600,9 +4650,9 @@ class Component extends DCLogic {
     return p && im ? p * im : null;
   }
   catColor(c) {
-    return { atrasada: "#EF4444", andamento: "#F59E0B", andamento_atraso: "#F59E0B",
-      sem_inicio_vencido: "#CBD5E1", sem_inicio: "#CBD5E1", concluido_atraso: "#10B981",
-      concluido: "#10B981", cancelado: "#94A3B8" }[c] || "#CBD5E1";
+    return { atrasada: "#FF4747", andamento: "#F5A524", andamento_atraso: "#F5A524",
+      sem_inicio_vencido: "#CBD5E1", sem_inicio: "#CBD5E1", concluido_atraso: "#4CC97A",
+      concluido: "#4CC97A", cancelado: "#B4B7C0" }[c] || "#CBD5E1";
   }
   catLabel(c) {
     return { atrasada: "Atrasada", andamento: "Em andamento", andamento_atraso: "Em andamento (fora do prazo)",
@@ -4635,7 +4685,7 @@ class Component extends DCLogic {
     }
     const hojeP = hoje ? P(new Date(hoje + "T00:00:00Z").getTime()) : -1;
     const todayStyle = hojeP >= 0 && hojeP <= 100 ?
-      "position:absolute;top:0;bottom:0;width:1px;background:#EF4444;opacity:.45;left:" + hojeP.toFixed(2) + "%" : "display:none";
+      "position:absolute;top:0;bottom:0;width:1px;background:#FF4747;opacity:.45;left:" + hojeP.toFixed(2) + "%" : "display:none";
     const months = Math.max(ticks.length, 4);
     const rows = ok.map(i => {
       const s = new Date(i.s + "T00:00:00Z").getTime(), e = new Date(i.d + "T00:00:00Z").getTime();
@@ -4802,7 +4852,7 @@ class Component extends DCLogic {
     const T = editando ? st.orgDraft : this.orgDados(), fmt = (n, d = 0) => (Number(n) || 0).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
     const all = T.an.flatMap(a => a.o), sum = (arr, k) => arr.reduce((s, o) => s + (Number(o[k]) || 0), 0), by = b => all.filter(o => o.m === b);
     const ini = n => { const w = String(n || "").split(" ").filter(x => x.length > 2); return (w.length > 1 ? w[0][0] + w[1][0] : (String(n || "").slice(0, 2) || "?")).toUpperCase(); };
-    const C = { g: ["#2563EB", "#E8EFFD", "GD"], m: ["#F59E0B", "#FEF3E2", "MK"], x: ["#94A0B4", "#EEF1F5", "?"] }, cc = m => C[m] || C.x;
+    const C = { g: ["#6C7CF5", "#E8EFFD", "GD"], m: ["#F5A524", "#FEF3E2", "MK"], x: ["#94A0B4", "#EEF1F5", "?"] }, cc = m => C[m] || C.x;
     const tot = sum(all, "uh") || 1, est = all.filter(o => o.est), nAn = T.an.length || 1;
     const ed = fn => this.setState(s => { if (!s.orgDraft) return null; const N = JSON.parse(JSON.stringify(s.orgDraft)); fn(N); return { orgDraft: N }; });
     const np = () => ({ id: this.uid(), cargo: "", nome: "" }), no = () => ({ id: this.uid(), n: "", m: "m", uh: null, m2: null, est: false });
@@ -4825,7 +4875,7 @@ class Component extends DCLogic {
         setN: set("n"), setUh: set("uh", num), setM2: set("m2", num),
         togM: () => ed(N => { const ob = lista(N, loc)[oi]; ob.m = { m: "g", g: "x", x: "m" }[ob.m] || "m"; }),
         togEst: () => ed(N => { const ob = lista(N, loc)[oi]; ob.est = !ob.est; }),
-        estBtn: "cursor:pointer;margin-left:auto;font-size:9.5px;font-weight:800;border-radius:6px;padding:1px 6px;font-family:var(--font-body);" + (o.est ? "color:#B45309;background:#FEF3E2;border:1px dashed #F59E0B" : "color:var(--slate-400);background:transparent;border:1px dashed var(--slate-300)"),
+        estBtn: "cursor:pointer;margin-left:auto;font-size:9.5px;font-weight:800;border-radius:6px;padding:1px 6px;font-family:var(--font-body);" + (o.est ? "color:#B45309;background:#FEF3E2;border:1px dashed #F5A524" : "color:var(--slate-400);background:transparent;border:1px dashed var(--slate-300)"),
         rem: () => { if (window.confirm("Excluir a obra " + (o.n || "sem nome") + "?")) ed(N => { lista(N, loc).splice(oi, 1); }); } }; };
     const dropZone = loc => ({ onDragOver: e => { if (editando && this._drag) { e.preventDefault(); if (alvo !== loc) this.setState({ orgAlvo: loc }); } },
       onDrop: e => { if (!editando) return; e.preventDefault(); this.orgMover(loc, null); } });
@@ -4841,10 +4891,10 @@ class Component extends DCLogic {
       orgAbrirEdicao: () => this.setState({ orgDraft: JSON.parse(JSON.stringify(this.orgDados())), orgMsg: "" }),
       orgTopo: T.topo.map((lv, li) => ({ edit: editando, pessoas: lv.map((p, pi) => pessoa(N => N.topo[li], pi, p)),
         addP: () => ed(N => { N.topo[li].push(np()); }) })),
-      orgKpis: [["#8B5CF6","#EFE9FE","#","Empreendimentos",fmt(all.length),T.an.length + " analistas · " + fmt(all.length / nAn, 1) + " obras/analista"],
-        ["#10B981","#E3F7F0","UH","Unidades habitacionais" + (est.length ? "*" : ""),fmt(sum(all, "uh")),fmt(sum(all, "m2"), 2) + " m² construído" + (est.length ? "*" : "")],
-        ["#2563EB","#E8EFFD","GD","Gadens",by("g").length + " obras",fmt(sum(by("g"), "uh")) + " UH · " + fmt(sum(by("g"), "m2")) + " m²"],
-        ["#F59E0B","#FEF3E2","MK","Make It",by("m").length + " obras",fmt(sum(by("m"), "uh")) + " UH · " + fmt(sum(by("m"), "m2")) + " m²"]].map(k => ({ cor:k[0], bg:k[1], ico:k[2], l:k[3], v:k[4], s:k[5] })),
+      orgKpis: [["#A78BEA","#EFE9FE","#","Empreendimentos",fmt(all.length),T.an.length + " analistas · " + fmt(all.length / nAn, 1) + " obras/analista"],
+        ["#4CC97A","#E3F7F0","UH","Unidades habitacionais" + (est.length ? "*" : ""),fmt(sum(all, "uh")),fmt(sum(all, "m2"), 2) + " m² construído" + (est.length ? "*" : "")],
+        ["#6C7CF5","#E8EFFD","GD","Gadens",by("g").length + " obras",fmt(sum(by("g"), "uh")) + " UH · " + fmt(sum(by("g"), "m2")) + " m²"],
+        ["#F5A524","#FEF3E2","MK","Make It",by("m").length + " obras",fmt(sum(by("m"), "uh")) + " UH · " + fmt(sum(by("m"), "m2")) + " m²"]].map(k => ({ cor:k[0], bg:k[1], ico:k[2], l:k[3], v:k[4], s:k[5] })),
       orgAn: null,
       _A: T.an.map((a, ai) => { const uh = sum(a.o, "uh"), e = a.o.some(o => o.est), q = a.o.length || 1, g = a.o.filter(o => o.m === "g").length, m = a.o.filter(o => o.m === "m").length, x = a.o.length - g - m;
         const z = dropZone(a.id), ab = a.abaixo || [], chave = a.n || a.id, aberto = editando || !this.orgVista().fechados[chave];
@@ -4889,7 +4939,7 @@ class Component extends DCLogic {
   anVals() {
     const an = this.state.an;
     const A = this.anBase(an.tab === "gadens" ? "Gadens Inc" : "Make It") || (an.tab === "gadens" ? { hoje: this.fuHoje(), analistas: [] } : this.state.adata);
-    const catLegend = [["Concluído", "#10B981"], ["Em andamento", "#F59E0B"], ["Em atraso", "#EF4444"], ["Sem início", "#CBD5E1"]].map(c => ({
+    const catLegend = [["Concluído", "#4CC97A"], ["Em andamento", "#F5A524"], ["Em atraso", "#FF4747"], ["Sem início", "#CBD5E1"]].map(c => ({
       label: c[0], dotStyle: "width:18px;height:8px;border-radius:99px;display:inline-block;background:" + c[1]
     }));
     if (!A) return { anTabs: [], anAnalistas: [], anStats: [], anChips: [], anObras: [], catLegend,
@@ -4988,6 +5038,8 @@ class Component extends DCLogic {
   fnVals() {
     const F = this.state.fdata, S = this.state.fstate, fn = this.state.fn;
     const empty = { finVazio: false, fnChips: [], fnRows: [], fnCards: [], fnFornOpts: [], fnObraOpts: [], fnDiscOpts: [],
+      fnKanban: [], fnKanbanVazioStyle: "display:none", fnBancoAberto: false, fnBancoTog: () => {}, fnBancoLabel: "", fnBarras: [], fnEixo: [], fnEixoStyle: "display:none",
+      fnModalOpen: false, fnModalFechar: () => {}, stop: e => e.stopPropagation(), fnM: { nome: "", pills: [], gantt: { rows: [], ticks: [], minStyle: "", ref: null }, legend: [], janelas: [], janStyle: "display:none", semJanStyle: "display:none" },
       fnCount: "—", fnSemVinculo: true, fnNew: fn.novo, setFnNew: e => this.setFn({ novo: e.target.value }),
       fnAdd: () => {}, fnKey: () => {}, fnObra: fn.obra, fnDisc: fn.disc, fnVinc: fn.vinc,
       setFnObra: () => {}, setFnDisc: () => {}, setFnVinc: () => {} };
@@ -5040,7 +5092,7 @@ class Component extends DCLogic {
           (cur ? "var(--blue-500)" : "var(--slate-200)") + ";color:" + (cur ? "var(--blue-700)" : "var(--slate-500)") + ";font-weight:" + (cur ? "700" : "500") };
     });
 
-    const palette = ["#2563EB", "#8B5CF6", "#06B6D4", "#10B981", "#F59E0B", "#EF4444", "#0EA5E9", "#A855F7"];
+    const palette = ["#6C7CF5", "#A78BEA", "#33C3F0", "#4CC97A", "#F5A524", "#FF4747", "#0EA5E9", "#A855F7"];
     const vinculados = S.fornecedores.filter(f => countLinked(f.id) > 0);
     const cards = vinculados.map(f => {
       const ks = Object.keys(S.vinculos).filter(k => S.vinculos[k] === f.id);
@@ -5079,7 +5131,7 @@ class Component extends DCLogic {
           this.pill(c.obras.length + " obras", "var(--slate-100)", "var(--slate-600)"),
           this.pill("pico " + c.peak + (c.peak > 1 ? " simultâneas" : " simultânea"), peakBg[0], peakBg[1])],
         gantt: this.buildGantt(c.items.map(i => ({ n: i.disciplina + (i.rev ? " " + i.rev : ""), sigla: i.sigla, obra: i.obra, cat: i.cat, s: i.s, d: i.d })),
-          i => cor[i.sigla] || "#2563EB", F.hoje, 220, "forn|" + c.f.id),
+          i => cor[i.sigla] || "#6C7CF5", F.hoje, 220, "forn|" + c.f.id),
         legend: c.obras.map(s => ({ label: (obrasMap[s] || s) + " (" + s + ")",
           dotStyle: "width:18px;height:8px;border-radius:99px;display:inline-block;background:" + cor[s] })),
         temJanelas: c.wins.length > 0, semJanelas: c.wins.length === 0,
@@ -5092,7 +5144,25 @@ class Component extends DCLogic {
       };
     });
 
+    // kanban: uma coluna por obra, um cartão por disciplina
+    const porObra = {}; fnRows.forEach(r => { (porObra[r.sigla] = porObra[r.sigla] || { sigla: r.sigla, obra: r.obra, cards: [] }).cards.push(r); });
+    const fnKanban = Object.keys(porObra).sort((x, y) => porObra[x].obra.localeCompare(porObra[y].obra)).map(k => { const o = porObra[k], nv = o.cards.filter(c => c.value).length;
+      return { sigla: o.sigla, obra: o.obra, cont: nv + "/" + o.cards.length, contStyle: "font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;background:" + (nv === o.cards.length ? "#EBF9EF;color:#15803D" : "var(--card);color:var(--slate-500)"),
+        cards: o.cards.map(c => Object.assign({}, c, { cardStyle: "background:var(--card);border:1px solid var(--slate-200);border-left:3px solid " + (c.value ? "#4CC97A" : "#F5A524") + ";border-radius:10px;padding:9px 10px;display:flex;flex-direction:column;gap:6px" })) }; });
+    // gráfico: y = fornecedor, x = pico de entregas simultâneas
+    const maxP = cards.reduce((m, c) => Math.max(m, c.peak), 1);
+    const fnBarras = cards.map(c => { const cor = c.peak >= 3 ? "#FF4747" : c.peak === 2 ? "#F5A524" : "#4CC97A";
+      return { nome: c.f.nome, pico: String(c.peak), sub: c.items.length + " entregas · " + c.obras.length + " obras", go: () => this.setFn({ open: c.f.id }),
+        barStyle: "position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:" + cor + ";width:" + (c.peak / maxP * 100).toFixed(1) + "%" }; });
+    const fnEixo = []; for (let i = 0; i <= maxP; i++) fnEixo.push({ t: String(i), style: "position:absolute;font-size:10.5px;color:var(--slate-400);transform:translateX(-50%);left:" + (i / maxP * 100).toFixed(1) + "%" });
+    const mSel = fn.open ? fnCards[cards.findIndex(c => c.f.id === fn.open)] : null;
     return {
+      fnKanban, fnKanbanVazioStyle: fnKanban.length ? "display:none" : "margin:0;font-size:12.5px;color:var(--slate-400)",
+      fnBancoAberto: !!fn.banco, fnBancoTog: () => this.setFn({ banco: !fn.banco }), fnBancoLabel: (fn.banco ? "Fechar banco de fornecedores" : "Banco de fornecedores (" + S.fornecedores.length + ")"),
+      fnBarras, fnEixo, fnEixoStyle: cards.length ? "position:relative;height:16px;margin:6px 194px 0 240px" : "display:none",
+      fnModalOpen: !!mSel, fnModalFechar: () => this.setFn({ open: null }), stop: e => e.stopPropagation(),
+      fnM: mSel ? Object.assign({}, mSel, { janStyle: mSel.temJanelas ? "" : "display:none", semJanStyle: mSel.temJanelas ? "display:none" : "margin:0;font-size:12px;color:var(--slate-400)" })
+        : { nome: "", pills: [], gantt: { rows: [], ticks: [], minStyle: "", ref: null }, legend: [], janelas: [], janStyle: "display:none", semJanStyle: "display:none" },
       fnChips, fnRows, fnCards, fnFornOpts: S.fornecedores.map(f => ({ id: f.id, nome: f.nome })),
       fnObraOpts, fnDiscOpts, fnObra: fn.obra, fnDisc: fn.disc, fnVinc: fn.vinc,
       setFnObra: e => this.setFn({ obra: e.target.value }),
@@ -5125,7 +5195,7 @@ class Component extends DCLogic {
         ";background:" + (s[0] === page ? "var(--card)" : "transparent") + ";color:" + (s[0] === page ? "var(--blue-700)" : "var(--slate-500)") +
         ";box-shadow:" + (s[0] === page ? "var(--card-shadow)" : "none") })) : [];
     const nav = pages.map(p => ({ p0: GRUPOS[p[0]] ? GRUPOS[p[0]][0][0] : p[0], ativo: p[0] === page || p[0] === gAtual, p })).map(({ p0, ativo, p }) => ({
-      label: p[0], mark: p[1], go: p[0] === "Termos de Abertura de Projeto (TAP)" ? () => { window.location.href = "tap.html"; } : this.go(GRUPOS[p[0]] && gAtual === p[0] ? page : p0),
+      label: p[0], mark: p[1], go: p[0] === "Termos de Abertura de Projeto (TAP)" ? () => { /* no artefato do Claude a TAP é a página "Plataforma TAP.dc.html"; no GitHub é tap.html */ window.location.href = /\.dc\.html$/i.test(decodeURIComponent(location.pathname)) ? "Plataforma TAP.dc.html" : "tap.html"; } : this.go(GRUPOS[p[0]] && gAtual === p[0] ? page : p0),
       markStyle: p[1] ? "font-family:var(--font-mono);font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;margin-left:auto;background:var(--slate-100);color:var(--slate-500)" : "display:none",
       style: "display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:10px 13px;border:0;border-radius:12px;cursor:pointer;font-family:var(--font-body);font-size:12.5px;font-weight:" +
         (ativo ? "800" : "600") + ";background:" + (ativo ? "var(--blue-50)" : "transparent") +
@@ -5259,7 +5329,7 @@ class Component extends DCLogic {
         };
       });
     }
-    const ganttLegend = [["Concluído", "#10B981"], ["Em andamento", "#F59E0B"], ["Em atraso", "#EF4444"], ["Sem início", "#CBD5E1"]].map(l => ({
+    const ganttLegend = [["Concluído", "#4CC97A"], ["Em andamento", "#F5A524"], ["Em atraso", "#FF4747"], ["Sem início", "#CBD5E1"]].map(l => ({
       label: l[0], dotStyle: "width:18px;height:8px;border-radius:99px;background:" + l[1] + ";display:inline-block"
     }));
 
@@ -5335,7 +5405,7 @@ class Component extends DCLogic {
         return [(CX + r * Math.cos(ang(i))).toFixed(1), (CY + r * Math.sin(ang(i))).toFixed(1)];
       };
       const ring = f => QCRIT.map((_, i) => pt(i, 5 * f).join(",")).join(" ");
-      const cores = ["#2563EB", "#8B5CF6", "#10B981"];
+      const cores = ["#6C7CF5", "#A78BEA", "#4CC97A"];
       const series = arr.slice(0, 3).map((s, k) => {
         const pts = s.valores.map((v, i) => pt(i, v == null ? 0 : v).join(" ").replace(" ", ",")).join(" ");
         return { label: s.label, color: cores[k % 3], fill: cores[k % 3] + "22", points: pts,
@@ -5380,7 +5450,7 @@ class Component extends DCLogic {
     const qualCrit = QCRIT.map((c, i) => {
       const v = critAtual[i];
       return { label: c, i: String(i + 1), valor: v == null ? "—" : v.toFixed(2).replace(".", ","),
-        cor: v == null ? "#94A3B8" : this.notaCor((v / 5) * 100) };
+        cor: v == null ? "#B4B7C0" : this.notaCor((v / 5) * 100) };
     });
     const maxForn = porForn.length ? porForn[0].media : 5;
     const qualRanking = porForn.map((f, i) => ({
@@ -5391,7 +5461,7 @@ class Component extends DCLogic {
         (this.state.qualForn === f.fornecedor ? "var(--blue-500)" : "transparent") +
         ";background:" + (this.state.qualForn === f.fornecedor ? "var(--blue-50)" : "transparent"),
       posStyle: "display:flex;align-items:center;justify-content:center;width:22px;height:22px;flex-shrink:0;border-radius:7px;font-family:var(--font-heading);font-weight:800;font-size:11px;background:" +
-        (i === 0 ? "#2563EB;color:#fff" : "var(--slate-200);color:var(--slate-600)"),
+        (i === 0 ? "#6C7CF5;color:#fff" : "var(--slate-200);color:var(--slate-600)"),
       barStyle: "display:block;height:100%;border-radius:99px;background:" + this.notaCor((f.media / 5) * 100) +
         ";width:" + ((f.media / 5) * 100).toFixed(1) + "%"
     }));
@@ -5418,19 +5488,19 @@ class Component extends DCLogic {
 
     const cardDefs = [
       { key: "risco", kicker: "Riscos", title: "Riscos por Empreendimento", sub: comScore === 0 ? "Sem impacto (1-5) preenchido na base — meta: zero riscos > 12 em obras de PE em diante" :
-          "Riscos em aberto em obras de PE em diante · " + criticosPE.length + " com score > 12 · nota = média por empreendimento", color: "#EF4444",
-        value: String(riscosAtivos.length), nota: notaRisco, bars: this.bars(this.group(riscosAtivos, x => x.obra), "#EF4444") },
-      { key: "desvio", kicker: "Prazo", title: "Desvio de LB de PE", sub: "Somatório dos atrasos registrados · " + desvioRows.length + " obra(s) em PE sob análise, " + isentas.length + " isenta(s) · meta: até 30% da fase", color: "#F59E0B",
-        value: String(desvioRows.length), nota: notaDesvio, bars: this.bars(desvioRows.filter(x => x.perc != null && x.perc > 0).map(x => [x.obra, Math.round(x.perc)]), "#F59E0B", v => v + "%") },
-      { key: "alt", kicker: "Escopo", title: "Alterações de Projeto", sub: "Alterações em obras já com Início de Obra — meta: zero", color: "#8B5CF6",
-        value: String(altF.length), nota: notaAlt, bars: this.bars(this.group(altF, x => x.disciplina), "#8B5CF6") },
-      { key: "estouro", kicker: "Custo", title: "Estouro de Obra por Projetos", sub: "Em apuração — os valores serão publicados ao término da auditoria de custos", color: "#EF4444",
+          "Riscos em aberto em obras de PE em diante · " + criticosPE.length + " com score > 12 · nota = média por empreendimento", color: "#FF4747",
+        value: String(riscosAtivos.length), nota: notaRisco, bars: this.bars(this.group(riscosAtivos, x => x.obra), "#FF4747") },
+      { key: "desvio", kicker: "Prazo", title: "Desvio de LB de PE", sub: "Somatório dos atrasos registrados · " + desvioRows.length + " obra(s) em PE sob análise, " + isentas.length + " isenta(s) · meta: até 30% da fase", color: "#F5A524",
+        value: String(desvioRows.length), nota: notaDesvio, bars: this.bars(desvioRows.filter(x => x.perc != null && x.perc > 0).map(x => [x.obra, Math.round(x.perc)]), "#F5A524", v => v + "%") },
+      { key: "alt", kicker: "Escopo", title: "Alterações de Projeto", sub: "Alterações em obras já com Início de Obra — meta: zero", color: "#A78BEA",
+        value: String(altF.length), nota: notaAlt, bars: this.bars(this.group(altF, x => x.disciplina), "#A78BEA") },
+      { key: "estouro", kicker: "Custo", title: "Estouro de Obra por Projetos", sub: "Em apuração — os valores serão publicados ao término da auditoria de custos", color: "#FF4747",
         value: "—", nota: null, bars: [] },
-      { key: "econ", kicker: "Custo", title: "Economia por Projetos", sub: "Economia gerada por otimizações de projeto", color: "#10B981",
-        value: this.short(totEcon), nota: null, bars: this.bars(this.group(econF, x => x.obra, x => x.valor || 0), "#10B981", v => this.short(v)) },
-      { key: "qual", kicker: "Qualidade", title: "Qualidade de Entrega", sub: "Média do checklist por empreendimento, depois média dos empreendimentos (1 a 5) · meta 4", color: "#2563EB",
+      { key: "econ", kicker: "Custo", title: "Economia por Projetos", sub: "Economia gerada por otimizações de projeto", color: "#4CC97A",
+        value: this.short(totEcon), nota: null, bars: this.bars(this.group(econF, x => x.obra, x => x.valor || 0), "#4CC97A", v => this.short(v)) },
+      { key: "qual", kicker: "Qualidade", title: "Qualidade de Entrega", sub: "Média do checklist por empreendimento, depois média dos empreendimentos (1 a 5) · meta 4", color: "#6C7CF5",
         value: mediaQualObra == null ? "—" : mediaQualObra.toFixed(2).replace(".", ","), nota: mediaQualObra == null ? null : this.nota((mediaQualObra / 5) * 100),
-        bars: this.bars(mediaPorChave(qualF, x => x.disciplina), "#2563EB", v => String(v).replace(".", ",")) }
+        bars: this.bars(mediaPorChave(qualF, x => x.disciplina), "#6C7CF5", v => String(v).replace(".", ",")) }
     ];
     const NUMS = { risco: 1, desvio: 2, alt: 3, qual: 5 };
     const indCards = cardDefs.map(c => ({ ult: NUMS[c.key] ? this.fechUltimo(NUMS[c.key]) : "", temUlt: !!(NUMS[c.key] && this.fechUltimo(NUMS[c.key])),
@@ -5468,8 +5538,8 @@ class Component extends DCLogic {
       const fg = score >= 15 ? "#991B1B" : score >= 8 ? "#92400E" : score >= 4 ? "#1E40AF" : "#065F46";
       matriz.push({ n: n || "", style: "height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:800;font-size:13px;background:" + bg + ";color:" + fg + (n ? "" : ";opacity:.55") });
     }
-    const faixas = [["Crítico (15-25)", "#EF4444", s => s >= 15], ["Alto (8-14)", "#F59E0B", s => s >= 8 && s < 15],
-      ["Moderado (4-7)", "#3B82F6", s => s >= 4 && s < 8], ["Baixo (1-3)", "#10B981", s => s < 4]];
+    const faixas = [["Crítico (15-25)", "#FF4747", s => s >= 15], ["Alto (8-14)", "#F5A524", s => s >= 8 && s < 15],
+      ["Moderado (4-7)", "#6C7CF5", s => s >= 4 && s < 8], ["Baixo (1-3)", "#4CC97A", s => s < 4]];
     const scores = riscosF.map(r => this.riscoScore(r)).filter(s => s != null);
     const matrizFaixas = faixas.map(f => ({ label: f[0], n: scores.filter(f[2]).length,
       dotStyle: "width:11px;height:11px;border-radius:4px;flex-shrink:0;background:" + f[1] }));
@@ -5495,7 +5565,7 @@ class Component extends DCLogic {
       .map(c => ({ projeto: c.projeto || "—", contratado: c.contratado || "—", valor: this.money(c.valor) }));
     const budgetObra = contratosObra.reduce((a, c) => a + (c.valor || 0), 0);
 
-    const palette = ["#2563EB", "#8B5CF6", "#06B6D4", "#10B981", "#F59E0B", "#94A3B8"];
+    const palette = ["#6C7CF5", "#A78BEA", "#33C3F0", "#4CC97A", "#F5A524", "#B4B7C0"];
     const disc = this.group(finAll, x => x.projeto, x => x.valor || 0);
     const top = disc.slice(0, 5); const resto = disc.slice(5).reduce((a, x) => a + x[1], 0);
     if (resto > 0) top.push(["Outros", resto]);
@@ -5540,8 +5610,8 @@ class Component extends DCLogic {
       return { title: c.title, sub: c.sub + " · " + rs.length + " obra(s)", media: media == null ? "—" : c.fmt(media),
         rows: rs.map(x => {
           const acima = x[c.ref] != null && x[c.kind] > x[c.ref];
-          return { obra: x.obra, value: c.fmt(x[c.kind]), color: acima ? "#EF4444" : "#10B981",
-            barStyle: "position:absolute;left:0;top:0;height:100%;border-radius:99px;background:" + (acima ? "#EF4444" : "#2563EB") +
+          return { obra: x.obra, value: c.fmt(x[c.kind]), color: acima ? "#FF4747" : "#4CC97A",
+            barStyle: "position:absolute;left:0;top:0;height:100%;border-radius:99px;background:" + (acima ? "#FF4747" : "#6C7CF5") +
               ";width:" + ((x[c.kind] / max) * 100).toFixed(1) + "%",
             refStyle: x[c.ref] == null ? "display:none" :
               "position:absolute;top:-2px;bottom:-2px;width:2px;background:#1E293B;left:" + ((x[c.ref] / max) * 100).toFixed(1) + "%" };
@@ -5549,9 +5619,9 @@ class Component extends DCLogic {
     });
 
     const finKpis = [
-      { label: "Total contratado", value: this.money(totContratado), sub: finAll.length + " contratos no filtro", color: "#2563EB" },
-      { label: "Medido (NF emitidas)", value: this.money(totMedido), sub: nfAll.length + " notas fiscais", color: "#8B5CF6" },
-      { label: "Saldo a medir", value: this.money(saldo), sub: totContratado ? Math.round((totMedido / totContratado) * 100) + "% já medido" : "—", color: "#F59E0B" }
+      { label: "Total contratado", value: this.money(totContratado), sub: finAll.length + " contratos no filtro", color: "#6C7CF5" },
+      { label: "Medido (NF emitidas)", value: this.money(totMedido), sub: nfAll.length + " notas fiscais", color: "#A78BEA" },
+      { label: "Saldo a medir", value: this.money(saldo), sub: totContratado ? Math.round((totMedido / totContratado) * 100) + "% já medido" : "—", color: "#F5A524" }
     ].map(k => ({
       label: k.label, value: k.value, sub: k.sub,
       cardStyle: "background:var(--card);border:1px solid var(--slate-100);border-left:4px solid " + k.color + ";border-radius:16px;padding:18px 20px;box-shadow:var(--card-shadow);display:flex;gap:14px;align-items:center",
@@ -5572,11 +5642,11 @@ class Component extends DCLogic {
             x.probabilidade == null ? "—" : String(x.probabilidade), s == null ? "—" : String(s) + (s > 12 ? " ⚠" : ""),
             fasePE(x.obra) ? "PE em diante" : "Antes do PE", x.status, x.plano || "—"]; }),
         charts: [
-          { title: "Riscos por obra", sub: "Quantidade de riscos identificados", bars: this.bars(this.group(riscosF, x => x.obra), "#EF4444") },
-          { title: "Riscos por faixa (impacto × probabilidade)", sub: semScore + " sem classificação na base", bars: this.bars(faixas.map(f => [f[0], scores.filter(f[2]).length]), "#EF4444") },
-          { title: "Riscos > 12 em obras de PE em diante", sub: "Meta: zero", bars: this.bars(this.group(criticosPE, x => x.obra), "#EF4444") },
-          { title: "Riscos por disciplina", sub: "Quantidade de registros", bars: this.bars(this.group(riscosF, x => x.disciplina), "#8B5CF6") },
-          { title: "Riscos por status", sub: "Distribuição do tratamento", bars: this.bars(this.group(riscosF, x => x.status), "#F59E0B") }
+          { title: "Riscos por obra", sub: "Quantidade de riscos identificados", bars: this.bars(this.group(riscosF, x => x.obra), "#FF4747") },
+          { title: "Riscos por faixa (impacto × probabilidade)", sub: semScore + " sem classificação na base", bars: this.bars(faixas.map(f => [f[0], scores.filter(f[2]).length]), "#FF4747") },
+          { title: "Riscos > 12 em obras de PE em diante", sub: "Meta: zero", bars: this.bars(this.group(criticosPE, x => x.obra), "#FF4747") },
+          { title: "Riscos por disciplina", sub: "Quantidade de registros", bars: this.bars(this.group(riscosF, x => x.disciplina), "#A78BEA") },
+          { title: "Riscos por status", sub: "Distribuição do tratamento", bars: this.bars(this.group(riscosF, x => x.status), "#F5A524") }
         ]
       },
       desvio: {
@@ -5601,10 +5671,10 @@ class Component extends DCLogic {
           go: () => { if (x.atual) this.setSemanal(x.obra, x.atual); }
         })),
         charts: [
-          { title: "Dias de atraso por motivo", sub: "Registros do formulário · soma dos dias", bars: this.bars(this.group(registros.filter(r => r.dias), r => r.motivo || "Sem motivo", r => r.dias), "#EF4444", v => v + " d") },
-          { title: "Dias de atraso por disciplina", sub: "Registros do formulário · soma dos dias", bars: this.bars(this.group(registros.filter(r => r.dias), r => r.disciplina || "Sem disciplina", r => r.dias), "#8B5CF6", v => v + " d") },
-          { title: "Atraso em dias por obra", sub: "Somatório dos atrasos registrados no formulário", bars: this.bars(desvioRows.filter(x => x.dias > 0).map(x => [x.obra, x.dias]), "#F59E0B", v => v + " d") },
-          { title: "Nota por obra", sub: "Meta: atraso até 30% da fase de Pré-executivo", bars: this.bars(desvioRows.filter(x => x.nota != null).map(x => [x.obra, x.nota]), "#10B981") }
+          { title: "Dias de atraso por motivo", sub: "Registros do formulário · soma dos dias", bars: this.bars(this.group(registros.filter(r => r.dias), r => r.motivo || "Sem motivo", r => r.dias), "#FF4747", v => v + " d") },
+          { title: "Dias de atraso por disciplina", sub: "Registros do formulário · soma dos dias", bars: this.bars(this.group(registros.filter(r => r.dias), r => r.disciplina || "Sem disciplina", r => r.dias), "#A78BEA", v => v + " d") },
+          { title: "Atraso em dias por obra", sub: "Somatório dos atrasos registrados no formulário", bars: this.bars(desvioRows.filter(x => x.dias > 0).map(x => [x.obra, x.dias]), "#F5A524", v => v + " d") },
+          { title: "Nota por obra", sub: "Meta: atraso até 30% da fase de Pré-executivo", bars: this.bars(desvioRows.filter(x => x.nota != null).map(x => [x.obra, x.nota]), "#4CC97A") }
         ]
       },
       registros: {
@@ -5613,8 +5683,8 @@ class Component extends DCLogic {
         cols: [["Obra", L], ["Disciplina", L], ["Motivo do atraso", L], ["Dias", R], ["Responsável", L], ["Data final PE", R], ["Plano de ação", L]],
         rows: registros.map(r => [r.obra || "—", r.disciplina || "—", r.motivo || "—", r.dias == null ? "—" : String(r.dias) + " d", r.responsavel || "—", this.br(r.dataPE), r.plano || "—"]),
         charts: [
-          { title: "Dias por motivo", sub: "Soma dos dias registrados", bars: this.bars(this.group(registros.filter(r => r.dias), r => r.motivo || "Sem motivo", r => r.dias), "#EF4444", v => v + " d") },
-          { title: "Dias por obra", sub: "Soma dos dias registrados", bars: this.bars(this.group(registros.filter(r => r.dias), r => r.obra || "—", r => r.dias), "#F59E0B", v => v + " d") }
+          { title: "Dias por motivo", sub: "Soma dos dias registrados", bars: this.bars(this.group(registros.filter(r => r.dias), r => r.motivo || "Sem motivo", r => r.dias), "#FF4747", v => v + " d") },
+          { title: "Dias por obra", sub: "Soma dos dias registrados", bars: this.bars(this.group(registros.filter(r => r.dias), r => r.obra || "—", r => r.dias), "#F5A524", v => v + " d") }
         ]
       },
       estouro: {
@@ -5630,9 +5700,9 @@ class Component extends DCLogic {
         cols: [["Obra", L], ["Disciplina", L], ["Motivo", L], ["Gravidade", L], ["Descrição", L]],
         rows: altF.map(x => [x.obra || "—", x.disciplina || "—", x.motivo || "—", x.gravidade || "—", x.descricao || "—"]),
         charts: [
-          { title: "Alterações por disciplina", sub: "Quantidade de registros", bars: this.bars(this.group(altF, x => x.disciplina), "#8B5CF6") },
-          { title: "Alterações por gravidade", sub: "Quantidade de registros", bars: this.bars(this.group(altF, x => x.gravidade), "#EF4444") },
-          { title: "Nota por obra (com Início de Obra)", sub: "Meta: zero alterações após o início da obra", bars: this.bars(notasAlt, "#10B981") }
+          { title: "Alterações por disciplina", sub: "Quantidade de registros", bars: this.bars(this.group(altF, x => x.disciplina), "#A78BEA") },
+          { title: "Alterações por gravidade", sub: "Quantidade de registros", bars: this.bars(this.group(altF, x => x.gravidade), "#FF4747") },
+          { title: "Nota por obra (com Início de Obra)", sub: "Meta: zero alterações após o início da obra", bars: this.bars(notasAlt, "#4CC97A") }
         ]
       },
       qual: {
@@ -5641,15 +5711,15 @@ class Component extends DCLogic {
         cols: [["Empreendimento", L], ["Disciplina", L], ["Fornecedor", L], ["Fase", L], ["Média", R]],
         rows: qualF.map(x => [x.empreendimento || "—", x.disciplina || "—", x.fornecedor || "—", x.fase || "—", x.media == null ? "—" : String(x.media).replace(".", ",")]),
         charts: [
-          { title: "Média por disciplina", sub: "Nota de 1 a 5", bars: this.bars(mediaPorChave(qualF, x => x.disciplina), "#2563EB", v => String(v).replace(".", ",")) },
-          { title: "Média por fornecedor", sub: "Nota de 1 a 5", bars: this.bars(mediaPorChave(qualF, x => x.fornecedor), "#10B981", v => String(v).replace(".", ",")) }
+          { title: "Média por disciplina", sub: "Nota de 1 a 5", bars: this.bars(mediaPorChave(qualF, x => x.disciplina), "#6C7CF5", v => String(v).replace(".", ",")) },
+          { title: "Média por fornecedor", sub: "Nota de 1 a 5", bars: this.bars(mediaPorChave(qualF, x => x.fornecedor), "#4CC97A", v => String(v).replace(".", ",")) }
         ]
       },
       econ: {
         title: "Economia por Projetos", sub: "Base DADOS INDICADORES · List = Economia de orçamentos por conta de projetos",
         cols: [["Obra", L], ["Disciplina", L], ["Valor economizado", R], ["Descrição", L]],
         rows: econF.map(x => [x.obra || "—", x.disciplina || "—", this.money(x.valor), x.descricao || "—"]),
-        charts: [{ title: "Economia por obra", sub: "Valor acumulado", bars: this.bars(this.group(econF, x => x.obra, x => x.valor || 0), "#10B981", v => this.short(v)) }]
+        charts: [{ title: "Economia por obra", sub: "Valor acumulado", bars: this.bars(this.group(econF, x => x.obra, x => x.valor || 0), "#4CC97A", v => this.short(v)) }]
       }
     };
     if (this.state.taskModal) {
@@ -5658,7 +5728,7 @@ class Component extends DCLogic {
         title: tm.title, sub: tm.tasks.length + (tm.tasks.length === 1 ? " atividade" : " atividades"),
         cols: [["Obra", L], ["Tarefa", L], ["Status", L], ["Início", R], ["Prazo", R], ["Prioridade", L]],
         rows: tm.tasks.map(t => [(t.sigla ? t.sigla + " · " : "") + t.obra, t.n, this.catLabel(t.cat), this.br(t.s), this.br(t.d), t.pri || "—"]),
-        charts: [{ title: "Atividades por obra", sub: "Quantidade no recorte", bars: this.bars(this.group(tm.tasks, x => x.obra), "#2563EB") }]
+        charts: [{ title: "Atividades por obra", sub: "Quantidade no recorte", bars: this.bars(this.group(tm.tasks, x => x.obra), "#6C7CF5") }]
       };
     }
     const mk = this.state.modal, md = mk ? M[mk] : null;
@@ -5682,23 +5752,23 @@ class Component extends DCLogic {
       fase: f.fase, dias: (f.dias == null ? "—" : f.dias + " d"),
       periodo: this.br(f.start) + " → " + this.br(f.end),
       barStyle: "display:flex;align-items:center;justify-content:flex-end;padding:0 9px;height:100%;border-radius:99px;background:" +
-        (f.fase === "Pré-executivo" ? "#8B5CF6" : f.fase === "Executivo" ? "#2563EB" : f.fase === "Anteprojeto" ? "#06B6D4" : "#10B981") +
+        (f.fase === "Pré-executivo" ? "#A78BEA" : f.fase === "Executivo" ? "#6C7CF5" : f.fase === "Anteprojeto" ? "#33C3F0" : "#4CC97A") +
         ";width:" + Math.max(((f.dias || 0) / maxFase) * 100, 9).toFixed(1) + "%"
     }));
     const geralKpis = [
-      { label: "Fase do projeto", value: faseAtual, sub: proxAxial ? "Próximo: " + proxAxial.label : "Marcos concluídos", icon: "◆", iconStyle: ik("#2563EB"), valueStyle: "font-family:var(--font-heading);font-weight:800;font-size:16px;line-height:1.2", flag: semFlag.flag, flagStyle: semFlag.flagStyle },
-      { label: "Vida útil do projeto", value: vida.dias == null ? "—" : vida.dias + " dias", sub: vida.inicio ? this.br(vida.inicio) + " → " + this.br(vida.fim) : "Sem marcos de início/executivo", icon: "◳", iconStyle: ik("#06B6D4"), valueStyle: vh,
+      { label: "Fase do projeto", value: faseAtual, sub: proxAxial ? "Próximo: " + proxAxial.label : "Marcos concluídos", icon: "◆", iconStyle: ik("#6C7CF5"), valueStyle: "font-family:var(--font-heading);font-weight:800;font-size:16px;line-height:1.2", flag: semFlag.flag, flagStyle: semFlag.flagStyle },
+      { label: "Vida útil do projeto", value: vida.dias == null ? "—" : vida.dias + " dias", sub: vida.inicio ? this.br(vida.inicio) + " → " + this.br(vida.fim) : "Sem marcos de início/executivo", icon: "◳", iconStyle: ik("#33C3F0"), valueStyle: vh,
         flag: vida.origem || "", flagStyle: vida.origem ? "font-size:10.5px;color:var(--slate-400);margin-top:2px" : "display:none" },
-      { label: "Prazo pré-executivo", value: o && o.dataPE ? this.br(o.dataPE) : "—", sub: o && o.pe && o.pe.dias ? "Fase de " + o.pe.dias + " dias" : "Marco axial de pré-executivo", icon: "◷", iconStyle: ik("#8B5CF6"), valueStyle: vh, flag: semFlag.flag, flagStyle: semFlag.flagStyle },
+      { label: "Prazo pré-executivo", value: o && o.dataPE ? this.br(o.dataPE) : "—", sub: o && o.pe && o.pe.dias ? "Fase de " + o.pe.dias + " dias" : "Marco axial de pré-executivo", icon: "◷", iconStyle: ik("#A78BEA"), valueStyle: vh, flag: semFlag.flag, flagStyle: semFlag.flagStyle },
       Object.assign({ label: "Budget comprometido", value: this.money(budgetObra),
-        sub: budgetDisp ? "Disponível " + this.money(budgetDisp) : "Sem budget na planilha SAÍDAS", icon: "R$", iconStyle: ik("#10B981"), valueStyle: vh },
-        dentro == null ? semFlag : dentro ? flag("Dentro do budget", "#10B981") :
-          flag("Acima do budget · " + this.money(budgetObra - budgetDisp), "#EF4444")),
+        sub: budgetDisp ? "Disponível " + this.money(budgetDisp) : "Sem budget na planilha SAÍDAS", icon: "R$", iconStyle: ik("#4CC97A"), valueStyle: vh },
+        dentro == null ? semFlag : dentro ? flag("Dentro do budget", "#4CC97A") :
+          flag("Acima do budget · " + this.money(budgetObra - budgetDisp), "#FF4747")),
       Object.assign({ label: "Budget por m²", value: rm2 == null ? "—" : "R$ " + rm2.toFixed(2).replace(".", ","),
-        sub: ec.m2 ? Math.round(ec.m2).toLocaleString("pt-BR") + " m² construídos" : "Sem m² na planilha SAÍDAS", icon: "m²", iconStyle: ik("#F59E0B"), valueStyle: vh },
-        refM2 == null ? semFlag : rm2 <= refM2 ? flag("Ref. R$ " + refM2.toFixed(2).replace(".", ",") + "/m²", "#10B981") :
-          flag("Ref. R$ " + refM2.toFixed(2).replace(".", ",") + "/m²", "#EF4444")),
-      { label: "Projetos complementares", value: o ? o.pct + "%" : "—", sub: o ? o.doneCompl + " de " + o.totalCompl + " tarefas" : "", icon: "%", iconStyle: ik("#2563EB"), valueStyle: vh + ";color:var(--blue-600)", flag: semFlag.flag, flagStyle: semFlag.flagStyle }
+        sub: ec.m2 ? Math.round(ec.m2).toLocaleString("pt-BR") + " m² construídos" : "Sem m² na planilha SAÍDAS", icon: "m²", iconStyle: ik("#F5A524"), valueStyle: vh },
+        refM2 == null ? semFlag : rm2 <= refM2 ? flag("Ref. R$ " + refM2.toFixed(2).replace(".", ",") + "/m²", "#4CC97A") :
+          flag("Ref. R$ " + refM2.toFixed(2).replace(".", ",") + "/m²", "#FF4747")),
+      { label: "Projetos complementares", value: o ? o.pct + "%" : "—", sub: o ? o.doneCompl + " de " + o.totalCompl + " tarefas" : "", icon: "%", iconStyle: ik("#6C7CF5"), valueStyle: vh + ";color:var(--blue-600)", flag: semFlag.flag, flagStyle: semFlag.flagStyle }
     ];
 
     return Object.assign(base, {
@@ -5716,7 +5786,8 @@ class Component extends DCLogic {
       atrasoNota: atrasosVals.nota, atrasoNotaStyle: atrasosVals.nota ? "margin:12px 0 0;font-size:11px;color:var(--slate-400)" : "display:none",
       prazosObra: !(this.state.bu === "Todos" && !this.state.sigla) && !!this.state.sigla,
       prazosSemObra: this.state.bu !== "Todos" && !this.state.sigla,
-      prazosGantt: this.state.bu === "Todos" || !!this.state.sigla,
+      prazosGantt: !!this.state.sigla,
+      ...(this.state.bu === "Todos" && !this.state.sigla ? this.pz2Vals(list) : this.pz2Vazio()),
       buAtual: this.state.bu,
       semFasesStatus: fases.length === 0,
       prazosNulo: o && o.totalCompl === 0 ? "Esta obra ainda não tem tarefas com a tag eng - complementares no cronograma." : "",
@@ -5736,18 +5807,18 @@ class Component extends DCLogic {
       ganttVazioStyle: g.length ? "display:none" : "margin:0;font-size:12.5px;color:var(--slate-400)",
       ganttWrapStyle: g.length ? "border:1px solid var(--slate-100);border-radius:12px;overflow-x:auto" : "display:none",
       ganttLegendaWrapStyle: g.length ? "display:flex;gap:18px;margin-top:14px;flex-wrap:wrap;align-items:center" : "display:none",
-      ganttHojeStyle: hojeVis ? "position:absolute;top:0;bottom:0;width:2px;background:#EF4444;z-index:1;pointer-events:none;left:" + hojePctPz.toFixed(2) + "%" : "display:none",
-      ganttHojeTagStyle: hojeVis ? "position:absolute;top:6px;transform:translateX(-50%);font-family:var(--font-mono);font-size:9.5px;font-weight:700;color:#fff;background:#EF4444;padding:1px 6px;border-radius:99px;white-space:nowrap;z-index:2;left:" + hojePctPz.toFixed(2) + "%" : "display:none",
+      ganttHojeStyle: hojeVis ? "position:absolute;top:0;bottom:0;width:2px;background:#FF4747;z-index:1;pointer-events:none;left:" + hojePctPz.toFixed(2) + "%" : "display:none",
+      ganttHojeTagStyle: hojeVis ? "position:absolute;top:6px;transform:translateX(-50%);font-family:var(--font-mono);font-size:9.5px;font-weight:700;color:#fff;background:#FF4747;padding:1px 6px;border-radius:99px;white-space:nowrap;z-index:2;left:" + hojePctPz.toFixed(2) + "%" : "display:none",
       ganttForaStyle: g.length && !hojeVis ? "font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:99px;background:var(--amber-50);color:#92400E;white-space:nowrap" : "display:none",
       ganttHojeLegendaStyle: hojeVis ? "display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--slate-500)" : "display:none",
       ganttRef: this.scrollRef(g.length ? (hojeVis ? hojePctPz : hojePctPz > 100 ? 100 : 0) : null, 270, "pz|" + (o ? o.sigla : "")),
       geralKpis: geralKpis,
       resumo: [
-        { label: "Riscos em aberto", value: String(riscosAtivos.length), color: "#EF4444", go: this.openModal("risco") },
-        { label: "Desvio LB de PE", value: String(desvioRows.length), color: "#F59E0B", go: this.openModal("desvio") },
+        { label: "Riscos em aberto", value: String(riscosAtivos.length), color: "#FF4747", go: this.openModal("risco") },
+        { label: "Desvio LB de PE", value: String(desvioRows.length), color: "#F5A524", go: this.openModal("desvio") },
         { label: "Estouro por projetos", value: "—", color: "var(--slate-400)", go: this.openModal("estouro") },
-        { label: "Alterações", value: String(altF.length), color: "#8B5CF6", go: this.openModal("alt") },
-        { label: "Qualidade média", value: mediaQual == null ? "—" : mediaQual.toFixed(1).replace(".", ","), color: "#2563EB", go: this.openModal("qual") }
+        { label: "Alterações", value: String(altF.length), color: "#A78BEA", go: this.openModal("alt") },
+        { label: "Qualidade média", value: mediaQual == null ? "—" : mediaQual.toFixed(1).replace(".", ","), color: "#6C7CF5", go: this.openModal("qual") }
       ],
       indCards,
       impLabels: il.slice().reverse(), probLabels: pl, matriz, matrizNota, nRiscos: riscosF.length,
@@ -5759,7 +5830,7 @@ class Component extends DCLogic {
         score: this.riscoScore(x) == null ? "—" : String(this.riscoScore(x)),
         ip: this.riscoScore(x) == null ? "" : "I" + x.impacto + " × P" + x.probabilidade,
         ipStyle: this.riscoScore(x) == null ? "display:none" : "display:block;font-size:10px;color:var(--slate-400);margin-top:3px;font-family:var(--font-mono)",
-        scoreStyle: (() => { const s = this.riscoScore(x); const c = s == null ? "#94A3B8" : s >= 15 ? "#EF4444" : s >= 8 ? "#F59E0B" : s >= 4 ? "#3B82F6" : "#10B981";
+        scoreStyle: (() => { const s = this.riscoScore(x); const c = s == null ? "#B4B7C0" : s >= 15 ? "#FF4747" : s >= 8 ? "#F5A524" : s >= 4 ? "#6C7CF5" : "#4CC97A";
           return "display:inline-block;min-width:30px;font-family:var(--font-heading);font-size:12px;font-weight:800;padding:3px 8px;border-radius:8px;background:" + c + "1F;color:" + c; })(),
         tagStyle: "font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;background:" +
           (x.status === "RISCO TRATADO" ? "#ECFDF5;color:#065F46" : x.status === "RISCO EM ANÁLISE" ? "#FFFBEB;color:#92400E" : "#FEF2F2;color:#991B1B")
@@ -5767,9 +5838,9 @@ class Component extends DCLogic {
       finKpis, finPorObra, finContratos, finEscopo: this.state.sigla && o ? o.nome : this.state.bu === "Todos" ? "todas as obras" : this.state.bu,
       pie, curvaLine, curvaArea, curvaGrid, curvaTicks, contratadoY: Y(totContratado).toFixed(1),
       curvaTextosY: this.svgText(curvaGrid.map(g => ({ label: g.label, attrs: { x: 40, y: g.ty } })),
-        { textAnchor: "end", fontSize: 10, fill: "#94A3B8", fontFamily: "DM Mono, monospace" }),
+        { textAnchor: "end", fontSize: 10, fill: "#B4B7C0", fontFamily: "DM Mono, monospace" }),
       curvaTextosX: this.svgText(curvaTicks.map(t => ({ label: t.label, attrs: { x: t.x, y: 252 } })),
-        { textAnchor: "middle", fontSize: 10, fill: "#94A3B8", fontFamily: "DM Mono, monospace" }),
+        { textAnchor: "middle", fontSize: 10, fill: "#B4B7C0", fontFamily: "DM Mono, monospace" }),
       finVazio: finAll.length === 0, benchCharts,
       modalOpen: !!md, modalTitle: md ? md.title : "", modalSub: md ? md.sub : "",
       modalRiscoPainel: !!(md && md.painel),
@@ -5800,8 +5871,8 @@ class Component extends DCLogic {
       }) : [],
       matrizFaixas,
       riscoCharts: [
-        { title: "Riscos por disciplina", sub: "Quantidade de riscos identificados", bars: this.bars(this.group(riscosF, x => x.disciplina), "#8B5CF6") },
-        { title: "Riscos por status", sub: "Distribuição do tratamento", bars: this.bars(this.group(riscosF, x => x.status), "#F59E0B") }
+        { title: "Riscos por disciplina", sub: "Quantidade de riscos identificados", bars: this.bars(this.group(riscosF, x => x.disciplina), "#A78BEA") },
+        { title: "Riscos por status", sub: "Distribuição do tratamento", bars: this.bars(this.group(riscosF, x => x.status), "#F5A524") }
       ].map(c => ({ title: c.title, sub: c.sub, bars: c.bars, vazio: c.bars.length === 0 })),
       modalEmpty: !!md && md.rows.length === 0 && mk !== "estouro",
       modalCharts: md ? md.charts.map(c => ({ title: c.title, sub: c.sub, bars: c.bars, vazio: c.bars.length === 0 })) : []
