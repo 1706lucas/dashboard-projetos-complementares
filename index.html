@@ -2736,7 +2736,10 @@ class Component extends DCLogic {
     if (/^#estouro=/.test(location.hash)) this.setState({ page: "Lançamento Financeiro" });
     this.iniciar();
     try { const raw = localStorage.getItem(this.SKEY); if (raw) this.setState({ semanal: JSON.parse(raw) }); } catch (e) { /* ignora */ }
-    try { const raw = localStorage.getItem(this.UKEY); if (raw) this.setState({ uploads: JSON.parse(raw) }); } catch (e) { /* ignora */ }
+    try { const raw = localStorage.getItem(this.UKEY); if (raw) { const u = JSON.parse(raw) || {};
+      // R32: o cronograma vem só do robô (ClickUp). Upload antigo guardado neste navegador é apagado.
+      if (u.cronograma) { delete u.cronograma; try { localStorage.setItem(this.UKEY, JSON.stringify(u)); } catch (e2) {} }
+      this.setState({ uploads: u }); } } catch (e) { /* ignora */ }
     try { const raw = localStorage.getItem(this.RKEY); if (raw) this.setState({ restr: JSON.parse(raw) }); } catch (e) { /* ignora */ }
     let tema = "claro";
     try { tema = localStorage.getItem(this.TKEY) || "claro"; } catch (e) { /* ignora */ }
@@ -3192,6 +3195,7 @@ class Component extends DCLogic {
         if (kind === "indicadores") {
           uploads.indicadores = { arquivo: f.name, quando, dados: X.mapIndicadores(wb) };
         } else if (kind === "cronograma") {
+          if (!window.__cronoManual) { erros.push(f.name + ": o cronograma agora vem só do robô (ClickUp) — não é mais preciso enviar a planilha"); continue; }
           const obras = (uploads.siglas ? uploads.siglas.dados : (this.state.data ? this.state.data.obras : [])) || [];
           const novo = X.mapCronograma(wb, obras, new Date().toISOString().slice(0, 10));
           const snap = X.snapshotCompl(wb);
@@ -3301,7 +3305,7 @@ class Component extends DCLogic {
     const u0 = this.state.uploads || {};
     // upload de cronograma feito no navegador só vale se for mais novo que a última leitura automática do ClickUp
     const robo = String((d.automatico && d.automatico.quando) || d.geradoEm || "").slice(0, 10);
-    const u = Object.assign({}, u0); if (u.cronograma && robo && String(u.cronograma.quando || "") < robo) delete u.cronograma;
+    const u = Object.assign({}, u0); delete u.cronograma; // R32: robô é a única fonte do cronograma
     if (!Object.keys(u).length) return d;
     const out = Object.assign({}, d);
     if (u.siglas) {
@@ -3443,7 +3447,7 @@ class Component extends DCLogic {
         ["obras", new Set(((d.pendencias && d.pendencias.itens) || []).map(p => this.norm(p.obra))).size]] : [],
       siglas: d ? [["empreendimentos", d.obras.length]] : []
     };
-    const fontes = Object.keys(this.FONTES).map(k => {
+    const fontes = Object.keys(this.FONTES).filter(k => k !== "cronograma").map(k => {
       const f = this.FONTES[k], up = u[k];
       return { titulo: f.titulo, cor: f.cor, alimenta: f.alimenta,
         arquivo: up ? up.arquivo : f.arquivo,
@@ -4139,6 +4143,9 @@ class Component extends DCLogic {
     const resumo = Object.keys(porSt).sort((x, y) => porSt[y] - porSt[x]).map(st => { const c = COR(st); return pill(porSt[st] + " " + st.toLowerCase(), c[0], c[1]); })
       .concat(ativo ? [pill("filtrado: " + itens.length + " de " + todos.length, "var(--blue-50)", "var(--blue-700)")] : [])
       .concat(((cards[0] && cards[0].resumo) || []).filter(x => /^⚠/.test(x.t)));
+    { const ci = this.cronoInfo(this.dados());
+      resumo.unshift(ci.velha ? pill("⚠ ClickUp lido em " + ci.txt + (ci.falha ? " · última leitura FALHOU" : " · dado antigo"), "#FEE2E2", "#991B1B")
+        : pill("✓ ClickUp lido em " + ci.txt, "#D1FAE5", "#065F46")); }
     const atr = itens.filter(t => /EM ATRASO/.test(stDe(t))).length;
     return [{ titulo: "Atividades de curto prazo, atrasadas e em andamento", sub: "Em atraso, em aberto com prazo correndo ou vencido, em progresso e a iniciar em até 15 dias · status como está no ClickUp",
       n: String(itens.length), nStyle: "font-family:var(--font-heading);font-weight:900;font-size:26px;line-height:1;color:" + (atr ? "#B91C1C" : "var(--slate-700)"),
@@ -4196,6 +4203,20 @@ class Component extends DCLogic {
         resumo: [pill(nProg + " em progresso", "#FEF3C7", "#92400E"), pill(nIni + " a iniciar em até 15 dias", "#DBEAFE", "#1E40AF")].concat(avisoV),
         itens: medio.map(x => x[1]), vazio: !medio.length, vazioTxt: "Nenhuma subatividade em progresso ou iniciando nos próximos 15 dias." }
     ];
+  }
+  // R32: quando o cronograma foi lido do ClickUp de verdade (o robô pode rodar e falhar só no cronograma)
+  cronoInfo(d) {
+    if (!d) return { quando: null, falha: null, velha: false, h: null };
+    const a = d.automatico || {};
+    const lFalha = (a.log || []).find(l => /^cronograma NÃO atualizado/.test(String(l)));
+    const lOk = (a.log || []).some(l => /^cronograma: \d+ tarefas/.test(String(l)));
+    const falha = d.cronoErro ? d.cronoErro.msg : lFalha ? String(lFalha).replace(/^cronograma NÃO atualizado:\s*/, "") : null;
+    const lidos = (d.obras || []).map(o => o.lidoEm).filter(Boolean).sort();
+    const quando = d.cronoLido && d.cronoLido.quando ? d.cronoLido.quando : !falha && lOk && a.quando ? a.quando : lidos.length ? lidos[lidos.length - 1] + "T12:00:00Z" : null;
+    const q = quando ? Date.parse(quando) : NaN, h = isNaN(q) ? null : (Date.now() - q) / 36e5;
+    const soDia = !!quando && /T12:00:00Z$/.test(quando) && !(d.cronoLido && d.cronoLido.quando);
+    const txt = isNaN(q) ? "data desconhecida" : soDia ? new Date(q).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) : new Date(q).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+    return { quando, txt, falha, h, velha: !!falha || h == null || h > 26 };
   }
   fuHoje() { const t = new Date(Date.now() - 3 * 3600e3); return t.toISOString().slice(0, 10); }
   fuDados(nome, sigla) {
@@ -5272,12 +5293,14 @@ class Component extends DCLogic {
       nav, pageTitle: gAtual || page, pageSub: page === "Financeiro" && this.state.fin && this.state.fin.base && (this.state.fin.base.obras || []).length ? subs[page] + " · fonte: Lançamento Financeiro" : subs[page], subTabs, temSubTabs: subTabs.length > 1,
       geradoEm: d ? d.geradoEm.split("-").reverse().join("/") : "—",
       ...(() => { // aviso de base desatualizada: última atualização automática (ou data da base) com mais de 26 h
-        const q = d && d.automatico && d.automatico.quando ? Date.parse(d.automatico.quando) : d && d.geradoEm ? Date.parse(d.geradoEm + "T10:00:00Z") : NaN;
-        const h = isNaN(q) ? null : (Date.now() - q) / 36e5;
-        const velha = h != null && h > 26;
+        const ci = this.cronoInfo(d);
+        const q = ci.quando ? Date.parse(ci.quando) : NaN;
+        const h = ci.h;
+        const velha = !!d && ci.velha;
         const quando = isNaN(q) ? "" : new Date(q).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
         return { baseVelha: velha, baseVelhaAdm: velha && !!(this.state.sessao && this.state.sessao.perfil === "admin"),
-          baseVelhaTxt: "Dados do ClickUp desatualizados: última atualização em " + quando + " (" + Math.floor((h || 0) / 24) + " dia(s)). Status e prazos podem não refletir o ClickUp." }; })(),
+          baseVelhaTxt: ci.falha ? "O robô rodou, mas NÃO conseguiu ler o cronograma do ClickUp (" + ci.falha + "). Status e prazos são da leitura de " + (quando || "data desconhecida") + "."
+            : "Dados do ClickUp desatualizados: última leitura do cronograma em " + (quando || "data desconhecida") + (h != null ? " (" + Math.floor(h / 24) + " dia(s))" : "") + ". Status e prazos podem não refletir o ClickUp." }; })(),
       versao: "v1.9",
       logo: React.createElement("img", { src: "data/logo-gadens.png", alt: "Grupo Gadens",
         style: { width: "40px", height: "auto", flexShrink: 0, display: "block" } }),
