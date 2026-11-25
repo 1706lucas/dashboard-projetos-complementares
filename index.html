@@ -4716,7 +4716,7 @@ class Component extends DCLogic {
       (a.obras[o.sigla] = a.obras[o.sigla] || { obra: o.nome, sigla: o.sigla, tasks: [] }).tasks.push(tk); a.all.push(tk);
     })));
     const c = (l, k) => l.filter(t => t.cat === k).length;
-    const analistas = Object.keys(por).map(k => { const a = por[k], ab = a.all.filter(t => t.cat !== "concluido" && t.cat !== "cancelado");
+    const analistas = Object.keys(por).map(k => { const a = por[k], ab = a.all.filter(t => t.cat !== "concluido" && t.cat !== "concluido_atraso" && t.cat !== "cancelado");
       return { name: a.name, total: a.all.length, atrasada: c(a.all, "atrasada"), andamento: c(a.all, "andamento") + c(a.all, "andamento_atraso"),
         andamentoForaPrazo: c(a.all, "andamento_atraso"), semInicioVencido: c(a.all, "sem_inicio_vencido"), semInicio: c(a.all, "sem_inicio"),
         concluidoAtraso: c(a.all, "concluido_atraso"), cancelado: c(a.all, "cancelado"),
