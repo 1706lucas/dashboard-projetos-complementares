@@ -5,6 +5,7 @@ const SUPORTE = { documento: 1, formulario: 1, indicador: 1 };
 const TIPOS = {
   atividade: { nome: "Atividade", w: 138, h: 66 },
   subprocesso: { nome: "Subprocesso", w: 138, h: 66 },
+  decisao: { nome: "Decisão", w: 104, h: 70 },
   documento: { nome: "Documento", w: 138, h: 58 },
   formulario: { nome: "Formulário", w: 138, h: 58 },
   indicador: { nome: "Indicador", w: 138, h: 58 },
@@ -124,6 +125,14 @@ a.pc-no{cursor:pointer}a.pc-no:hover{box-shadow:0 0 0 3px var(--blue-50,#EFF6FF)
 .pc-no.fim i{border-color:#B91C1C;background:#FCA5A5}
 .pc-edita .pc-no{cursor:move}
 .pc-no.sel{outline:2px solid var(--blue-500,#3B82F6);outline-offset:2px}
+.pc-no.decisao{background:transparent;border:0;padding:12px 20px;font-size:10px;line-height:1.15;isolation:isolate}
+.pc-no.decisao span{position:relative;z-index:1;color:#422006}
+.pc-no.decisao .pc-los{position:absolute;inset:0;width:100%;height:100%;z-index:0;overflow:visible}
+.pc-no.decisao .pc-los polygon{fill:#FEF08A;stroke:#CA8A04;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.pc-no.decisao.sel{outline:0}.pc-no.decisao.sel .pc-los polygon{stroke:var(--blue-500,#3B82F6);stroke-width:3}
+.pc-no.decisao .pc-ponto{right:-9px}
+.pc-rot{font-size:11px;font-weight:800;fill:var(--slate-500,#64748B);paint-order:stroke;stroke:var(--card,#fff);stroke-width:3px}
+.pc-rot.sim{fill:#15803D}.pc-rot.nao{fill:#B91C1C}
 .pc-no.mira{outline:3px solid #10B981;outline-offset:2px}
 .pc-ponto{position:absolute;right:-9px;top:50%;margin-top:-9px;width:18px;height:18px;border-radius:99px;background:var(--blue-600,#2563EB);border:3px solid #fff;cursor:crosshair;box-shadow:0 1px 3px rgba(15,23,42,.35)}
 .pc-lateral{flex:0 0 250px;display:flex;flex-direction:column;gap:9px;align-self:flex-start}
@@ -169,6 +178,26 @@ function caminho(a, b) {
   const direita = n => redondo(n.tipo) ? n.x + TIPOS[n.tipo].w / 2 + 16 : n.x + TIPOS[n.tipo].w;
   const esquerda = n => redondo(n.tipo) ? n.x + TIPOS[n.tipo].w / 2 - 16 : n.x;
   const cy = n => redondo(n.tipo) ? n.y + 15 : n.y + TIPOS[n.tipo].h / 2;
+  // losango: entra e sai por qualquer uma das 4 pontas, a que estiver virada para o outro item
+  if (a.tipo === "decisao" || b.tipo === "decisao") {
+    const cx = n => n.x + TIPOS[n.tipo].w / 2;
+    const ponta = (n, o) => { const T = TIPOS[n.tipo], dx = cx(o) - cx(n), dy = cy(o) - cy(n);
+      const hor = Math.abs(dx) * (T.h / T.w) >= Math.abs(dy);
+      if (n.tipo === "decisao") return hor ? { x: dx >= 0 ? n.x + T.w : n.x, y: cy(n), h: 1 } : { x: cx(n), y: dy >= 0 ? n.y + T.h : n.y, h: 0 };
+      return null; };
+    const lado = (n, o, h) => { const T = TIPOS[n.tipo], r = redondo(n.tipo), dx = cx(o) - cx(n), dy = cy(o) - cy(n);
+      if (h) return { x: dx >= 0 ? direita(n) : esquerda(n), y: cy(n), h: 1 };
+      return { x: cx(n), y: dy >= 0 ? (r ? n.y + 30 : n.y + T.h) : n.y, h: 0 }; };
+    let P = ponta(a, b), Q = ponta(b, a);
+    if (!P) P = lado(a, b, Q.h); if (!Q) Q = lado(b, a, P.h);
+    const r = v => Math.round(v);
+    if (P.h && Q.h && Math.abs(P.y - Q.y) < 6) return "M" + r(P.x) + " " + r(P.y) + " H" + r(Q.x);
+    if (!P.h && !Q.h && Math.abs(P.x - Q.x) < 6) return "M" + r(P.x) + " " + r(P.y) + " V" + r(Q.y);
+    if (P.h && Q.h) { const m = r((P.x + Q.x) / 2); return "M" + r(P.x) + " " + r(P.y) + " H" + m + " V" + r(Q.y) + " H" + r(Q.x); }
+    if (!P.h && !Q.h) { const m = r((P.y + Q.y) / 2); return "M" + r(P.x) + " " + r(P.y) + " V" + m + " H" + r(Q.x) + " V" + r(Q.y); }
+    if (P.h) return "M" + r(P.x) + " " + r(P.y) + " H" + r(Q.x) + " V" + r(Q.y);
+    return "M" + r(P.x) + " " + r(P.y) + " V" + r(Q.y) + " H" + r(Q.x);
+  }
   if (suporte(a) || suporte(b) || a.tipo === "subprocesso" && Math.abs(ax - bx) < 40 || b.tipo === "subprocesso" && Math.abs(ax - bx) < 40) {
     if (Math.abs(ay - by) >= Math.abs(ax - bx) * .5) {
       const desce = by > ay, y1 = desce ? a.y + A.h : a.y, y2 = desce ? b.y : b.y + B.h;
@@ -246,6 +275,13 @@ export function montar(raiz, opts) {
       const d = caminho(a, b), sup = suporte(a) || suporte(b) || a.tipo === "subprocesso" && b.tipo === "atividade" && Math.abs(a.x - b.x) < 40;
       const sel = S.sel && S.sel.seta === s.id;
       h += '<path class="pc-seta' + (sup ? " sup" : "") + (sel ? " sel" : "") + '" d="' + d + '" marker-end="url(#pc-pt)"/>';
+      if (s.rot) { const m = /^M(-?[\d.]+) (-?[\d.]+) ?([HVL])(-?[\d.]+)(?: (-?[\d.]+))?/.exec(d);
+        if (m) { const x = +m[1], y = +m[2], c = m[3], v1 = +m[4];
+          const vert = c === "V" || (c === "L" && Math.abs(v1 - x) < 1), alvo = c === "L" ? (vert ? +m[5] : v1) : v1;
+          const neg = vert ? alvo < y : alvo < x;
+          const esc = String(s.rot).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]);
+          const tx = vert ? x + 7 : neg ? x - 8 : x + 8, ty = vert ? (neg ? y - 7 : y + 15) : y - 7;
+          h += '<text class="pc-rot' + (/^n[aã]o$/i.test(s.rot.trim()) ? " nao" : /^sim$/i.test(s.rot.trim()) ? " sim" : "") + '"' + (!vert && neg ? ' text-anchor="end"' : "") + ' x="' + tx + '" y="' + ty + '">' + esc + '</text>'; } }
       if (S.edita) h += '<path class="pc-alvo" data-seta="' + s.id + '" d="' + d + '"/>'; });
     svg.innerHTML = h;
   }
@@ -262,6 +298,8 @@ export function montar(raiz, opts) {
       else if (suporte(n) && !lk) d.title = "Link ainda não cadastrado";
       if (ICONE[n.tipo]) { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.innerHTML = ICONE[n.tipo]; d.appendChild(s); }
       if (n.tipo === "inicio" || n.tipo === "fim") d.appendChild(el("i"));
+      if (n.tipo === "decisao") { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("class", "pc-los"); s.setAttribute("viewBox", "0 0 " + t.w + " " + t.h); s.setAttribute("preserveAspectRatio", "none");
+        s.innerHTML = '<polygon points="' + t.w / 2 + ',2 ' + (t.w - 2) + ',' + t.h / 2 + ' ' + t.w / 2 + ',' + (t.h - 2) + ' 2,' + t.h / 2 + '"/>'; d.appendChild(s); d.style.height = t.h + "px"; }
       d.appendChild(el("span", null, n.texto || t.nome));
       if (S.edita && S.sel && S.sel.no === n.id) { d.classList.add("sel"); const pt = el("div", "pc-ponto"); pt.style.transform = "scale(" + 1 / S.z + ")"; d.appendChild(pt); }
       mundo.appendChild(d);
@@ -372,6 +410,11 @@ export function montar(raiz, opts) {
       lateral.appendChild(botao("Excluir item", excluir, "per"));
     } else if (S.sel && S.sel.seta) {
       lateral.appendChild(el("h4", null, "Seta selecionada"));
+      { const s = fase().setas.find(x => x.id === S.sel.seta);
+        if (s) { const ri = el("input"); ri.placeholder = "ex.: Sim / Não / Aprovado"; ri.value = s.rot || ""; ri.maxLength = 24; ri.addEventListener("focus", marca);
+          ri.addEventListener("input", () => { const v = ri.value.trim(); if (v) s.rot = v; else delete s.rot; guarda(); desenhaSetas(); });
+          const at = el("div", "pc-paleta"); [["Sim"], ["Não"]].forEach(o => at.appendChild(botao(o[0], () => { marca(); s.rot = o[0]; ri.value = o[0]; guarda(); desenhaSetas(); })));
+          lateral.append(campo("Rótulo da seta", ri), at); } }
       lateral.appendChild(botao("Excluir seta", excluir, "per"));
     } else lateral.appendChild(el("p", "pc-aviso", "Selecione um item para editar. Arraste para mover. Delete exclui o selecionado."));
   }
@@ -446,7 +489,11 @@ export function montar(raiz, opts) {
     if (!g) return; const v = g; g = null; palco.classList.remove("arrasta");
     if (v.tipo === "move" && v.moveu) guarda();
     if (v.tipo === "liga") { const f = fase();
-      if (v.mira && !f.setas.some(s => s.de === v.n.id && s.para === v.mira)) { marca(); f.setas.push({ id: novoId("s"), de: v.n.id, para: v.mira }); guarda(); }
+      if (v.mira && !f.setas.some(s => s.de === v.n.id && s.para === v.mira)) { marca();
+        const nova = { id: novoId("s"), de: v.n.id, para: v.mira };
+        if (v.n.tipo === "decisao") { const ja = f.setas.filter(s => s.de === v.n.id).map(s => String(s.rot || "").toLowerCase());
+          nova.rot = ja.indexOf("sim") < 0 ? "Sim" : ja.indexOf("não") < 0 ? "Não" : ""; if (!nova.rot) delete nova.rot; }
+        f.setas.push(nova); S.sel = { seta: nova.id }; guarda(); }
       tudo(); }
   };
   palco.addEventListener("pointerup", fimGesto); palco.addEventListener("pointercancel", fimGesto);
