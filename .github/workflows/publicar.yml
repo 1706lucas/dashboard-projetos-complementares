@@ -8,29 +8,26 @@ on:
     - cron: "0 10 * * 0,6"        # sábado e domingo: 07h de Brasília
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
 concurrency:
   group: publicar
   cancel-in-progress: false
 
 jobs:
-  publicar:
+  # 1) lê o ClickUp, salva os dados e empacota o site
+  preparar:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+    permissions:
+      contents: write
+    outputs:
+      alerta: ${{ steps.robo.outputs.alerta }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         if: github.event_name != 'push'
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Buscar dados no ClickUp
         id: robo
@@ -48,26 +45,52 @@ jobs:
           git add data/dashboard.json.enc data/historico.json.enc
           if git diff --cached --quiet; then echo "Sem mudanças nos dados."; exit 0; fi
           git commit -m "Dados do ClickUp $(date -u +'%F %H:%M')"
-          # se alguém subiu arquivos enquanto o robô rodava, junta antes de enviar (antes isso derrubava a atualização)
           for i in 1 2 3; do
             git pull --rebase -X theirs origin main && git push && exit 0
             echo "Tentativa $i falhou, tentando de novo em 20 s"; sleep 20
           done
           exit 1
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: .
+
+  # 2) publica em job separado (contorna a falha "No artifacts named github-pages" do GitHub)
+  publicar:
+    needs: preparar
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+      actions: read
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url || steps.deploy2.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+
       - id: deploy
         uses: actions/deploy-pages@v4
+        continue-on-error: true
 
-      # Publica mesmo assim e, no fim, marca a execução como FALHA quando o cronograma não foi lido.
-      # Execução com falha = e-mail automático do GitHub para o dono do repositório.
+      - name: Aguardar antes da 2ª tentativa
+        if: steps.deploy.outcome == 'failure'
+        run: sleep 60
+
+      - id: deploy2
+        if: steps.deploy.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+
+  # 3) alerta: execução marcada como falha quando o cronograma não foi lido (o GitHub envia o e-mail)
+  alerta:
+    needs: [preparar, publicar]
+    if: always() && needs.preparar.outputs.alerta != ''
+    runs-on: ubuntu-latest
+    steps:
       - name: Alerta - leitura do ClickUp incompleta
-        if: steps.robo.outputs.alerta != ''
         env:
-          ALERTA: ${{ steps.robo.outputs.alerta }}
+          ALERTA: ${{ needs.preparar.outputs.alerta }}
         run: |
           echo "::error title=Dashboard com dados antigos::$ALERTA"
           exit 1
